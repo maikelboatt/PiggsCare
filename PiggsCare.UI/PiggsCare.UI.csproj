@@ -10,7 +10,6 @@
 
     <ItemGroup>
         <Folder Include="Components\"/>
-        <Folder Include="Views\"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -22,6 +21,10 @@
         <Resource Include="Assets\Icons\Logo2.jpeg">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Resource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\PiggsCare.Core\PiggsCare.Core.csproj"/>
     </ItemGroup>
 
 </Project>

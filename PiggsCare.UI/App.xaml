@@ -1,0 +1,17 @@
+﻿<Application x:Class="PiggsCare.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--  Default theme of application  -->
+                <ResourceDictionary Source="Themes/LightTheme.xaml" />
+
+                <ResourceDictionary Source="Assets/Icons/Icons.xaml" />
+                <ResourceDictionary Source="Styles/ButtonStyle.xaml" />
+                <ResourceDictionary Source="Styles/RadioButtonStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

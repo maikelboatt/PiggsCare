@@ -33,12 +33,11 @@
                                        VerticalAlignment="Center"
                                        RadiusX="3"
                                        RadiusY="3">
-                                <Rectangle.BitmapEffect>
-                                    <DropShadowBitmapEffect Direction="0"
-                                                            ShadowDepth="3"
-                                                            Softness="0.6"
-                                                            Color="#5B8DEF" />
-                                </Rectangle.BitmapEffect>
+                                <Rectangle.Effect>
+                                    <DropShadowEffect Direction="0"
+                                                      ShadowDepth="3"
+                                                      Color="#5B8DEF" />
+                                </Rectangle.Effect>
                             </Rectangle>
 
                             <!--  Icon  -->
@@ -66,13 +65,13 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="txtName" Property="Foreground" Value="{DynamicResource SecundaryTextColor}" />
-                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource SecundaryTextColor}" />
+                            <Setter TargetName="txtName" Property="Foreground" Value="{DynamicResource SecondaryTextColor}" />
+                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource SecondaryTextColor}" />
                             <Setter TargetName="btnSelected" Property="Background" Value="{DynamicResource TertiaryBackgroundColor}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource TertiaryTextColor}" />
-                            <Setter TargetName="Indicator" Property="Fill" Value="{DynamicResource SecundaryBlueColor}" />
+                            <Setter TargetName="Indicator" Property="Fill" Value="{DynamicResource SecondaryBlueColor}" />
                             <Setter TargetName="btnSelected" Property="Background" Value="{DynamicResource TertiaryBackgroundColor}" />
                             <Setter TargetName="txtName" Property="Foreground" Value="{DynamicResource TertiaryTextColor}" />
                         </Trigger>
@@ -85,7 +84,7 @@
 
     <!--  Start: ToggleButtonStyle  -->
     <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}">
-        <Setter Property="Background" Value="{DynamicResource SecundaryWhiteColor}" />
+        <Setter Property="Background" Value="{DynamicResource SecondaryWhiteColor}" />
         <Setter Property="BorderBrush" Value="{DynamicResource PrimaryWhiteColor}" />
         <Setter Property="Height" Value="20" />
         <Setter Property="Width" Value="35" />
@@ -103,9 +102,9 @@
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="7">
                             <!--  Optional  -->
-                            <!--<Border.Effect>
-                                <DropShadowEffect ShadowDepth="0.5" Opacity=".2"/>
-                            </Border.Effect>-->
+                            <Border.Effect>
+                                <DropShadowEffect Opacity=".2" ShadowDepth="0.5" />
+                            </Border.Effect>
                         </Border>
                         <Ellipse x:Name="Ellipse"
                                  Width="20"
@@ -116,9 +115,9 @@
                                  Stroke="{TemplateBinding BorderBrush}"
                                  StrokeThickness="3">
                             <!--  Optional  -->
-                            <!--<Ellipse.Effect>
-                                <DropShadowEffect ShadowDepth="0.5" Opacity=".2"/>
-                            </Ellipse.Effect>-->
+                            <Ellipse.Effect>
+                                <DropShadowEffect Opacity=".2" ShadowDepth="0.5" />
+                            </Ellipse.Effect>
                         </Ellipse>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -154,7 +153,7 @@
                         </EventTrigger>
 
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Ellipse" Property="Fill" Value="{DynamicResource SecundaryBlueColor}" />
+                            <Setter TargetName="Ellipse" Property="Fill" Value="{DynamicResource SecondaryBlueColor}" />
                             <Setter TargetName="Ellipse" Property="Stroke" Value="{DynamicResource PrimaryTextColor}" />
                         </Trigger>
                     </ControlTemplate.Triggers>

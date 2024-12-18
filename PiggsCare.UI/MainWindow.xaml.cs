@@ -1,23 +1,43 @@
-﻿using System.Text;
+﻿using PiggsCare.UI.Themes;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace PiggsCare.UI;
-
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow:Window
+namespace PiggsCare.UI
 {
-    public MainWindow()
+    /// <summary>
+    ///     Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow:Window
     {
-        InitializeComponent();
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void Themes_Click( object sender, RoutedEventArgs e )
+        {
+            if (Themes.IsChecked == true)
+            {
+                ThemesController.SetTheme(ThemeTypes.Dark);
+            }
+            else
+            {
+                ThemesController.SetTheme(ThemeTypes.Light);
+            }
+        }
+
+        private void CloseButton_OnClick( object sender, RoutedEventArgs e )
+        {
+            Close();
+        }
+
+        private void RestoreButton_OnClick( object sender, RoutedEventArgs e )
+        {
+            WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+        }
+
+        private void MinimizeButton_OnClick( object sender, RoutedEventArgs e )
+        {
+            WindowState = WindowState.Minimized;
+        }
     }
 }

@@ -23,8 +23,8 @@ namespace PiggsCare.UI.Themes
 
             switch (theme)
             {
-                case ThemeTypes.Light: themeName = "Light"; break;
-                case ThemeTypes.Dark: themeName = "Dark"; break;
+                case ThemeTypes.Light: themeName = "LightTheme"; break;
+                case ThemeTypes.Dark: themeName = "DarkTheme"; break;
             }
 
             try

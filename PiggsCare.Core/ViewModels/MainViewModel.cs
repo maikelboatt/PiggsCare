@@ -5,7 +5,7 @@ namespace PiggsCare.Core.ViewModels
 {
     public class MainViewModel:ViewModelBase
     {
-        private ViewModelBase _currentViewModel = new HomeViewModel();
+        private ViewModelBase _currentViewModel = new AnalyticsViewModel();
         public ViewModelBase CurrentViewModel
         {
             get => _currentViewModel;

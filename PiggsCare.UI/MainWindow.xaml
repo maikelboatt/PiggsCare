@@ -8,7 +8,7 @@
         x:Name="Home"
         Title="MainWindow"
         Width="1000"
-        Height="720"
+        Height="620"
         d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel}"
         AllowsTransparency="True"
         Background="Transparent"
@@ -21,6 +21,10 @@
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
             <views:HomeView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:AnalyticsViewModel}">
+            <views:AnalyticsView />
         </DataTemplate>
     </Window.Resources>
 
@@ -67,15 +71,16 @@
                     <!--  Start Navigation Buttons  -->
                     <StackPanel Grid.Row="1">
                         <RadioButton Margin="0,30,0,0"
+                                     Content="Analytics"
+                                     IsChecked="True"
+                                     Style="{DynamicResource MenuRadioButtonStyle}"
+                                     Tag="{DynamicResource analytics}" />
+
+                        <RadioButton Margin="0,1,0,1"
                                      Command="{Binding NavigateToHome}"
                                      Content="Home"
                                      Style="{DynamicResource MenuRadioButtonStyle}"
                                      Tag="{DynamicResource home}" />
-
-                        <RadioButton Margin="0,1,0,1"
-                                     Content="Analytics"
-                                     Style="{DynamicResource MenuRadioButtonStyle}"
-                                     Tag="{DynamicResource analytics}" />
 
                         <RadioButton Content="Messages"
                                      Style="{DynamicResource MenuRadioButtonStyle}"

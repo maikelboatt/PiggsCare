@@ -9,18 +9,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Components\" />
+        <Folder Include="Components\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Assets\Icons\Logo1.png" />
-        <Resource Include="Assets\Icons\Logo1.png">
+        <None Remove="Assets\Icons\Logo1.png"/>
+        <None Remove="Assets\Icons\Logo2.jpeg"/>
+        <ProjectReference Include="..\PiggsCare.Core\PiggsCare.Core.csproj"/>
+        <None Remove="Assets\Icons\logo2.png"/>
+        <Resource Include="Assets\Icons\logo2.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Resource>
-        <None Remove="Assets\Icons\Logo2.jpeg" />
-        <ProjectReference Include="..\PiggsCare.Core\PiggsCare.Core.csproj" />
-        <Resource Include="Assets\Icons\Logo2.jpeg">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <None Remove="Assets\Icons\logo.png" />
+        <Resource Include="Assets\Icons\logo.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Resource>
     </ItemGroup>
 

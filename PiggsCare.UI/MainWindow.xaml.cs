@@ -15,14 +15,7 @@ namespace PiggsCare.UI
 
         private void Themes_Click( object sender, RoutedEventArgs e )
         {
-            if (Themes.IsChecked == true)
-            {
-                ThemesController.SetTheme(ThemeTypes.Dark);
-            }
-            else
-            {
-                ThemesController.SetTheme(ThemeTypes.Light);
-            }
+            ThemesController.SetTheme(Themes.IsChecked == true ? ThemeTypes.Dark : ThemeTypes.Light);
         }
 
         private void CloseButton_OnClick( object sender, RoutedEventArgs e )

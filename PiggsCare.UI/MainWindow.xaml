@@ -22,9 +22,11 @@
         <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
             <views:HomeView />
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type viewModels:AnalyticsViewModel}">
             <views:AnalyticsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:NotificationViewModel}">
+            <views:NotificationView />
         </DataTemplate>
     </Window.Resources>
 
@@ -55,7 +57,7 @@
                                Height="36"
                                Margin="10,0,0,0"
                                VerticalAlignment="Center"
-                               Source="/Assets/Icons/Logo2.jpeg"
+                               Source="/Assets/Icons/logo.png"
                                Stretch="Fill" />
 
                         <Label Margin="5,0,0,0"
@@ -71,6 +73,7 @@
                     <!--  Start Navigation Buttons  -->
                     <StackPanel Grid.Row="1">
                         <RadioButton Margin="0,30,0,0"
+                                     Command="{Binding NavigateToAnalytics}"
                                      Content="Analytics"
                                      IsChecked="True"
                                      Style="{DynamicResource MenuRadioButtonStyle}"
@@ -94,6 +97,7 @@
                         <Separator Margin="20,20" Background="{DynamicResource TertiaryBackgroundColor}" />
 
                         <RadioButton Margin="0,1,0,1"
+                                     Command="{Binding NavigateToNotifications}"
                                      Content="Notifications"
                                      Style="{DynamicResource MenuRadioButtonStyle}"
                                      Tag="{DynamicResource notifications}" />

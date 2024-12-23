@@ -1,4 +1,4 @@
-﻿using PiggsCare.Core.Commands.NavigationCommands;
+﻿using PiggsCare.Core.Commands;
 using System.Windows.Input;
 
 namespace PiggsCare.Core.ViewModels
@@ -9,9 +9,9 @@ namespace PiggsCare.Core.ViewModels
 
         public MainViewModel()
         {
-            NavigateToHome = new NavigateToHomeCommand(this);
-            NavigateToAnalytics = new NavigateToAnalyticsCommand(this);
-            NavigateToNotifications = new NavigateToNotificationCommand(this);
+            NavigateToHome = new ChangeMainSectionCommand(new HomeViewModel(), this);
+            NavigateToAnalytics = new ChangeMainSectionCommand(new AnalyticsViewModel(), this);
+            NavigateToNotifications = new ChangeMainSectionCommand(new NotificationViewModel(), this);
         }
 
         #region Properties

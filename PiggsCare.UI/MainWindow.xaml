@@ -31,7 +31,7 @@
     </Window.Resources>
 
 
-    <Border Background="{DynamicResource PrimaryBackgroundColor}">
+    <Border Background="{DynamicResource PrimaryBackgroundColor}" CornerRadius="10">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250" />

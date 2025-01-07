@@ -20,10 +20,14 @@
         <Resource Include="Assets\Icons\logo2.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Resource>
-        <None Remove="Assets\Icons\logo.png" />
+        <None Remove="Assets\Icons\logo.png"/>
         <Resource Include="Assets\Icons\logo.png">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Resource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0"/>
     </ItemGroup>
 
 </Project>

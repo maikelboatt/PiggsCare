@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiggsCare.UI", "PiggsCare.U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiggsCare.Core", "PiggsCare.Core\PiggsCare.Core.csproj", "{4BCFEC8C-F164-4C0C-8559-BE09B50D5637}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiggsCare.Domain", "PiggsCare.Domain\PiggsCare.Domain.csproj", "{5BAA80ED-E63F-46E8-98FE-8553CBC837C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4BCFEC8C-F164-4C0C-8559-BE09B50D5637}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BCFEC8C-F164-4C0C-8559-BE09B50D5637}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BCFEC8C-F164-4C0C-8559-BE09B50D5637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BAA80ED-E63F-46E8-98FE-8553CBC837C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BAA80ED-E63F-46E8-98FE-8553CBC837C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BAA80ED-E63F-46E8-98FE-8553CBC837C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BAA80ED-E63F-46E8-98FE-8553CBC837C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="Assets/Icons/Icons.xaml" />
                 <ResourceDictionary Source="Styles/ButtonStyle.xaml" />
                 <ResourceDictionary Source="Styles/RadioButtonStyle.xaml" />
+                <ResourceDictionary Source="Styles/CollectionItemsStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -4,13 +4,13 @@ namespace PiggsCare.Domain.DTO
 {
     public class AnimalDto
     {
-        public required int AnimalId { get; init; }
-        public required int AnimalIdentification { get; init; }
-        public required string Breed { get; set; }
-        public required DateTime BirthDate { get; init; }
-        public required string CertificateNumber { get; set; }
-        public required Gender Gender { get; init; }
-        public required float? BackFatIndex { get; set; }
+        public int AnimalId { get; init; }
+        public int AnimalIdentification { get; init; }
+        public string Breed { get; set; }
+        public DateTime BirthDate { get; init; }
+        public string CertificateNumber { get; set; }
+        public Gender Gender { get; init; }
+        public float? BackFatIndex { get; set; }
 
         // Navigation properties (for relationships)
         public List<BreedingEventDto> BreedingEvents { get; set; }

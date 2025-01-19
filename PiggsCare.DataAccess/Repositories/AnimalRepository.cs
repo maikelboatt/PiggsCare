@@ -1,44 +1,53 @@
-using Microsoft.Extensions.Configuration;
+using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.Domain.Models;
 using PiggsCare.Domain.Repositories;
 
 namespace PiggsCare.DataAccess.Repositories
 {
-    public class AnimalRepository(  ):IAnimalRepository
+    public class AnimalRepository( ISqlDataAccess dataAccess ):IAnimalRepository
     {
-        public Task<IEnumerable<Animal>> GetAllAnimalsAsync()
+        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggyKare;Integrated Security=True;TrustServerCertificate=True;";
+
+        public async Task<IEnumerable<Animal>> GetAllAnimalsAsync()
         {
-            throw new NotImplementedException();
+            return await dataAccess.QueryAsync<Animal, dynamic>("dbo.GetAllAnimals", new { }, Connectionstring);
         }
 
-        public Task<Animal> GetAnimalByIdAsync( int id )
+        public async Task<Animal?> GetAnimalByIdAsync( int id )
         {
-            throw new NotImplementedException();
+            IEnumerable<Animal> result = await dataAccess.QueryAsync<Animal, dynamic>("dbo.GetAnimalById", new { AnimalID = id }, Connectionstring);
+            return result.FirstOrDefault();
         }
 
-        public Task<Animal> CreateAnimalAsync( Animal animal )
+        public async Task CreateAnimalAsync( Animal animal )
         {
-            throw new NotImplementedException();
+            await dataAccess.CommandAsync("dbo.InsertAnimal",
+                                          new
+                                          {
+                                              animal.Name, animal.Breed, animal.BirthDate, animal.CertificateNumber
+                                          },
+                                          Connectionstring);
         }
 
-        public Task<Animal> UpdateAnimalAsync( Animal animal )
+        public async Task UpdateAnimalAsync( Animal animal )
         {
-            throw new NotImplementedException();
+            await dataAccess.CommandAsync("dbo.UpdateAnimal", animal, Connectionstring);
         }
 
-        public Task DeleteAnimalAsync( int id )
+        public async Task DeleteAnimalAsync( int id )
         {
-            throw new NotImplementedException();
+            await dataAccess.CommandAsync("DeleteAnimal", new { Id = id });
         }
 
-        public Task<Animal> GetAnimalByNameAsync( int name )
+        public async Task<Animal?> GetAnimalByNameAsync( int name )
         {
-            throw new NotImplementedException();
+            IEnumerable<Animal?> result = await dataAccess.QueryAsync<Animal, dynamic>("dbo.GetAnimalByName", new { Name = name }, Connectionstring);
+            return result.FirstOrDefault();
         }
 
-        public Task<IEnumerable<Animal>> GetAnimalByBreedAsync( string breed )
+        public async Task<IEnumerable<Animal>> GetAnimalByBreedAsync( string breed )
         {
-            throw new NotImplementedException();
+            return await dataAccess.QueryAsync<Animal, dynamic>("GetAnimalByBreed", new { Breed = breed });
         }
     }
 }

@@ -15,21 +15,19 @@ namespace PiggsCare.Domain.Repositories
         /// </summary>
         /// <param name="id" >Unique identification of animal </param>
         /// <returns>Returns animal with said id otherwise null</returns>
-        Task<Animal> GetAnimalByIdAsync( int id );
+        Task<Animal?> GetAnimalByIdAsync( int id );
 
         /// <summary>
         ///     Creates a new animal record
         /// </summary>
         /// <param name="animal" > Details of the animal</param>
-        /// <returns>the created animal</returns>
-        Task<Animal> CreateAnimalAsync( Animal animal );
+        Task CreateAnimalAsync( Animal animal );
 
         /// <summary>
         ///     Updates an existing record
         /// </summary>
         /// <param name="animal" >Change details</param>
-        /// <returns>Updated record</returns>
-        Task<Animal> UpdateAnimalAsync( Animal animal );
+        Task UpdateAnimalAsync( Animal animal );
 
         /// <summary>
         ///     Deletes an animal from the database
@@ -42,7 +40,7 @@ namespace PiggsCare.Domain.Repositories
         /// </summary>
         /// <param name="name" >Name of pig</param>
         /// <returns></returns>
-        Task<Animal> GetAnimalByNameAsync( int name );
+        Task<Animal?> GetAnimalByNameAsync( int name );
 
         /// <summary>
         ///     Gets animal by breed

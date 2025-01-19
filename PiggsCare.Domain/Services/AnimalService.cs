@@ -10,19 +10,19 @@ namespace PiggsCare.Domain.Services
             return await animalRepository.GetAllAnimalsAsync();
         }
 
-        public async Task<Animal> GetAnimalByIdAsync( int id )
+        public async Task<Animal?> GetAnimalByIdAsync( int id )
         {
             return await animalRepository.GetAnimalByIdAsync(id);
         }
 
-        public async Task<Animal> CreateAnimalAsync( Animal animal )
+        public async Task CreateAnimalAsync( Animal animal )
         {
-            return await animalRepository.CreateAnimalAsync(animal);
+            await animalRepository.CreateAnimalAsync(animal);
         }
 
-        public async Task<Animal> UpdateAnimalAsync( Animal animal )
+        public async Task UpdateAnimalAsync( Animal animal )
         {
-            return await animalRepository.UpdateAnimalAsync(animal);
+            await animalRepository.UpdateAnimalAsync(animal);
         }
 
         public async Task DeleteAnimalAsync( int id )
@@ -30,7 +30,7 @@ namespace PiggsCare.Domain.Services
             await animalRepository.DeleteAnimalAsync(id);
         }
 
-        public async Task<Animal> GetAnimalByNameAsync( int name )
+        public async Task<Animal?> GetAnimalByNameAsync( int name )
         {
             return await animalRepository.GetAnimalByNameAsync(name);
         }

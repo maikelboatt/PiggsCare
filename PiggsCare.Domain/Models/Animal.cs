@@ -1,20 +1,16 @@
 namespace PiggsCare.Domain.Models
 {
-    public class Animal(
-        int animalId,
-        int animalIdentification,
-        string breed,
-        DateTime birthDate,
-        string certificateNumber,
-        Gender gender,
-        float? backFatIndex )
+    public class Animal
     {
-        public int AnimalId { get; init; } = animalId;
-        public int AnimalIdentification { get; init; } = animalIdentification;
-        public string Breed { get; set; } = breed;
-        public DateTime BirthDate { get; init; } = birthDate;
-        public string CertificateNumber { get; set; } = certificateNumber;
-        public Gender Gender { get; init; } = gender;
-        public float? BackFatIndex { get; set; } = backFatIndex;
+        public int AnimalId { get; init; }
+        public required int Name { get; init; }
+        public required string Breed { get; init; }
+        public required DateTime BirthDate { get; init; }
+        public required int CertificateNumber { get; init; }
+
+        public override string ToString()
+        {
+            return $"Animal Id: {AnimalId}, Animal Name: {Name}, Breed: {Breed}, BirthDate: {BirthDate}, CertificateNumber: {CertificateNumber}";
+        }
     }
 }

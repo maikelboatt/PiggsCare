@@ -1,8 +1,8 @@
-﻿using System.Windows.Controls;
+﻿using MvvmCross.Platforms.Wpf.Views;
 
 namespace PiggsCare.UI.Views
 {
-    public partial class HomeView:UserControl
+    public partial class HomeView:MvxWpfView
     {
         public HomeView()
         {
@@ -10,4 +10,3 @@ namespace PiggsCare.UI.Views
         }
     }
 }
-

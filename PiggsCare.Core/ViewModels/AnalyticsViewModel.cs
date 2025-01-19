@@ -1,6 +1,8 @@
-﻿namespace PiggsCare.Core.ViewModels
+﻿using MvvmCross.ViewModels;
+
+namespace PiggsCare.Core.ViewModels
 {
-    public class AnalyticsViewModel:ViewModelBase
+    public class AnalyticsViewModel:MvxViewModel
     {
     }
 }

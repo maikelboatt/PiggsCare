@@ -1,8 +1,8 @@
-﻿using System.Windows.Controls;
+﻿using MvvmCross.Platforms.Wpf.Views;
 
 namespace PiggsCare.UI.Views
 {
-    public partial class AnalyticsView:UserControl
+    public partial class AnalyticsView:MvxWpfView
     {
         public AnalyticsView()
         {
@@ -10,4 +10,3 @@ namespace PiggsCare.UI.Views
         }
     }
 }
-

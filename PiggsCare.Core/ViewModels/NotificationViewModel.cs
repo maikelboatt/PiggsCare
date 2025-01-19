@@ -1,11 +1,11 @@
-using PiggsCare.Core.Commands;
+using MvvmCross.Commands;
+using MvvmCross.ViewModels;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Windows.Input;
 
 namespace PiggsCare.Core.ViewModels
 {
-    public class NotificationViewModel:ViewModelBase
+    public class NotificationViewModel:MvxViewModel
     {
         private ObservableCollection<string> _messages =
         [
@@ -19,7 +19,7 @@ namespace PiggsCare.Core.ViewModels
 
         public NotificationViewModel()
         {
-            ClearCommand = new ClearNotificationCommand(this);
+            // ClearCommand = new ClearNotificationCommand(this);
 
             _messages.CollectionChanged += MessagesOnCollectionChanged;
         }
@@ -29,20 +29,25 @@ namespace PiggsCare.Core.ViewModels
         public ObservableCollection<string> Messages
         {
             get => _messages;
-            set => SetField(ref _messages, value);
+            set => SetProperty(ref _messages, value);
         }
-
-        #endregion
-
-        #region Commands
-
-        public ICommand ClearCommand { get; private set; }
 
         #endregion
 
         private void MessagesOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
         {
-            OnPropertyChanged(nameof(Messages));
+            RaisePropertyChanged(nameof(Messages));
         }
+
+        #region Commands
+
+        public IMvxCommand ClearCommand => new MvxCommand(ClearCommandExecute);
+
+        private void ClearCommandExecute()
+        {
+            _messages.Clear();
+        }
+
+        #endregion
     }
 }

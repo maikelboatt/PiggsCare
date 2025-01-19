@@ -9,10 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Components\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Remove="Assets\Icons\Logo1.png"/>
         <None Remove="Assets\Icons\Logo2.jpeg"/>
         <ProjectReference Include="..\PiggsCare.Core\PiggsCare.Core.csproj"/>
@@ -28,6 +24,9 @@
 
     <ItemGroup>
         <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0"/>
+        <PackageReference Include="MvvmCross" Version="9.3.0"/>
+        <PackageReference Include="MvvmCross.Platforms.Wpf" Version="9.3.0"/>
+        <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0"/>
     </ItemGroup>
 
 </Project>

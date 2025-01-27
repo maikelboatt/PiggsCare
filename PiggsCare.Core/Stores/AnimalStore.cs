@@ -9,13 +9,15 @@ namespace PiggsCare.Core.Stores
     {
         private readonly IEnumerable<Animal> _animals =
         [
-            new()
-            {
-                Name = 724,
-                Breed = "null",
-                BirthDate = DateTime.Now,
-                CertificateNumber = 10
-            }
+            // new()
+            // {
+            //     Name = 724,
+            //     Breed = "null",
+            //     BirthDate = DateTime.Now,
+            //     CertificateNumber = 10,
+            //     Gender = Gender.Male,
+            //     BackFatIndex = 12.9F
+            // }
         ];
 
         private readonly IAnimalService _animalService;

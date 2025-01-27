@@ -5,6 +5,7 @@
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                   xmlns:local="clr-namespace:PiggsCare.UI.Views"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:modalDialogControl="clr-namespace:ModalDialogControl;assembly=ModalDialogControl"
                   xmlns:viewModels="clr-namespace:PiggsCare.Core.ViewModels;assembly=PiggsCare.Core"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
                   x:Name="Home"
@@ -28,183 +29,208 @@
         <DataTemplate DataType="{x:Type viewModels:AnimalListingViewModel}">
             <components:AnimalListing />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:TestViewModel}">
+            <components:Test />
+        </DataTemplate>
     </views:MvxWpfView.Resources>
 
-    <Border Background="{DynamicResource PrimaryBackgroundColor}" CornerRadius="10">
+    <Border UseLayoutRounding="True">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+            <Grid.OpacityMask>
+                <VisualBrush Visual="{Binding ElementName=Border}" />
+            </Grid.OpacityMask>
 
-            <!--  Start Navigation-Pane  -->
-            <Border Grid.Column="0"
-                    Padding="10"
-                    Background="{DynamicResource SecondaryBackgroundColor}"
-                    CornerRadius="10 0 0 10">
+            <modalDialogControl:ModalDialog Panel.ZIndex="1"
+                                            Background="{DynamicResource PrimaryBackgroundColor}"
+                                            IsOpen="{Binding IsModalOpen, UpdateSourceTrigger=PropertyChanged}">
+                <ContentControl Content="{Binding CurrentModalViewModel}" />
+            </modalDialogControl:ModalDialog>
 
-                <Grid x:Name="GridMenu">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="60" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="80" />
-                    </Grid.RowDefinitions>
 
-                    <!--  Logo  -->
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Image Width="36"
-                               Height="36"
-                               Margin="10,0,0,0"
-                               VerticalAlignment="Center"
-                               Source="/Assets/Icons/logo.png"
-                               Stretch="Fill" />
+            <Border x:Name="Border"
+                    Background="{DynamicResource PrimaryBackgroundColor}"
+                    CornerRadius="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                        <Label Margin="5,0,0,0"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Center"
-                               HorizontalContentAlignment="Left"
-                               Content="PiggsCare"
-                               FontSize="24"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource SecondaryBlueColor}" />
-                    </StackPanel>
+                    <!--  Start Navigation-Pane  -->
+                    <Border Grid.Column="0"
+                            Padding="10"
+                            Background="{DynamicResource SecondaryBackgroundColor}"
+                            CornerRadius="10 0 0 10">
 
-                    <!--  Start Navigation Buttons  -->
-                    <StackPanel Grid.Row="1">
-                        <RadioButton Margin="0,30,0,0"
-                                     Command="{Binding NavigateToAnalytics}"
-                                     Content="Analytics"
-                                     IsChecked="True"
-                                     Style="{DynamicResource MenuRadioButtonStyle}"
-                                     Tag="{DynamicResource analytics}" />
+                        <Grid x:Name="GridMenu">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="60" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="80" />
+                            </Grid.RowDefinitions>
 
-                        <RadioButton Margin="0,1,0,1"
-                                     Command="{Binding NavigateToHome}"
-                                     Content="Home"
-                                     Style="{DynamicResource MenuRadioButtonStyle}"
-                                     Tag="{DynamicResource home}" />
+                            <!--  Logo  -->
+                            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                <Image Width="36"
+                                       Height="36"
+                                       Margin="10,0,0,0"
+                                       VerticalAlignment="Center"
+                                       Source="/Assets/Icons/logo.png"
+                                       Stretch="Fill" />
 
-                        <RadioButton Content="Messages"
-                                     Style="{DynamicResource MenuRadioButtonStyle}"
-                                     Tag="{DynamicResource messages}" />
+                                <Label Margin="5,0,0,0"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       HorizontalContentAlignment="Left"
+                                       Content="PiggsCare"
+                                       FontSize="24"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource SecondaryBlueColor}" />
+                            </StackPanel>
 
-                        <RadioButton Margin="0,1,0,1"
-                                     Content="Collections"
-                                     Style="{DynamicResource MenuRadioButtonStyle}"
-                                     Tag="{DynamicResource collections}" />
+                            <!--  Start Navigation Buttons  -->
+                            <StackPanel Grid.Row="1">
+                                <RadioButton Margin="0,30,0,0"
+                                             Command="{Binding NavigateToAnalytics}"
+                                             Content="Analytics"
+                                             IsChecked="True"
+                                             Style="{DynamicResource MenuRadioButtonStyle}"
+                                             Tag="{DynamicResource Analytics}" />
 
-                        <Separator Margin="20,20" Background="{DynamicResource TertiaryBackgroundColor}" />
+                                <RadioButton Margin="0,1,0,1"
+                                             Command="{Binding NavigateToHome}"
+                                             Content="Home"
+                                             Style="{DynamicResource MenuRadioButtonStyle}"
+                                             Tag="{DynamicResource Home}" />
 
-                        <RadioButton Margin="0,1,0,1"
-                                     Command="{Binding NavigateToNotifications}"
-                                     Content="Notifications"
-                                     Style="{DynamicResource MenuRadioButtonStyle}"
-                                     Tag="{DynamicResource notifications}" />
+                                <RadioButton Content="Messages"
+                                             Style="{DynamicResource MenuRadioButtonStyle}"
+                                             Tag="{DynamicResource Messages}" />
 
-                        <RadioButton Content="Settings"
-                                     Style="{DynamicResource MenuRadioButtonStyle}"
-                                     Tag="{DynamicResource settings}" />
-                    </StackPanel>
-                    <!--  End Navigation Buttons  -->
+                                <RadioButton Margin="0,1,0,1"
+                                             Content="Collections"
+                                             Style="{DynamicResource MenuRadioButtonStyle}"
+                                             Tag="{DynamicResource Collections}" />
 
-                    <!--  Start Theme Switcher  -->
-                    <Path Grid.Row="2"
-                          Margin="20,0,0,0"
-                          HorizontalAlignment="Left"
-                          VerticalAlignment="Center"
-                          Data="{DynamicResource information}"
-                          Fill="{DynamicResource TertiaryTextColor}" />
+                                <Separator Margin="20,20" Background="{DynamicResource TertiaryBackgroundColor}" />
 
-                    <Border Grid.Row="2"
-                            Width="110"
-                            Height="35"
-                            Margin="0,0,20,0"
-                            HorizontalAlignment="Right"
-                            Background="{DynamicResource TertiaryBackgroundColor}"
-                            CornerRadius="18">
-                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                            <Path Width="16"
-                                  Height="16"
+                                <RadioButton Margin="0,1,0,1"
+                                             Command="{Binding NavigateToNotifications}"
+                                             Content="Notifications"
+                                             Style="{DynamicResource MenuRadioButtonStyle}"
+                                             Tag="{DynamicResource Notifications}" />
+
+                                <RadioButton Content="Settings"
+                                             Style="{DynamicResource MenuRadioButtonStyle}"
+                                             Tag="{DynamicResource Settings}" />
+                            </StackPanel>
+                            <!--  End Navigation Buttons  -->
+
+                            <!--  Start Theme Switcher  -->
+                            <Path Grid.Row="2"
+                                  Margin="20,0,0,0"
+                                  HorizontalAlignment="Left"
                                   VerticalAlignment="Center"
-                                  Data="{DynamicResource sun}"
-                                  Fill="{DynamicResource PrimaryYellowColor}"
-                                  Stretch="UniformToFill" />
-                            <ToggleButton x:Name="Themes"
-                                          Margin="10,0,10,0"
-                                          HorizontalAlignment="Right"
-                                          Click="Themes_Click"
-                                          IsChecked="False"
-                                          Style="{DynamicResource ToggleButtonStyle}" />
-                            <Path Width="16"
-                                  Height="16"
-                                  VerticalAlignment="Center"
-                                  Data="{DynamicResource moon}"
-                                  Fill="{DynamicResource PrimaryWhiteColor}"
-                                  Stretch="Fill" />
-                        </StackPanel>
-                        <!--<Border.BitmapEffect>
+                                  Data="{DynamicResource Information}"
+                                  Fill="{DynamicResource TertiaryTextColor}" />
+
+                            <Border Grid.Row="2"
+                                    Width="110"
+                                    Height="35"
+                                    Margin="0,0,20,0"
+                                    HorizontalAlignment="Right"
+                                    Background="{DynamicResource TertiaryBackgroundColor}"
+                                    CornerRadius="18">
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <Path Width="16"
+                                          Height="16"
+                                          VerticalAlignment="Center"
+                                          Data="{DynamicResource Sun}"
+                                          Fill="{DynamicResource PrimaryYellowColor}"
+                                          Stretch="UniformToFill" />
+                                    <ToggleButton x:Name="Themes"
+                                                  Margin="10,0,10,0"
+                                                  HorizontalAlignment="Right"
+                                                  Click="Themes_Click"
+                                                  IsChecked="False"
+                                                  Style="{DynamicResource ToggleButtonStyle}" />
+                                    <Path Width="16"
+                                          Height="16"
+                                          VerticalAlignment="Center"
+                                          Data="{DynamicResource Moon}"
+                                          Fill="{DynamicResource PrimaryWhiteColor}"
+                                          Stretch="Fill" />
+                                </StackPanel>
+                                <!--<Border.BitmapEffect>
         <DropShadowBitmapEffect
                         ShadowDepth="1"
                         Direction="0"
                         Color="#5B8DEF"
                         Softness="0.8"/>
     </Border.BitmapEffect>-->
+                            </Border>
+                            <!--  End Theme Switcher  -->
+                        </Grid>
+
                     </Border>
-                    <!--  End Theme Switcher  -->
+                    <!--  End Navigation-Pane  -->
+
+                    <!--  Start Main-Content  -->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="60" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <!--  Start: Button to Close | Restore | Minimize  -->
+                        <StackPanel Grid.Row="0"
+                                    Height="30"
+                                    Margin="0,5,10,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    FlowDirection="RightToLeft"
+                                    Orientation="Horizontal">
+
+                            <Button x:Name="CloseButton"
+                                    Click="CloseButton_OnClick"
+                                    Content="{DynamicResource Close}"
+                                    Style="{StaticResource IconButtonsStyle}"
+                                    Tag="IsCloseButton" />
+
+                            <Button x:Name="RestoreButton"
+                                    Margin="5,0"
+                                    Click="RestoreButton_OnClick">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource IconButtonsStyle}" TargetType="{x:Type Button}">
+                                        <Setter Property="Content" Value="{DynamicResource Maximize}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=_isRestored}" Value="false">
+                                                <Setter Property="Content" Value="{DynamicResource Restore}" />
+                                            </DataTrigger>
+
+                                            <!-- <DataTrigger Binding="{Binding ElementName=_parentWindow, Path=WindowState}" Value="Maximized"> -->
+                                            <!--     <Setter Property="Content" Value="{DynamicResource Restore}" /> -->
+                                            <!-- </DataTrigger> -->
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <Button x:Name="MinimizeButton"
+                                    Click="MinimizeButton_OnClick"
+                                    Content="{DynamicResource Minimize}"
+                                    Style="{StaticResource IconButtonsStyle}" />
+                        </StackPanel>
+                        <!--  End: Button to Close | Restore | Minimize  -->
+
+                        <ContentControl Grid.Row="1"
+                                        Margin="10"
+                                        Content="{Binding CurrentViewModel}" />
+                    </Grid>
+                    <!--  End Main-Content  -->
                 </Grid>
-
             </Border>
-            <!--  End Navigation-Pane  -->
-
-            <!--  Start Main-Content  -->
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="60" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-
-                <!--  Start: Button to Close | Restore | Minimize  -->
-                <StackPanel Grid.Row="0"
-                            Height="30"
-                            Margin="0,5,10,0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            FlowDirection="RightToLeft"
-                            Orientation="Horizontal">
-
-                    <Button x:Name="CloseButton"
-                            Click="CloseButton_OnClick"
-                            Content="{DynamicResource close}"
-                            Style="{StaticResource IconButtonsStyle}"
-                            Tag="IsCloseButton" />
-
-                    <Button x:Name="RestoreButton"
-                            Margin="5,0"
-                            Click="RestoreButton_OnClick">
-                        <Button.Style>
-                            <Style BasedOn="{StaticResource IconButtonsStyle}" TargetType="{x:Type Button}">
-                                <Setter Property="Content" Value="{DynamicResource maximize}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=_parentWindow, Path=WindowState}" Value="Maximized">
-                                        <Setter Property="Content" Value="{DynamicResource restore}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-
-                    <Button x:Name="MinimizeButton"
-                            Click="MinimizeButton_OnClick"
-                            Content="{DynamicResource minimize}"
-                            Style="{StaticResource IconButtonsStyle}" />
-                </StackPanel>
-                <!--  End: Button to Close | Restore | Minimize  -->
-
-                <ContentControl Grid.Row="1"
-                                Margin="10"
-                                Content="{Binding CurrentViewModel}" />
-            </Grid>
-            <!--  End Main-Content  -->
         </Grid>
     </Border>
 

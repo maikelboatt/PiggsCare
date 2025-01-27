@@ -3,6 +3,7 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                  xmlns:loadingSpinnerControl="clr-namespace:LoadingSpinnerControl;assembly=LoadingSpinnerControl"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:viewModels="clr-namespace:PiggsCare.Core.ViewModels;assembly=PiggsCare.Core"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
@@ -11,128 +12,152 @@
                   d:DesignWidth="auto"
                   DataContext=""
                   mc:Ignorable="d">
-    <Grid Margin="3">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <StackPanel Margin="15,0,0,0"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
-                <!--  Search Button  -->
-                <TextBox Width="260"
-                         Margin="0,0,-10,0"
-                         Style="{DynamicResource TextBoxStyle}"
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Width="40"
-                         Margin="0,0,-27,0"
-                         BorderThickness="0,2,2,2"
-                         Focusable="False"
-                         Style="{DynamicResource TextBoxStyle}" />
-                <iconPacks:PackIconMaterial VerticalAlignment="Center"
-                                            Kind="AccountSearchOutline"
-                                            Style="{DynamicResource IconButtonIcon}" />
-            </StackPanel>
+    <views:MvxWpfView.Resources>
+        <BooleanToVisibilityConverter x:Key="ToVisibilityConverter" />
+    </views:MvxWpfView.Resources>
+    <Grid>
 
-            <Button Grid.Column="1"
-                    Width="100"
-                    Margin="10,0"
-                    HorizontalAlignment="Right"
-                    Command="{Binding LoadAnimalsCommand}"
-                    Style="{DynamicResource CreateBtn}">
-                <iconPacks:PackIconMaterial Kind="Pig" Style="{StaticResource IconButtonIcon}" />
-            </Button>
+        <loadingSpinnerControl:LoadingSpinner Diameter="100"
+                                              IsLoading="{Binding IsLoading}"
+                                              Thickness="3" />
+
+        <!-- <StackPanel VerticalAlignment="Center" Visibility="{Binding IsLoading, Converter={StaticResource ToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"> -->
+        <!--  <TextBlock Margin="0,10"  -->
+        <!--  FontFamily="Amita"  -->
+        <!--  Text="Loading Pigs from database...."  -->
+        <!--  TextAlignment="Center" />  -->
+        <!-- </StackPanel> -->
+
+        <Grid Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+            <Grid Margin="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Margin="15,0,0,0"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                        <!--  Search Button  -->
+                        <TextBox Width="260"
+                                 Margin="0,0,-10,0"
+                                 Style="{DynamicResource TextBoxStyle}"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Width="40"
+                                 Margin="0,0,-27,0"
+                                 BorderThickness="0,2,2,2"
+                                 Focusable="False"
+                                 Style="{DynamicResource TextBoxStyle}" />
+                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                    Kind="AccountSearchOutline"
+                                                    Style="{DynamicResource IconButtonIcon}" />
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Width="100"
+                            Margin="10,0"
+                            HorizontalAlignment="Right"
+                            Command="{Binding LoadAnimalsCommand}"
+                            Style="{DynamicResource CreateBtn}">
+                        <iconPacks:PackIconMaterial Kind="Pig" Style="{StaticResource IconButtonIcon}" />
+                    </Button>
+                </Grid>
+
+                <TextBlock Grid.Row="1"
+                           Foreground="Red"
+                           Text="{Binding ErrorMessage}"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource ToVisibilityConverter}}" />
+
+                <DataGrid Grid.Row="2"
+                          Background="{DynamicResource SecondaryBackgroundColor}"
+                          CellStyle="{DynamicResource DataGridCellStyle1}"
+                          ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}"
+                          ItemsSource="{Binding Animals, UpdateSourceTrigger=PropertyChanged}"
+                          RowStyle="{DynamicResource DataGridRowStyle1}"
+                          Style="{DynamicResource DataGridStyle1}"
+                          VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="*"
+                                            Binding="{Binding Name}"
+                                            CanUserResize="False"
+                                            Header="Identification"
+                                            IsReadOnly="True" />
+
+                        <DataGridTextColumn Width="*"
+                                            Binding="{Binding Breed}"
+                                            CanUserResize="False"
+                                            Header="Breed "
+                                            IsReadOnly="True" />
+
+                        <DataGridTextColumn Width="*"
+                                            Binding="{Binding BirthDate}"
+                                            CanUserResize="False"
+                                            Header="Birth date"
+                                            IsReadOnly="True" />
+
+                        <DataGridTextColumn Width="*"
+                                            Binding="{Binding CertificateNumber}"
+                                            CanUserResize="False"
+                                            Header="Certificate Number"
+                                            IsReadOnly="True" />
+
+                        <DataGridTextColumn Width="*"
+                                            Binding="{Binding Gender}"
+                                            CanUserResize="False"
+                                            Header="Gender"
+                                            IsReadOnly="True" />
+
+                        <DataGridTextColumn Width="*"
+                                            Binding="{Binding BackFatIndex}"
+                                            Header="BackFatIndex"
+                                            IsReadOnly="True" />
+
+                        <DataGridTemplateColumn Width="auto"
+                                                Header="Operations"
+                                                IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+
+                                        <Button Margin="0,0,5,0"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.ReadClientRecordCommand}"
+                                                CommandParameter="{Binding Id}"
+                                                IsDefault="True"
+                                                Style="{DynamicResource CreateBtn}">
+                                            <iconPacks:PackIconMaterial Kind="OpenInNew" Style="{StaticResource IconButtonIcon}" />
+                                        </Button>
+
+                                        <Button Margin="0,0,5,0"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.EditExistingClientCommand}"
+                                                CommandParameter="{Binding Id}"
+                                                Style="{DynamicResource EditBtn}">
+                                            <iconPacks:PackIconMaterial Kind="AccountEdit" Style="{StaticResource IconButtonIcon}" />
+                                        </Button>
+
+                                        <Button Margin="0,0,5,0"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.DeleteClientRecordCommand}"
+                                                CommandParameter="{Binding Id}"
+                                                Style="{DynamicResource DelBtn}">
+                                            <iconPacks:PackIconMaterial Kind="DeleteOutline" Style="{StaticResource IconButtonIcon}" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!--  <ComboBox  -->
+                <!--  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:MvxWpfView}},Path=DataContext.Names}" />  -->
+            </Grid>
         </Grid>
-
-        <DataGrid Grid.Row="1"
-                  Background="{DynamicResource SecondaryBackgroundColor}"
-                  CellStyle="{DynamicResource DataGridCellStyle1}"
-                  ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}"
-                  ItemsSource="{Binding Animals, UpdateSourceTrigger=PropertyChanged}"
-                  RowStyle="{DynamicResource DataGridRowStyle1}"
-                  Style="{DynamicResource DataGridStyle1}"
-                  VerticalScrollBarVisibility="Auto">
-            <DataGrid.Columns>
-                <DataGridTextColumn Width="*"
-                                    Binding="{Binding Name}"
-                                    CanUserResize="False"
-                                    Header="Identification"
-                                    IsReadOnly="True" />
-
-                <DataGridTextColumn Width="*"
-                                    Binding="{Binding Breed}"
-                                    CanUserResize="False"
-                                    Header="Breed "
-                                    IsReadOnly="True" />
-
-                <DataGridTextColumn Width="*"
-                                    Binding="{Binding BirthDate}"
-                                    CanUserResize="False"
-                                    Header="Birth date"
-                                    IsReadOnly="True" />
-
-                <DataGridTextColumn Width="*"
-                                    Binding="{Binding CertificateNumber}"
-                                    CanUserResize="False"
-                                    Header="Certificate Number"
-                                    IsReadOnly="True" />
-
-                <DataGridTextColumn Width="*"
-                                    Binding="{Binding Gender}"
-                                    CanUserResize="False"
-                                    Header="Gender"
-                                    IsReadOnly="True" />
-
-                <DataGridTemplateColumn Width="auto"
-                                        Header="Operations"
-                                        IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-
-                                <Button Margin="0,0,5,0"
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.OpenClientMeasurementCommand}"
-                                        CommandParameter="{Binding Id}"
-                                        Style="{DynamicResource CreateBtn}">
-                                    <iconPacks:PackIconMaterial Kind="PencilBoxOutline" Style="{StaticResource IconButtonIcon}" />
-                                </Button>
-
-                                <Button Margin="0,0,5,0"
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.ReadClientRecordCommand}"
-                                        CommandParameter="{Binding Id}"
-                                        IsDefault="True"
-                                        Style="{DynamicResource CreateBtn}">
-                                    <iconPacks:PackIconMaterial Kind="OpenInNew" Style="{StaticResource IconButtonIcon}" />
-                                </Button>
-
-                                <Button Margin="0,0,5,0"
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.EditExistingClientCommand}"
-                                        CommandParameter="{Binding Id}"
-                                        Style="{DynamicResource EditBtn}">
-                                    <iconPacks:PackIconMaterial Kind="AccountEdit" Style="{StaticResource IconButtonIcon}" />
-                                </Button>
-
-                                <Button Margin="0,0,5,0"
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.DeleteClientRecordCommand}"
-                                        CommandParameter="{Binding Id}"
-                                        Style="{DynamicResource DelBtn}">
-                                    <iconPacks:PackIconMaterial Kind="DeleteOutline" Style="{StaticResource IconButtonIcon}" />
-                                </Button>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <!--  <ComboBox  -->
-        <!--  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:MvxWpfView}},Path=DataContext.Names}" />  -->
     </Grid>
 
 </views:MvxWpfView>

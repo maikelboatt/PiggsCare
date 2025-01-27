@@ -11,6 +11,7 @@
     <ItemGroup>
         <None Remove="Assets\Icons\Logo1.png"/>
         <None Remove="Assets\Icons\Logo2.jpeg"/>
+        <ProjectReference Include="..\ModalDialogControl\ModalDialogControl.csproj"/>
         <ProjectReference Include="..\PiggsCare.Core\PiggsCare.Core.csproj"/>
         <None Remove="Assets\Icons\logo2.png"/>
         <Resource Include="Assets\Icons\logo2.png">
@@ -23,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="LoadingSpinner.WPF" Version="1.0.0"/>
         <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0"/>
         <PackageReference Include="MvvmCross" Version="9.3.0"/>
         <PackageReference Include="MvvmCross.Platforms.Wpf" Version="9.3.0"/>

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiggsCare.Domain", "PiggsCa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiggsCare.DataAccess", "PiggsCare.DataAccess\PiggsCare.DataAccess.csproj", "{D13F84AD-C46D-46B4-981C-365701DB1FFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModalDialogControl", "ModalDialogControl\ModalDialogControl.csproj", "{558CCAC0-3A9D-43F4-AD8B-71026433F39F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D13F84AD-C46D-46B4-981C-365701DB1FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D13F84AD-C46D-46B4-981C-365701DB1FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D13F84AD-C46D-46B4-981C-365701DB1FFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{558CCAC0-3A9D-43F4-AD8B-71026433F39F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{558CCAC0-3A9D-43F4-AD8B-71026433F39F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{558CCAC0-3A9D-43F4-AD8B-71026433F39F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{558CCAC0-3A9D-43F4-AD8B-71026433F39F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

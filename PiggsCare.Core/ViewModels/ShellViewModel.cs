@@ -1,31 +1,74 @@
-using MvvmCross.Navigation;
-using MvvmCross.Plugin.Messenger;
+using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Commands;
-using PiggsCare.Domain.Services;
+using PiggsCare.Core.Factory;
+using PiggsCare.Core.Stores;
 using System.Windows.Input;
 
 namespace PiggsCare.Core.ViewModels
 {
     public class ShellViewModel:MvxViewModel, IMainViewModel
     {
-        private MvxViewModel _currentViewModel = new AnalyticsViewModel();
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IViewModelFactory _viewModelFactory;
+        private MvxViewModel? _currentViewModel;
 
-        public ShellViewModel( IAnimalService animalService, IMvxNavigationService navigationService, IMvxMessenger messenger )
+        public ShellViewModel( ModalNavigationStore modalNavigationStore, IViewModelFactory viewModelFactory )
         {
-            NavigateToHome = new ChangeMainSectionCommand(new HomeViewModel(animalService, navigationService, messenger), this);
-            NavigateToAnalytics = new ChangeMainSectionCommand(new AnalyticsViewModel(), this);
-            NavigateToNotifications = new ChangeMainSectionCommand(new NotificationViewModel(), this);
+            _modalNavigationStore = modalNavigationStore;
+            _viewModelFactory = viewModelFactory;
+            NavigateToHome = new MvxCommand(ShowHomeView);
+            NavigateToAnalytics = new MvxCommand(ShowAnalyticsView);
+            NavigateToNotifications = new MvxCommand(ShowNotificationView);
+
+            modalNavigationStore.CurrentModalViewModelChanged += ModalNavigationStoreOnCurrentModalViewModelChanged;
+
+        }
+
+        public override Task Initialize()
+        {
+            ShowAnalyticsView();
+            return base.Initialize();
+        }
+
+        private void ShowNotificationView()
+        {
+            NotificationViewModel? viewmodel = _viewModelFactory.CreateViewModel<NotificationViewModel>();
+            CurrentViewModel = viewmodel;
+            viewmodel?.Initialize();
+        }
+
+        private void ShowHomeView()
+        {
+            HomeViewModel? viewmodel = _viewModelFactory.CreateViewModel<HomeViewModel>();
+            viewmodel?.Initialize();
+            CurrentViewModel = viewmodel;
+        }
+
+        private void ShowAnalyticsView()
+        {
+            AnalyticsViewModel? viewmodel = _viewModelFactory.CreateViewModel<AnalyticsViewModel>();
+            CurrentViewModel = viewmodel;
+            viewmodel?.Initialize();
+        }
+
+
+        private void ModalNavigationStoreOnCurrentModalViewModelChanged()
+        {
+            RaisePropertyChanged(nameof(CurrentModalViewModel));
+            RaisePropertyChanged(nameof(IsModalOpen));
         }
 
 
         #region Properties
 
-        public MvxViewModel CurrentViewModel
+        public MvxViewModel? CurrentViewModel
         {
             get => _currentViewModel;
             set => SetProperty(ref _currentViewModel, value);
         }
+
+        public bool IsModalOpen => _modalNavigationStore.CurrentModalViewModel != null;
+        public MvxViewModel? CurrentModalViewModel => _modalNavigationStore?.CurrentModalViewModel;
 
         #endregion
 

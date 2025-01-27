@@ -4,6 +4,6 @@ namespace PiggsCare.Core.ViewModels
 {
     public interface IMainViewModel
     {
-        MvxViewModel CurrentViewModel { get; set; }
+        MvxViewModel? CurrentViewModel { get; set; }
     }
 }

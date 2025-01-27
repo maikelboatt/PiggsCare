@@ -17,6 +17,7 @@ namespace PiggsCare.Core.ViewModels
             "500: Internal Server Error!"
         ];
 
+
         public NotificationViewModel()
         {
             // ClearCommand = new ClearNotificationCommand(this);
@@ -34,10 +35,17 @@ namespace PiggsCare.Core.ViewModels
 
         #endregion
 
+        public override Task Initialize()
+        {
+            Console.WriteLine("Initialized NotificationViewModel");
+            return base.Initialize();
+        }
+
         private void MessagesOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
         {
             RaisePropertyChanged(nameof(Messages));
         }
+
 
         #region Commands
 

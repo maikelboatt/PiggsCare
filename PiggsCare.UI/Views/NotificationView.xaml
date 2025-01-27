@@ -37,6 +37,7 @@
                            HorizontalAlignment="Right"
                            VerticalAlignment="Center"
                            FontSize="14"
+                           Foreground="{DynamicResource PrimaryTextColor}"
                            Text="Clear All" />
 
                 <Button Grid.Column="2"

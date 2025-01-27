@@ -1,27 +1,23 @@
-﻿using MvvmCross.Navigation;
-using MvvmCross.Plugin.Messenger;
-using MvvmCross.ViewModels;
-using PiggsCare.Core.Commands;
-using PiggsCare.Domain.Services;
-using System.Windows.Input;
+﻿using MvvmCross.ViewModels;
+using PiggsCare.Core.Factory;
 
 namespace PiggsCare.Core.ViewModels
 {
-    public class HomeViewModel:MvxViewModel
+    public class HomeViewModel( IViewModelFactory viewModelFactory ):MvxViewModel, IHomeViewModel
     {
-        private readonly IAnimalService _animalService;
-        private readonly IMvxMessenger _messenger;
+        public AnimalListingViewModel? AnimalListingViewModel => CreateViewModel();
 
-        public HomeViewModel( IAnimalService animalService, IMvxNavigationService mvxNavigationService, IMvxMessenger messenger )
+        public override Task Initialize()
         {
-            _animalService = animalService;
-            _messenger = messenger;
-
-            mvxNavigationService.Navigate<AnimalListingViewModel>();
+            Console.WriteLine("Initialize HomeViewModel");
+            return base.Initialize();
         }
 
-        // public ICommand LoadAnimalsCommand { get; set; }
-
-        public AnimalListingViewModel AnimalListingViewModel => new(_animalService, _messenger);
+        private AnimalListingViewModel? CreateViewModel()
+        {
+            AnimalListingViewModel? viewmodel = viewModelFactory.CreateViewModel<AnimalListingViewModel>();
+            viewmodel?.Initialize();
+            return viewmodel;
+        }
     }
 }

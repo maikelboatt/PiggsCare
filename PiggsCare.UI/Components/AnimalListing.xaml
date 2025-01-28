@@ -22,12 +22,13 @@
                                               IsLoading="{Binding IsLoading}"
                                               Thickness="3" />
 
-        <!-- <StackPanel VerticalAlignment="Center" Visibility="{Binding IsLoading, Converter={StaticResource ToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"> -->
-        <!--  <TextBlock Margin="0,10"  -->
-        <!--  FontFamily="Amita"  -->
-        <!--  Text="Loading Pigs from database...."  -->
-        <!--  TextAlignment="Center" />  -->
-        <!-- </StackPanel> -->
+        <StackPanel VerticalAlignment="Center" Visibility="{Binding IsLoading, Converter={StaticResource ToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock Margin="0,10"
+                       VerticalAlignment="Top"
+                       FontFamily="Amita"
+                       Text="Loading Pigs from database...."
+                       TextAlignment="Center" />
+        </StackPanel>
 
         <Grid Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
             <Grid Margin="3">
@@ -77,10 +78,10 @@
 
                 <DataGrid Grid.Row="2"
                           Background="{DynamicResource SecondaryBackgroundColor}"
-                          CellStyle="{DynamicResource DataGridCellStyle1}"
-                          ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}"
+                          CellStyle="{StaticResource DataGridCellStyle1}"
+                          ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle1}"
                           ItemsSource="{Binding Animals, UpdateSourceTrigger=PropertyChanged}"
-                          RowStyle="{DynamicResource DataGridRowStyle1}"
+                          RowStyle="{StaticResource DataGridRowStyle1}"
                           Style="{DynamicResource DataGridStyle1}"
                           VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>

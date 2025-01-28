@@ -19,9 +19,11 @@
         <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
             <local:HomeView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type viewModels:AnalyticsViewModel}">
             <local:AnalyticsView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type viewModels:NotificationViewModel}">
             <local:NotificationView />
         </DataTemplate>
@@ -32,6 +34,10 @@
 
         <DataTemplate DataType="{x:Type viewModels:TestViewModel}">
             <components:Test />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
+            <components:Dashboard />
         </DataTemplate>
     </views:MvxWpfView.Resources>
 

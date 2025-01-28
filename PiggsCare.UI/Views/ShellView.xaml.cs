@@ -6,7 +6,6 @@ namespace PiggsCare.UI.Views
 {
     public partial class ShellView:MvxWpfView
     {
-        private bool _isRestored;
         private Window _parentWindow;
 
         public ShellView()
@@ -27,16 +26,7 @@ namespace PiggsCare.UI.Views
 
         private void RestoreButton_OnClick( object sender, RoutedEventArgs e )
         {
-            if (_parentWindow.WindowState == WindowState.Normal)
-            {
-                _parentWindow.WindowState = WindowState.Maximized;
-                _isRestored = false;
-            }
-            else
-            {
-                _parentWindow.WindowState = WindowState.Normal;
-                _isRestored = true;
-            }
+            _parentWindow.WindowState = _parentWindow.WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
 
             // _parentWindow.WindowState = _parentWindow.WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
         }

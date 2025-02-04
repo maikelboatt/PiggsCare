@@ -1,8 +1,10 @@
 using LiveCharts;
 using LiveCharts.Defaults;
+using LiveCharts.Wpf;
 using MvvmCross.ViewModels;
 using PiggsCare.Domain.Models;
 using PiggsCare.Domain.Services;
+using System.Collections.ObjectModel;
 
 namespace PiggsCare.Core.ViewModels
 {
@@ -21,6 +23,8 @@ namespace PiggsCare.Core.ViewModels
         }
 
         public Func<ChartPoint, string> PointLabel { get; set; }
+        public SeriesCollection SeriesCollection { get; set; }
+        public ObservableCollection<string> Labels { get; set; }
 
         public IChartValues FemaleValues
         {
@@ -43,8 +47,36 @@ namespace PiggsCare.Core.ViewModels
 
         public override void Prepare()
         {
-            PointLabel = point => $"{point.Y} ({point.Participation:P})";
+            SetupPieChart();
+            SetupBarChart();
             base.Prepare();
+        }
+
+        private void SetupPieChart()
+        {
+
+            PointLabel = point => $"{point.Y} ({point.Participation:P})";
+        }
+
+        private void SetupBarChart()
+        {
+
+            SeriesCollection =
+            [
+                new ColumnSeries
+                {
+                    Title = "2015",
+                    Values = new ChartValues<double> { _female, 50, 39, 50 }
+                },
+
+                new ColumnSeries
+                {
+                    Title = "2016",
+                    Values = new ChartValues<double> { _male, 56, 42, 48 }
+                }
+            ];
+
+            Labels = ["Jan", "Feb", "March", "April", "May"];
         }
 
         public override async Task Initialize()

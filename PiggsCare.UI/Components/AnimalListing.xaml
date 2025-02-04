@@ -65,7 +65,8 @@
                             Width="100"
                             Margin="10,0"
                             HorizontalAlignment="Right"
-                            Command="{Binding LoadAnimalsCommand}"
+                            Command="{Binding InsertRecordCommand}"
+                            IsDefault="True"
                             Style="{DynamicResource CreateBtn}">
                         <iconPacks:PackIconMaterial Kind="Pig" Style="{StaticResource IconButtonIcon}" />
                     </Button>

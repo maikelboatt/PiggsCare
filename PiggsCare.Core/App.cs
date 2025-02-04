@@ -8,7 +8,6 @@ using PiggsCare.Core.Stores;
 using PiggsCare.Core.ViewModels;
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.Repositories;
-using PiggsCare.Domain.Repositories;
 using PiggsCare.Domain.Services;
 using System.Reflection;
 
@@ -23,8 +22,8 @@ namespace PiggsCare.Core
             [
                 GetType().Assembly,              // Current assembly (PiggsCare.Core)
                 typeof(IAnimalService).Assembly, // Assembly containing the interfaces
-                typeof(AnimalService).Assembly,  // Assembly containing the implementations
-                typeof(IAnimalRepository).Assembly,
+                // typeof(AnimalService).Assembly,  // Assembly containing the implementations
+                // typeof(IAnimalRepository).Assembly,
                 typeof(AnimalRepository).Assembly
             ];
 
@@ -36,15 +35,15 @@ namespace PiggsCare.Core
                     .AsInterfaces()
                     .RegisterAsLazySingleton();
 
-                // Register Repositories
+                // Register Stores
                 CreatableTypes(assembly)
-                    .EndingWith("Repository")
+                    .EndingWith("Store")
                     .AsInterfaces()
                     .RegisterAsLazySingleton();
 
-                // Register Stores
+                // Register Repositories
                 CreatableTypes(assembly)
-                    .EndingWith("Stores")
+                    .EndingWith("Repository")
                     .AsInterfaces()
                     .RegisterAsLazySingleton();
 

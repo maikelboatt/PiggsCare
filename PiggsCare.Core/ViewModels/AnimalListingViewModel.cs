@@ -1,8 +1,8 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Control;
+using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
 using System.Collections.Specialized;
 
 namespace PiggsCare.Core.ViewModels
@@ -11,11 +11,34 @@ namespace PiggsCare.Core.ViewModels
     {
         #region Constructor
 
-        public AnimalListingViewModel( IAnimalService animalService, IModalNavigationControl modalNavigationControl )
+        public AnimalListingViewModel( IModalNavigationControl modalNavigationControl, IAnimalStore animalStore )
         {
-            _animalService = animalService;
             _modalNavigationControl = modalNavigationControl;
+            _animalStore = animalStore;
             _animals.CollectionChanged += AnimalsOnCollectionChanged;
+
+            animalStore.OnLoad += AnimalStoreOnOnLoad;
+        }
+
+        #endregion
+
+        #region Commands
+
+        public IMvxAsyncCommand LoadAnimalsCommand => new MvxAsyncCommand(TestCrudOperations);
+        public IMvxAsyncCommand InsertRecordCommand => new MvxAsyncCommand(ExecuteInsertRecord);
+
+        #endregion
+
+        #region Event Handlers
+
+        private void AnimalStoreOnOnLoad()
+        {
+            RaisePropertyChanged(nameof(Animals));
+        }
+
+        private void AnimalsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
+        {
+            RaisePropertyChanged(nameof(Animals));
         }
 
         #endregion
@@ -23,10 +46,9 @@ namespace PiggsCare.Core.ViewModels
         #region Fields
 
         private readonly MvxObservableCollection<Animal> _animals = [];
-        private readonly IAnimalService _animalService;
 
-        // private static readonly IEnumerable<Animal> _animalsEnumerable = [];
         private readonly IModalNavigationControl _modalNavigationControl;
+        private readonly IAnimalStore _animalStore;
         private bool _isLoading;
 
         #endregion
@@ -57,22 +79,14 @@ namespace PiggsCare.Core.ViewModels
 
         public IEnumerable<Animal> Animals => _animals;
 
-        public IMvxAsyncCommand LoadAnimalsCommand => new MvxAsyncCommand(TestCrudOperations);
-
         #endregion
 
         #region Methods
 
-        private void AnimalsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
-        {
-            RaisePropertyChanged(nameof(Animals));
-        }
-
-
-        private async Task LoadAnimals()
+        private void LoadAnimals()
         {
             _animals.Clear();
-            IEnumerable<Animal> animals = await _animalService.GetAllAnimalsAsync();
+            IEnumerable<Animal> animals = _animalStore.Animals;
             foreach (Animal animal in animals)
             {
                 _animals.Add(animal);
@@ -84,7 +98,8 @@ namespace PiggsCare.Core.ViewModels
             IsLoading = true;
             try
             {
-                await LoadAnimals();
+                await _animalStore.Load();
+                LoadAnimals();
             }
             catch (Exception e)
             {
@@ -95,6 +110,12 @@ namespace PiggsCare.Core.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        private async Task ExecuteInsertRecord()
+        {
+            _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(7);
+            // TODO Add functionality for inserting record
         }
 
         private async Task TestCrudOperations()
@@ -108,7 +129,7 @@ namespace PiggsCare.Core.ViewModels
             //
             // // foreach (Animal animal in animals)
             // Console.WriteLine(animal);
-            // _modalNavigationControl.PopUp<TestViewModel>(1);
+            _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(7);
             // _modalNavigationControl.Open<TestViewModel>();
         }
 

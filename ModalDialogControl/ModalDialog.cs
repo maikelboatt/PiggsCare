@@ -30,6 +30,18 @@ namespace ModalDialogControl
             typeof(ModalDialog),
             new PropertyMetadata(default(bool)));
 
+        public static readonly DependencyProperty TheBackgroundProperty = DependencyProperty.Register(
+            nameof(TheBackground),
+            typeof(SolidColorBrush),
+            typeof(ModalDialog),
+            new PropertyMetadata(default(SolidColorBrush)));
+
+        public static readonly DependencyProperty TheShadowProperty = DependencyProperty.Register(
+            nameof(TheShadow),
+            typeof(SolidColorBrush),
+            typeof(ModalDialog),
+            new PropertyMetadata(default(SolidColorBrush)));
+
         static ModalDialog()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ModalDialog), new FrameworkPropertyMetadata(typeof(ModalDialog)));
@@ -41,6 +53,18 @@ namespace ModalDialogControl
         {
             get => (bool)GetValue(IsOpenProperty);
             set => SetValue(IsOpenProperty, value);
+        }
+
+        public SolidColorBrush TheBackground
+        {
+            get => (SolidColorBrush)GetValue(TheBackgroundProperty);
+            set => SetValue(TheBackgroundProperty, value);
+        }
+
+        public SolidColorBrush TheShadow
+        {
+            get => (SolidColorBrush)GetValue(TheShadowProperty);
+            set => SetValue(TheShadowProperty, value);
         }
 
         private static SolidColorBrush CreateBackground()

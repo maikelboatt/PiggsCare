@@ -20,10 +20,16 @@
                                     <VisualBrush Visual="{Binding ElementName=border}" />
                                 </Grid.OpacityMask>
                                 <Border x:Name="border"
-                                        Background="White"
+                                        Background="{TemplateBinding TheBackground}"
                                         CornerRadius="5" />
                                 <ContentControl Content="{TemplateBinding Content}" />
                             </Grid>
+
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10"
+                                                  ShadowDepth="10"
+                                                  Color="{TemplateBinding TheShadow}" />
+                            </Border.Effect>
 
                         </Border>
                     </Grid>

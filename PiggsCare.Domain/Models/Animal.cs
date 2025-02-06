@@ -6,7 +6,7 @@ namespace PiggsCare.Domain.Models
         string breed,
         DateTime birthDate,
         int certificateNumber,
-        Gender gender,
+        string gender,
         float backFatIndex )
     {
         public int AnimalId { get; init; } = animalId;
@@ -14,7 +14,7 @@ namespace PiggsCare.Domain.Models
         public string Breed { get; init; } = breed;
         public DateTime BirthDate { get; init; } = birthDate;
         public int CertificateNumber { get; init; } = certificateNumber;
-        public Gender Gender { get; init; } = gender;
+        public string Gender { get; init; } = gender;
         public float BackFatIndex { get; init; } = backFatIndex;
 
         public override string ToString()

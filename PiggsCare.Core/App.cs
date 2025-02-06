@@ -94,6 +94,7 @@ namespace PiggsCare.Core
                     prepareMethod?.Invoke(viewModel, new[] { parameter });
                 }
 
+                viewModel.Initialize();
                 return viewModel;
             });
 

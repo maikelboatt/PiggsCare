@@ -18,6 +18,8 @@ namespace PiggsCare.Core.ViewModels
             _animals.CollectionChanged += AnimalsOnCollectionChanged;
 
             animalStore.OnLoad += AnimalStoreOnOnLoad;
+            animalStore.OnSave += AnimalStoreOnOnSave;
+            animalStore.OnUpdate += AnimalStoreOnOnUpdate;
         }
 
         #endregion
@@ -25,11 +27,23 @@ namespace PiggsCare.Core.ViewModels
         #region Commands
 
         public IMvxAsyncCommand LoadAnimalsCommand => new MvxAsyncCommand(TestCrudOperations);
-        public IMvxAsyncCommand InsertRecordCommand => new MvxAsyncCommand(ExecuteInsertRecord);
+        public IMvxAsyncCommand OpenInsertRecordDialogCommand => new MvxAsyncCommand(ExecuteOpenInsertRecordDialog);
+        public MvxAsyncCommand<int> OpenModifyRecordDialogCommand => new(ExecuteOpenModifyRecordDialog);
 
         #endregion
 
         #region Event Handlers
+
+        private void AnimalStoreOnOnSave( Animal obj )
+        {
+            RaisePropertyChanged(nameof(Animals));
+        }
+
+        private void AnimalStoreOnOnUpdate( Animal obj )
+        {
+            RaisePropertyChanged(nameof(Animals));
+        }
+
 
         private void AnimalStoreOnOnLoad()
         {
@@ -78,6 +92,7 @@ namespace PiggsCare.Core.ViewModels
         }
 
         public IEnumerable<Animal> Animals => _animals;
+        // public ICollectionView Animals { get; private set; }
 
         #endregion
 
@@ -112,10 +127,15 @@ namespace PiggsCare.Core.ViewModels
             }
         }
 
-        private async Task ExecuteInsertRecord()
+        private async Task ExecuteOpenInsertRecordDialog()
         {
-            _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(7);
+            _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(6);
             // TODO Add functionality for inserting record
+        }
+
+        private async Task ExecuteOpenModifyRecordDialog( int id )
+        {
+            _modalNavigationControl.PopUp<AnimalModifyFormViewModel>(id);
         }
 
         private async Task TestCrudOperations()
@@ -129,7 +149,7 @@ namespace PiggsCare.Core.ViewModels
             //
             // // foreach (Animal animal in animals)
             // Console.WriteLine(animal);
-            _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(7);
+            // _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(7);
             // _modalNavigationControl.Open<TestViewModel>();
         }
 

@@ -65,7 +65,7 @@
                             Width="100"
                             Margin="10,0"
                             HorizontalAlignment="Right"
-                            Command="{Binding InsertRecordCommand}"
+                            Command="{Binding OpenInsertRecordDialogCommand}"
                             IsDefault="True"
                             Style="{DynamicResource CreateBtn}">
                         <iconPacks:PackIconMaterial Kind="Pig" Style="{StaticResource IconButtonIcon}" />
@@ -130,22 +130,22 @@
 
                                         <Button Margin="0,0,5,0"
                                                 Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.ReadClientRecordCommand}"
-                                                CommandParameter="{Binding Id}"
+                                                CommandParameter="{Binding AnimalId}"
                                                 IsDefault="True"
                                                 Style="{DynamicResource CreateBtn}">
                                             <iconPacks:PackIconMaterial Kind="OpenInNew" Style="{StaticResource IconButtonIcon}" />
                                         </Button>
 
                                         <Button Margin="0,0,5,0"
-                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.EditExistingClientCommand}"
-                                                CommandParameter="{Binding Id}"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.OpenModifyRecordDialogCommand}"
+                                                CommandParameter="{Binding AnimalId}"
                                                 Style="{DynamicResource EditBtn}">
                                             <iconPacks:PackIconMaterial Kind="AccountEdit" Style="{StaticResource IconButtonIcon}" />
                                         </Button>
 
                                         <Button Margin="0,0,5,0"
                                                 Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.DeleteClientRecordCommand}"
-                                                CommandParameter="{Binding Id}"
+                                                CommandParameter="{Binding AnimalId}"
                                                 Style="{DynamicResource DelBtn}">
                                             <iconPacks:PackIconMaterial Kind="DeleteOutline" Style="{StaticResource IconButtonIcon}" />
                                         </Button>

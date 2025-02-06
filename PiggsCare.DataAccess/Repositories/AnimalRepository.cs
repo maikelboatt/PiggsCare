@@ -57,6 +57,7 @@ namespace PiggsCare.DataAccess.Repositories
             // Convert Animal Object to an AnimalDto Object
             AnimalDto record = new()
             {
+                AnimalId = animal.AnimalId,
                 Name = animal.Name,
                 Breed = animal.Breed,
                 BirthDate = animal.BirthDate,

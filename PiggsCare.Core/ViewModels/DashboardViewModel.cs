@@ -92,8 +92,8 @@ namespace PiggsCare.Core.ViewModels
             {
                 IEnumerable<Animal> animal = await animalService.GetAllAnimalsAsync();
                 Animal[] enumerable = animal as Animal[] ?? animal.ToArray();
-                _male = enumerable.Count(pig => pig.Gender == Gender.Male);
-                _female = enumerable.Count(pig => pig.Gender == Gender.Female);
+                _male = enumerable.Count(pig => pig.Gender == "Male");
+                _female = enumerable.Count(pig => pig.Gender == "Female");
             }
             catch (Exception e)
             {

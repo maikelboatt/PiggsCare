@@ -6,7 +6,7 @@
                   xmlns:forms="clr-namespace:PiggsCare.UI.Forms"
                   xmlns:local="clr-namespace:PiggsCare.UI.Views"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                  xmlns:modalControl="clr-namespace:ModalControl;assembly=ModalControl"
+                  xmlns:modalDialogControl="clr-namespace:ModalDialogControl;assembly=ModalDialogControl"
                   xmlns:viewModels="clr-namespace:PiggsCare.Core.ViewModels;assembly=PiggsCare.Core"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
                   x:Name="Home"
@@ -44,6 +44,10 @@
         <DataTemplate DataType="{x:Type viewModels:AnimalCreateFormViewModel}">
             <forms:AnimalCreateForm />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:AnimalModifyFormViewModel}">
+            <forms:AnimalModifyForm />
+        </DataTemplate>
     </views:MvxWpfView.Resources>
 
     <Border UseLayoutRounding="True">
@@ -52,15 +56,16 @@
                 <VisualBrush Visual="{Binding ElementName=Border}" />
             </Grid.OpacityMask>
 
-            <modalControl:Modal Panel.ZIndex="10" IsOpen="{Binding IsModalOpen, UpdateSourceTrigger=PropertyChanged}">
-                <ContentControl Margin="50,25" Content="{Binding CurrentModalViewModel}" />
-            </modalControl:Modal>
-            <!--    -->
-            <!--  <modalDialogControl:ModalDialog Panel.ZIndex="1"  -->
-            <!--  Background="{DynamicResource PrimaryBackgroundColor}"  -->
-            <!--  IsOpen="{Binding IsModalOpen, UpdateSourceTrigger=PropertyChanged}">  -->
-            <!--     <ContentControl Content="{Binding CurrentModalViewModel}" /> -->
-            <!-- </modalDialogControl:ModalDialog> -->
+            <!-- <modalControl:Modal Panel.ZIndex="10" IsOpen="{Binding IsModalOpen, UpdateSourceTrigger=PropertyChanged}"> -->
+            <!--     <ContentControl Margin="50,25" Content="{Binding CurrentModalViewModel}" /> -->
+            <!-- </modalControl:Modal> -->
+
+            <modalDialogControl:ModalDialog Panel.ZIndex="1"
+                                            IsOpen="{Binding IsModalOpen, UpdateSourceTrigger=PropertyChanged}"
+                                            TheBackground="{DynamicResource TertiaryBackgroundColor}"
+                                            TheShadow="{DynamicResource SecondaryWhiteColor}">
+                <ContentControl Margin="30,15" Content="{Binding CurrentModalViewModel}" />
+            </modalDialogControl:ModalDialog>
 
 
             <Border x:Name="Border"

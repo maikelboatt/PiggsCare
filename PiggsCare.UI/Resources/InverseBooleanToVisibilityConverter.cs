@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PiggsCare.UI.Converters
+namespace PiggsCare.UI.Resources
 {
     public class InverseBooleanToVisibilityConverter:IValueConverter
     {

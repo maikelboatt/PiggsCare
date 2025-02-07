@@ -1,8 +1,8 @@
 ﻿<views:MvxApplication x:Class="PiggsCare.UI.App"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:converters="clr-namespace:PiggsCare.UI.Converters"
-                      xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf">
+                      xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
+                      xmlns:resources="clr-namespace:PiggsCare.UI.Resources">
     <views:MvxApplication.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -15,7 +15,7 @@
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml" />
                 <ResourceDictionary Source="Styles/CommonCtrls.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+            <resources:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         </ResourceDictionary>
     </views:MvxApplication.Resources>
 </views:MvxApplication>

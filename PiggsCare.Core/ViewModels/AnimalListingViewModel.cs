@@ -20,6 +20,7 @@ namespace PiggsCare.Core.ViewModels
             animalStore.OnLoad += AnimalStoreOnOnLoad;
             animalStore.OnSave += AnimalStoreOnOnSave;
             animalStore.OnUpdate += AnimalStoreOnOnUpdate;
+            animalStore.OnDelete += AnimalStoreOnOnDelete;
         }
 
         #endregion
@@ -27,8 +28,9 @@ namespace PiggsCare.Core.ViewModels
         #region Commands
 
         public IMvxAsyncCommand LoadAnimalsCommand => new MvxAsyncCommand(TestCrudOperations);
-        public IMvxAsyncCommand OpenInsertRecordDialogCommand => new MvxAsyncCommand(ExecuteOpenInsertRecordDialog);
-        public MvxAsyncCommand<int> OpenModifyRecordDialogCommand => new(ExecuteOpenModifyRecordDialog);
+        public IMvxCommand OpenInsertRecordDialogCommand => new MvxCommand(ExecuteOpenInsertRecordDialog);
+        public IMvxCommand<int> OpenModifyRecordDialogCommand => new MvxCommand<int>(ExecuteOpenModifyRecordDialog);
+        public IMvxCommand<int> OpenRemoveRecordDialogCommand => new MvxCommand<int>(ExecuteOpenRemoveRecordDialog);
 
         #endregion
 
@@ -44,6 +46,10 @@ namespace PiggsCare.Core.ViewModels
             RaisePropertyChanged(nameof(Animals));
         }
 
+        private void AnimalStoreOnOnDelete( int obj )
+        {
+            RaisePropertyChanged(nameof(Animals));
+        }
 
         private void AnimalStoreOnOnLoad()
         {
@@ -127,15 +133,22 @@ namespace PiggsCare.Core.ViewModels
             }
         }
 
-        private async Task ExecuteOpenInsertRecordDialog()
+        private void ExecuteOpenInsertRecordDialog()
         {
+            // Open the AnimalCreateForm dialog
             _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(6);
-            // TODO Add functionality for inserting record
         }
 
-        private async Task ExecuteOpenModifyRecordDialog( int id )
+        private void ExecuteOpenModifyRecordDialog( int id )
         {
+            // Open the AnimalModifyForm dialog
             _modalNavigationControl.PopUp<AnimalModifyFormViewModel>(id);
+        }
+
+        private void ExecuteOpenRemoveRecordDialog( int id )
+        {
+            // Open the AnimalDeleteForm dialog
+            _modalNavigationControl.PopUp<AnimalDeleteFormViewModel>(id);
         }
 
         private async Task TestCrudOperations()

@@ -48,6 +48,10 @@
         <DataTemplate DataType="{x:Type viewModels:AnimalModifyFormViewModel}">
             <forms:AnimalModifyForm />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:AnimalDeleteFormViewModel}">
+            <forms:AnimalDeleteForm />
+        </DataTemplate>
     </views:MvxWpfView.Resources>
 
     <Border UseLayoutRounding="True">

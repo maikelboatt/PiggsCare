@@ -24,7 +24,9 @@
                        Foreground="{DynamicResource TertiaryTextColor}"
                        Text="Add New Pig"
                        TextAlignment="Center">
-                <icon:PackIconMaterial VerticalAlignment="Center" Kind="AccountPlusOutline" />
+                <icon:PackIconMaterial VerticalAlignment="Center"
+                                       Kind="AccountPlusOutline"
+                                       Style="{DynamicResource FormButtonIcon}" />
             </TextBlock>
 
             <!--  Input Elements  -->

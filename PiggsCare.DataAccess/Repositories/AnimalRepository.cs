@@ -72,7 +72,7 @@ namespace PiggsCare.DataAccess.Repositories
 
         public async Task DeleteAnimalAsync( int id )
         {
-            await dataAccess.CommandAsync("DeleteAnimal", new { Id = id });
+            await dataAccess.CommandAsync("DeleteAnimal", new { AnimalId = id }, Connectionstring);
         }
 
         public async Task<Animal?> GetAnimalByNameAsync( int name )

@@ -9,6 +9,14 @@
         <Setter Property="Height" Value="16" />
     </Style>
 
+    <!--  Form Header Icon  -->
+    <Style x:Key="FormButtonIcon"
+           BasedOn="{StaticResource IconButtonIcon}"
+           TargetType="iconPacks:PackIconMaterial">
+        <Setter Property="Padding" Value="3,5,0,0" />
+    </Style>
+
+
     <!--  Start: TextBox with Placeholder  -->
     <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
         <Setter Property="Background" Value="{DynamicResource PrimaryTextBoxBackgroundColor}" />
@@ -105,6 +113,12 @@
     </Style>
     <!--#endregion-->
 
+    <!--  Delete Button  -->
+    <Style x:Key="DeleteButton"
+           BasedOn="{StaticResource SuccessButton}"
+           TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="red" />
+    </Style>
     <!--#region SecondaryButton-->
 
     <Style x:Key="CancelButton"

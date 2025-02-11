@@ -32,6 +32,8 @@ namespace PiggsCare.Core.ViewModels
         public IMvxCommand<int> OpenModifyRecordDialogCommand => new MvxCommand<int>(ExecuteOpenModifyRecordDialog);
         public IMvxCommand<int> OpenRemoveRecordDialogCommand => new MvxCommand<int>(ExecuteOpenRemoveRecordDialog);
 
+        public IMvxCommand<int> OpenAnimalDetailsDialogCommand => new MvxCommand<int>(ExecuteOpenAnimalDetailsDialog);
+
         #endregion
 
         #region Event Handlers
@@ -119,7 +121,7 @@ namespace PiggsCare.Core.ViewModels
             IsLoading = true;
             try
             {
-                await _animalStore.Load();
+                // await _animalStore.Load();
                 LoadAnimals();
             }
             catch (Exception e)
@@ -149,6 +151,11 @@ namespace PiggsCare.Core.ViewModels
         {
             // Open the AnimalDeleteForm dialog
             _modalNavigationControl.PopUp<AnimalDeleteFormViewModel>(id);
+        }
+
+        private void ExecuteOpenAnimalDetailsDialog( int id )
+        {
+            _modalNavigationControl.PopUp<SelectedAnimalDetailsViewModel>(id);
         }
 
         private async Task TestCrudOperations()

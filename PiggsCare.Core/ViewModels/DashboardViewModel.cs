@@ -2,13 +2,13 @@ using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using MvvmCross.ViewModels;
+using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
 using System.Collections.ObjectModel;
 
 namespace PiggsCare.Core.ViewModels
 {
-    public class DashboardViewModel( IAnimalService animalService ):MvxViewModel
+    public class DashboardViewModel( IAnimalStore animalStore ):MvxViewModel
     {
         private double _female;
         private IChartValues _femaleValues;
@@ -90,7 +90,8 @@ namespace PiggsCare.Core.ViewModels
             IsLoading = true;
             try
             {
-                IEnumerable<Animal> animal = await animalService.GetAllAnimalsAsync();
+                await animalStore.Load();
+                IEnumerable<Animal> animal = animalStore.Animals;
                 Animal[] enumerable = animal as Animal[] ?? animal.ToArray();
                 _male = enumerable.Count(pig => pig.Gender == "Male");
                 _female = enumerable.Count(pig => pig.Gender == "Female");

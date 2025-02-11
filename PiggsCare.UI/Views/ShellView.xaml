@@ -52,6 +52,10 @@
         <DataTemplate DataType="{x:Type viewModels:AnimalDeleteFormViewModel}">
             <forms:AnimalDeleteForm />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:SelectedAnimalDetailsViewModel}">
+            <components:SelectedAnimalDetails />
+        </DataTemplate>
     </views:MvxWpfView.Resources>
 
     <Border UseLayoutRounding="True">

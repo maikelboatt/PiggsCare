@@ -41,6 +41,14 @@
             <components:Dashboard />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type viewModels:HealthListingViewModel}">
+            <components:HealthListing />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:SelectedAnimalDetailsViewModel}">
+            <components:SelectedAnimalDetails />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type viewModels:AnimalCreateFormViewModel}">
             <forms:AnimalCreateForm />
         </DataTemplate>
@@ -53,9 +61,6 @@
             <forms:AnimalDeleteForm />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type viewModels:SelectedAnimalDetailsViewModel}">
-            <components:SelectedAnimalDetails />
-        </DataTemplate>
     </views:MvxWpfView.Resources>
 
     <Border UseLayoutRounding="True">

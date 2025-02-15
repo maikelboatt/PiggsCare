@@ -1,12 +1,22 @@
 using MvvmCross.ViewModels;
+using PiggsCare.Core.Factory;
 
 namespace PiggsCare.Core.ViewModels
 {
-    public class SelectedAnimalDetailsViewModel:MvxViewModel<int>, ISelectedAnimalsDetailsViewModel
+    public class SelectedAnimalDetailsViewModel( IViewModelFactory viewModelFactory ):MvxViewModel<int>, ISelectedAnimalsDetailsViewModel
     {
         public override void Prepare( int parameter )
         {
             Console.WriteLine(parameter);
+            SetupViewModel();
+        }
+
+
+        private void SetupViewModel()
+        {
+            HealthListingViewModel? viewmodel = viewModelFactory.CreateViewModel<HealthListingViewModel>();
+            CurrentViewModel = viewmodel;
+            viewmodel?.Initialize();
         }
 
         #region Fields
@@ -18,10 +28,17 @@ namespace PiggsCare.Core.ViewModels
         private int _certificateNumber;
         private string _gender;
         private float _backFatIndex;
+        private MvxViewModel? _currentViewModel;
 
         #endregion
 
         #region Properties
+
+        public MvxViewModel? CurrentViewModel
+        {
+            get => _currentViewModel;
+            set => SetProperty(ref _currentViewModel, value);
+        }
 
         public int Name
         {

@@ -4,10 +4,10 @@ namespace PiggsCare.DataAccess.DTO
     {
         public int HealthRecordId { get; init; }
         public required int AnimalId { get; init; }
-        public required DateTime RecordDate { get; set; }
-        public required string Diagnosis { get; set; }
-        public required string Treatment { get; set; }
-        public required string Outcome { get; set; }
+        public required DateTime RecordDate { get; init; }
+        public required string Diagnosis { get; init; }
+        public required string Treatment { get; init; }
+        public required string Outcome { get; init; }
 
         // // Navigation property
         // public AnimalDto AnimalDto { get; set; }

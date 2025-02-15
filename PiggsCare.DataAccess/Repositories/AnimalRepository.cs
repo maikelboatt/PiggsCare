@@ -49,7 +49,8 @@ namespace PiggsCare.DataAccess.Repositories
                                           {
                                               record.Name, record.Breed, record.BirthDate, record.CertificateNumber, record.Gender, record.BackFatIndex
                                           },
-                                          Connectionstring);
+                                          Connectionstring
+                );
         }
 
         public async Task UpdateAnimalAsync( Animal animal )

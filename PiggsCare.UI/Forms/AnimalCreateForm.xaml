@@ -36,6 +36,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -85,8 +86,15 @@
                                          Description="Back Fat Index"
                                          Placeholder="34" />
 
+                <TextBox Grid.Row="3"
+                         Grid.Column="0"
+                         Text="{Binding Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Grid.Row="3"
+                           Grid.Column="1"
+                           Text="{Binding Errors[Name], Converter={StaticResource ErrorConverter}}" />
+
                 <!--  //Cancel Button  -->
-                <Button Grid.Row="3"
+                <Button Grid.Row="4"
                         Grid.Column="0"
                         Command="{Binding CancelRecordCommand}"
                         Content="Cancel"
@@ -94,7 +102,7 @@
                         Style="{StaticResource CancelButton}" />
 
                 <!--  //Submit Button  -->
-                <Button Grid.Row="3"
+                <Button Grid.Row="4"
                         Grid.Column="1"
                         Command="{Binding SubmitRecordCommand}"
                         Content="Submit"

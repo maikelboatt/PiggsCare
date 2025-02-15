@@ -51,7 +51,6 @@ namespace PiggsCare.Core.ViewModels
 
         #endregion
 
-
         #region Fields
 
         private int _animalId;

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using MvvmCross;
 using MvvmCross.Exceptions;
 using MvvmCross.IoC;
@@ -9,6 +10,7 @@ using PiggsCare.Core.ViewModels;
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.Repositories;
 using PiggsCare.Domain.Services;
+using System.IO;
 using System.Reflection;
 
 namespace PiggsCare.Core
@@ -17,6 +19,15 @@ namespace PiggsCare.Core
     {
         public override void Initialize()
         {
+            IConfigurationBuilder builder = new ConfigurationBuilder()
+                                            .SetBasePath(Directory.GetCurrentDirectory())
+                                            .AddJsonFile("appsettings.json", true, true);
+
+            IConfiguration config = builder.Build();
+
+            // Register the configuration file
+            Mvx.IoCProvider?.RegisterSingleton(config);
+
 
             Assembly[] assembliesToScan =
             [
@@ -54,8 +65,10 @@ namespace PiggsCare.Core
                     .RegisterAsDynamic();
             }
 
+
             // Register ISqlDataAccess
-            Mvx.IoCProvider?.RegisterSingleton<ISqlDataAccess>(new TestDataAccess());
+            // Mvx.IoCProvider.LazyConstructAndRegisterSingleton<ISqlDataAccess, SqlDataAccess>();
+            Mvx.IoCProvider.LazyConstructAndRegisterSingleton<ISqlDataAccess, TestDataAccess>();
 
             // Register ModalNavigationStore
             Mvx.IoCProvider?.RegisterSingleton(new ModalNavigationStore());

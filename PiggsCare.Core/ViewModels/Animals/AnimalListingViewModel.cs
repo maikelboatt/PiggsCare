@@ -3,18 +3,20 @@ using MvvmCross.ViewModels;
 using PiggsCare.Core.Control;
 using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
+using PiggsCare.Domain.Services;
 using System.Collections.Specialized;
 
-namespace PiggsCare.Core.ViewModels
+namespace PiggsCare.Core.ViewModels.Animals
 {
     public class AnimalListingViewModel:MvxViewModel
     {
         #region Constructor
 
-        public AnimalListingViewModel( IModalNavigationControl modalNavigationControl, IAnimalStore animalStore )
+        public AnimalListingViewModel( IModalNavigationControl modalNavigationControl, IAnimalStore animalStore, IHealthRecordService healthRecordService )
         {
             _modalNavigationControl = modalNavigationControl;
             _animalStore = animalStore;
+            _healthRecordService = healthRecordService;
             _animals.CollectionChanged += AnimalsOnCollectionChanged;
 
             animalStore.OnLoad += AnimalStoreOnOnLoad;
@@ -25,9 +27,18 @@ namespace PiggsCare.Core.ViewModels
 
         #endregion
 
+        #region ViewModelLifeCycle
+
+        public override async Task Initialize()
+        {
+            await LoadAnimalsAsync();
+            await base.Initialize();
+        }
+
+        #endregion
+
         #region Commands
 
-        public IMvxAsyncCommand LoadAnimalsCommand => new MvxAsyncCommand(TestCrudOperations);
         public IMvxCommand OpenInsertRecordDialogCommand => new MvxCommand(ExecuteOpenInsertRecordDialog);
         public IMvxCommand<int> OpenModifyRecordDialogCommand => new MvxCommand<int>(ExecuteOpenModifyRecordDialog);
         public IMvxCommand<int> OpenRemoveRecordDialogCommand => new MvxCommand<int>(ExecuteOpenRemoveRecordDialog);
@@ -67,27 +78,12 @@ namespace PiggsCare.Core.ViewModels
 
         #region Fields
 
-        private readonly MvxObservableCollection<Animal> _animals = [];
+        private MvxObservableCollection<Animal> _animals => new(_animalStore.Animals);
 
         private readonly IModalNavigationControl _modalNavigationControl;
         private readonly IAnimalStore _animalStore;
+        private readonly IHealthRecordService _healthRecordService;
         private bool _isLoading;
-
-        #endregion
-
-        #region ViewModelLifeCycle
-
-        public override void Prepare()
-        {
-            Console.WriteLine("Prepare animals listing");
-            base.Prepare();
-        }
-
-        public override async Task Initialize()
-        {
-            await LoadAnimalsAsync();
-            await base.Initialize();
-        }
 
         #endregion
 
@@ -106,23 +102,14 @@ namespace PiggsCare.Core.ViewModels
 
         #region Methods
 
-        private void LoadAnimals()
-        {
-            _animals.Clear();
-            IEnumerable<Animal> animals = _animalStore.Animals;
-            foreach (Animal animal in animals)
-            {
-                _animals.Add(animal);
-            }
-        }
-
         private async Task LoadAnimalsAsync()
         {
             IsLoading = true;
             try
             {
-                // await _animalStore.Load();
-                LoadAnimals();
+                await _animalStore.Load();
+                _animals.Clear();
+                UpdateView();
             }
             catch (Exception e)
             {
@@ -133,6 +120,11 @@ namespace PiggsCare.Core.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        private void UpdateView()
+        {
+            RaisePropertyChanged(nameof(Animals));
         }
 
         private void ExecuteOpenInsertRecordDialog()
@@ -156,21 +148,6 @@ namespace PiggsCare.Core.ViewModels
         private void ExecuteOpenAnimalDetailsDialog( int id )
         {
             _modalNavigationControl.PopUp<SelectedAnimalDetailsViewModel>(id);
-        }
-
-        private async Task TestCrudOperations()
-        {
-            // const Gender male = Gender.Male;
-            // string? maleString = Enum.GetName(male);
-            // Animal record = new(102, "Oestrus", DateTime.Now, 33, maleString, 34.16F);
-            // await _animalService.CreateAnimalAsync(record);
-
-            // Animal? animal = await _animalService.GetAnimalByNameAsync(102);
-            //
-            // // foreach (Animal animal in animals)
-            // Console.WriteLine(animal);
-            // _modalNavigationControl.PopUp<AnimalCreateFormViewModel>(7);
-            // _modalNavigationControl.Open<TestViewModel>();
         }
 
         #endregion

@@ -3,7 +3,7 @@ using MvvmCross.ViewModels;
 using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 
-namespace PiggsCare.Core.ViewModels
+namespace PiggsCare.Core.ViewModels.Animals
 {
     public class AnimalModifyFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore ):MvxViewModel<int>, IAnimalModifyFormViewModel
     {

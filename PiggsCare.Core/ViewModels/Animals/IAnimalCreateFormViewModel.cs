@@ -1,6 +1,6 @@
 using MvvmCross.ViewModels;
 
-namespace PiggsCare.Core.ViewModels
+namespace PiggsCare.Core.ViewModels.Animals
 {
     public interface IAnimalCreateFormViewModel:IMvxViewModel
     {

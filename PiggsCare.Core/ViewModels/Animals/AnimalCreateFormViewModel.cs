@@ -6,7 +6,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace PiggsCare.Core.ViewModels
+namespace PiggsCare.Core.ViewModels.Animals
 {
     public class AnimalCreateFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore ):MvxViewModel<int>, IAnimalCreateFormViewModel, INotifyDataErrorInfo
     {

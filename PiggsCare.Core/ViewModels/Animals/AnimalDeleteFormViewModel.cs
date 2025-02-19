@@ -4,7 +4,7 @@ using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 using System.Windows;
 
-namespace PiggsCare.Core.ViewModels
+namespace PiggsCare.Core.ViewModels.Animals
 {
     public class AnimalDeleteFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore ):MvxViewModel<int>, IAnimalDeleteFormViewModel
     {

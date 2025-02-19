@@ -36,19 +36,5 @@ namespace PiggsCare.Domain.Services
         /// </summary>
         /// <param name="id" >Unique identification of health record</param>
         Task DeleteHealthRecordAsync( int id );
-
-        /// <summary>
-        ///     Gets health record by name
-        /// </summary>
-        /// <param name="name" >Name of pig</param>
-        /// <returns></returns>
-        Task<HealthRecord?> GetHealthRecordByNameAsync( int name );
-
-        /// <summary>
-        ///     Gets health-record by breed
-        /// </summary>
-        /// <param name="breed" >Breed of health-record</param>
-        /// <returns></returns>
-        Task<IEnumerable<HealthRecord>> GetHealthRecordByBreedAsync( string breed );
     }
 }

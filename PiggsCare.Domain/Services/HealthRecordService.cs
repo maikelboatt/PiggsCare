@@ -29,15 +29,5 @@ namespace PiggsCare.Domain.Services
         {
             await recordRepository.DeleteHealthRecordAsync(id);
         }
-
-        public async Task<HealthRecord?> GetHealthRecordByNameAsync( int name )
-        {
-            return await recordRepository.GetHealthRecordByNameAsync(name);
-        }
-
-        public async Task<IEnumerable<HealthRecord>> GetHealthRecordByBreedAsync( string breed )
-        {
-            return await recordRepository.GetHealthRecordByBreedAsync(breed);
-        }
     }
 }

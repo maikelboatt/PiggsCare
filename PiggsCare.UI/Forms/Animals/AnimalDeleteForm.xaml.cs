@@ -1,6 +1,6 @@
 using MvvmCross.Platforms.Wpf.Views;
 
-namespace PiggsCare.UI.Forms
+namespace PiggsCare.UI.Forms.Animals
 {
     public partial class AnimalDeleteForm:MvxWpfView
     {

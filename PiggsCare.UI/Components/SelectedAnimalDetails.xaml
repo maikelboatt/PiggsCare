@@ -104,6 +104,13 @@
                                     </StackPanel>
                                 </RadioButton>
 
+                                <Button Width="100"
+                                        HorizontalAlignment="Center"
+                                        Command="{Binding PowerOffCommand}"
+                                        Style="{DynamicResource DelBtn}">
+                                    <iconPacks:PackIconMaterial Kind="Power" Style="{StaticResource IconButtonIcon}" />
+                                </Button>
+
 
                             </StackPanel>
                             <!--  End Navigation Buttons  -->

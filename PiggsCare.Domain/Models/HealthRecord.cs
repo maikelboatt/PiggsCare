@@ -17,7 +17,7 @@ namespace PiggsCare.Domain.Models
 
         public override string ToString()
         {
-            return $"Animal Identifier: {AnimalId}, Record Date: {RecordDate}, Diagnosis: {Diagnosis}, Treatment: {Treatment}, Outcome: {Outcome}";
+            return $"Health Record Key: {HealthRecordId}, Animal Identifier: {AnimalId}, Record Date: {RecordDate}, Diagnosis: {Diagnosis}, Treatment: {Treatment}, Outcome: {Outcome}";
         }
     }
 }

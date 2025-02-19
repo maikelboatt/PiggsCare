@@ -1,5 +1,6 @@
 ﻿using MvvmCross.ViewModels;
 using PiggsCare.Core.Factory;
+using PiggsCare.Core.ViewModels.Animals;
 
 namespace PiggsCare.Core.ViewModels
 {

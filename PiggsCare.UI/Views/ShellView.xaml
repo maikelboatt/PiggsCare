@@ -1,9 +1,12 @@
 <views:MvxWpfView x:Class="PiggsCare.UI.Views.ShellView"
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:animalForm="clr-namespace:PiggsCare.UI.Forms.Animals"
+                  xmlns:animalViewModels="clr-namespace:PiggsCare.Core.ViewModels.Animals;assembly=PiggsCare.Core"
                   xmlns:components="clr-namespace:PiggsCare.UI.Components"
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                  xmlns:forms="clr-namespace:PiggsCare.UI.Forms"
+                  xmlns:healthRecordViewModel="clr-namespace:PiggsCare.Core.ViewModels.HealthRecords;assembly=PiggsCare.Core"
+                  xmlns:healthRecordsForm="clr-namespace:PiggsCare.UI.Forms.HealthRecords"
                   xmlns:local="clr-namespace:PiggsCare.UI.Views"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:modalDialogControl="clr-namespace:ModalDialogControl;assembly=ModalDialogControl"
@@ -29,19 +32,15 @@
             <local:NotificationView />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type viewModels:AnimalListingViewModel}">
+        <DataTemplate DataType="{x:Type animalViewModels:AnimalListingViewModel}">
             <components:AnimalListing />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:TestViewModel}">
-            <components:Test />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
             <components:Dashboard />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type viewModels:HealthListingViewModel}">
+        <DataTemplate DataType="{x:Type healthRecordViewModel:HealthListingViewModel}">
             <components:HealthListing />
         </DataTemplate>
 
@@ -49,16 +48,28 @@
             <components:SelectedAnimalDetails />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type viewModels:AnimalCreateFormViewModel}">
-            <forms:AnimalCreateForm />
+        <DataTemplate DataType="{x:Type animalViewModels:AnimalCreateFormViewModel}">
+            <animalForm:AnimalCreateForm />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type viewModels:AnimalModifyFormViewModel}">
-            <forms:AnimalModifyForm />
+        <DataTemplate DataType="{x:Type animalViewModels:AnimalModifyFormViewModel}">
+            <animalForm:AnimalModifyForm />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type viewModels:AnimalDeleteFormViewModel}">
-            <forms:AnimalDeleteForm />
+        <DataTemplate DataType="{x:Type animalViewModels:AnimalDeleteFormViewModel}">
+            <animalForm:AnimalDeleteForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type healthRecordViewModel:HealthRecordCreateFormViewModel}">
+            <healthRecordsForm:HealthRecordCreateForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type healthRecordViewModel:HealthRecordModifyFormViewModel}">
+            <healthRecordsForm:HealthRecordModifyForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type healthRecordViewModel:HealthRecordDeleteFormViewModel}">
+            <healthRecordsForm:HealthRecordDeleteForm />
         </DataTemplate>
 
     </views:MvxWpfView.Resources>

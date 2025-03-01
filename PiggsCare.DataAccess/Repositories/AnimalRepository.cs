@@ -2,10 +2,11 @@ using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
 using PiggsCare.Domain.Repositories;
+using PiggsCare.Domain.Services;
 
 namespace PiggsCare.DataAccess.Repositories
 {
-    public class AnimalRepository( ISqlDataAccess dataAccess ):IAnimalRepository
+    public class AnimalRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IAnimalRepository
     {
         private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggyKare;Integrated Security=True;TrustServerCertificate=True;";
 
@@ -15,7 +16,7 @@ namespace PiggsCare.DataAccess.Repositories
             IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("dbo.GetAllAnimals", new { }, Connectionstring);
 
             // Convert AnimalDto Object to Animal Object
-            return result.Select(x => new Animal(x.AnimalId, x.Name, x.Breed, x.BirthDate, x.CertificateNumber, x.Gender, x.BackFatIndex));
+            return result.Select(x => new Animal(x.AnimalId, x.Name, x.Breed, dateConverterService.GetDateOnly(x.BirthDate), x.CertificateNumber, x.Gender, x.BackFatIndex));
         }
 
         public async Task<Animal?> GetAnimalByIdAsync( int id )
@@ -26,7 +27,13 @@ namespace PiggsCare.DataAccess.Repositories
 
             // Converts AnimalDto to Animal object
             return animalDto != null
-                ? new Animal(animalDto.AnimalId, animalDto.Name, animalDto.Breed, animalDto.BirthDate, animalDto.CertificateNumber, animalDto.Gender, animalDto.BackFatIndex)
+                ? new Animal(animalDto.AnimalId,
+                             animalDto.Name,
+                             animalDto.Breed,
+                             dateConverterService.GetDateOnly(animalDto.BirthDate),
+                             animalDto.CertificateNumber,
+                             animalDto.Gender,
+                             animalDto.BackFatIndex)
                 : null;
         }
 
@@ -37,7 +44,7 @@ namespace PiggsCare.DataAccess.Repositories
             {
                 Name = animal.Name,
                 Breed = animal.Breed,
-                BirthDate = animal.BirthDate,
+                BirthDate = dateConverterService.GetDateTime(animal.BirthDate),
                 CertificateNumber = animal.CertificateNumber,
                 Gender = animal.Gender,
                 BackFatIndex = animal.BackFatIndex
@@ -61,7 +68,7 @@ namespace PiggsCare.DataAccess.Repositories
                 AnimalId = animal.AnimalId,
                 Name = animal.Name,
                 Breed = animal.Breed,
-                BirthDate = animal.BirthDate,
+                BirthDate = dateConverterService.GetDateTime(animal.BirthDate),
                 CertificateNumber = animal.CertificateNumber,
                 Gender = animal.Gender,
                 BackFatIndex = animal.BackFatIndex
@@ -84,7 +91,13 @@ namespace PiggsCare.DataAccess.Repositories
 
             // Converts AnimalDto to Animal object
             return animalDto != null
-                ? new Animal(animalDto.AnimalId, animalDto.Name, animalDto.Breed, animalDto.BirthDate, animalDto.CertificateNumber, animalDto.Gender, animalDto.BackFatIndex)
+                ? new Animal(animalDto.AnimalId,
+                             animalDto.Name,
+                             animalDto.Breed,
+                             dateConverterService.GetDateOnly(animalDto.BirthDate),
+                             animalDto.CertificateNumber,
+                             animalDto.Gender,
+                             animalDto.BackFatIndex)
                 : null;
         }
 
@@ -93,7 +106,7 @@ namespace PiggsCare.DataAccess.Repositories
             IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("GetAnimalByBreed", new { Breed = breed }, Connectionstring);
 
             // Convert AnimalDto Object to Animal Object
-            return result.Select(x => new Animal(x.AnimalId, x.Name, x.Breed, x.BirthDate, x.CertificateNumber, x.Gender, x.BackFatIndex));
+            return result.Select(x => new Animal(x.AnimalId, x.Name, x.Breed, dateConverterService.GetDateOnly(x.BirthDate), x.CertificateNumber, x.Gender, x.BackFatIndex));
         }
     }
 }

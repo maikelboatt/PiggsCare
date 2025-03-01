@@ -31,6 +31,7 @@
         <PackageReference Include="MvvmCross.Platforms.Wpf" Version="9.3.0"/>
         <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0"/>
         <PackageReference Include="SimpleModal.WPF" Version="1.0.0"/>
+        <PackageReference Include="WPF-UI" Version="4.0.1"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -45,6 +46,11 @@
             <SubType>Designer</SubType>
         </Page>
         <Page Update="Forms\Animals\AnimalModifyForm.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Forms\Breeding\BreedingEventCreateForm.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>

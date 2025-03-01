@@ -3,6 +3,8 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:animalForm="clr-namespace:PiggsCare.UI.Forms.Animals"
                   xmlns:animalViewModels="clr-namespace:PiggsCare.Core.ViewModels.Animals;assembly=PiggsCare.Core"
+                  xmlns:breedingEventForm="clr-namespace:PiggsCare.UI.Forms.Breeding"
+                  xmlns:breedingEventViewModel="clr-namespace:PiggsCare.Core.ViewModels.Breeding;assembly=PiggsCare.Core"
                   xmlns:components="clr-namespace:PiggsCare.UI.Components"
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                   xmlns:healthRecordViewModel="clr-namespace:PiggsCare.Core.ViewModels.HealthRecords;assembly=PiggsCare.Core"
@@ -44,6 +46,10 @@
             <components:HealthListing />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type breedingEventViewModel:BreedingEventListingViewModel}">
+            <components:BreedingListing />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type viewModels:SelectedAnimalDetailsViewModel}">
             <components:SelectedAnimalDetails />
         </DataTemplate>
@@ -71,6 +77,19 @@
         <DataTemplate DataType="{x:Type healthRecordViewModel:HealthRecordDeleteFormViewModel}">
             <healthRecordsForm:HealthRecordDeleteForm />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type breedingEventViewModel:BreedingEventCreateFormViewModel}">
+            <breedingEventForm:BreedingEventCreateForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type breedingEventViewModel:BreedingEventModifyFormViewModel}">
+            <breedingEventForm:BreedingEventModifyForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type breedingEventViewModel:BreedingEventDeleteFormViewModel}">
+            <breedingEventForm:BreedingEventDeleteForm />
+        </DataTemplate>
+
 
     </views:MvxWpfView.Resources>
 

@@ -2,7 +2,6 @@ using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Factory;
 using PiggsCare.Core.Stores;
-using System.Windows.Input;
 
 namespace PiggsCare.Core.ViewModels
 {
@@ -74,9 +73,9 @@ namespace PiggsCare.Core.ViewModels
 
         #region Commands
 
-        public ICommand NavigateToHome { get; private set; }
-        public ICommand NavigateToAnalytics { get; private set; }
-        public ICommand NavigateToNotifications { get; private set; }
+        public MvxCommand NavigateToHome { get; private set; }
+        public MvxCommand NavigateToAnalytics { get; private set; }
+        public MvxCommand NavigateToNotifications { get; private set; }
 
         #endregion
     }

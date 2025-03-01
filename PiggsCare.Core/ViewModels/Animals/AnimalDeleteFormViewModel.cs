@@ -63,7 +63,7 @@ namespace PiggsCare.Core.ViewModels.Animals
         private int _animalId;
         private int _name;
         private string _breed;
-        private DateTime _birthDate;
+        private DateOnly _birthDate;
         private int _certificateNumber;
         private string _gender;
         private float _backFatIndex;
@@ -89,7 +89,7 @@ namespace PiggsCare.Core.ViewModels.Animals
             get => _breed;
             set => SetProperty(ref _breed, value);
         }
-        public DateTime BirthDate
+        public DateOnly BirthDate
         {
             get => _birthDate;
             set => SetProperty(ref _birthDate, value);

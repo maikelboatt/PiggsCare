@@ -5,7 +5,7 @@ namespace PiggsCare.DataAccess.DTO
         public int BreedingEventId { get; init; }
         public required int AnimalId { get; init; }
         public required DateTime AiDate { get; init; }
-        public required DateTime? ExpectedFarrowDate { get; init; } // Nullable DateTime
+        public required DateTime ExpectedFarrowDate { get; init; } // Nullable DateTime
 
         // // Navigation properties
         // public AnimalDto AnimalDto { get; set; }

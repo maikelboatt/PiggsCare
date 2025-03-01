@@ -46,6 +46,7 @@
                                 <!--  Tag="{DynamicResource Analytics}" />  -->
 
                                 <RadioButton Margin="12,1,0,1"
+                                             Command="{Binding NavigateToHealth}"
                                              IsChecked="True"
                                              Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">
@@ -54,13 +55,14 @@
                                     </StackPanel>
                                 </RadioButton>
 
-                                <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
+                                <RadioButton Margin="12,1,0,1"
+                                             Command="{Binding NavigateToBreeding}"
+                                             Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconMaterial Kind="Stethoscope" />
                                         <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Breeding " />
                                     </StackPanel>
                                 </RadioButton>
-
 
                                 <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">

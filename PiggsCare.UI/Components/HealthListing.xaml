@@ -83,7 +83,7 @@
                           VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Width="*"
-                                            Binding="{Binding RecordDate}"
+                                            Binding="{Binding RecordDate, Converter={StaticResource ShortDateConverter}}"
                                             CanUserResize="False"
                                             Header="Record Date"
                                             IsReadOnly="True" />

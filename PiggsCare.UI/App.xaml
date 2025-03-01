@@ -16,6 +16,9 @@
                 <ResourceDictionary Source="Styles/CommonCtrls.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <resources:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+            <resources:LongDateConverter x:Key="LongDateConverter" />
+            <resources:ShortDateConverter x:Key="ShortDateConverter" />
+            <resources:NullToBoolConverter x:Key="NullToBoolConverter" />
             <resources:ErrorConverter x:Key="ErrorConverter" />
         </ResourceDictionary>
     </views:MvxApplication.Resources>

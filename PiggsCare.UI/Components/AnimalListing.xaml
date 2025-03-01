@@ -99,7 +99,7 @@
                                             IsReadOnly="True" />
 
                         <DataGridTextColumn Width="*"
-                                            Binding="{Binding BirthDate}"
+                                            Binding="{Binding BirthDate, Converter={StaticResource ShortDateConverter}}"
                                             CanUserResize="False"
                                             Header="Birth date"
                                             IsReadOnly="True" />

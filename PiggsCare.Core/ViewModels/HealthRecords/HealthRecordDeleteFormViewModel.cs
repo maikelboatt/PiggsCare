@@ -33,7 +33,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #region Fields
 
-        private DateTime _recordDate;
+        private DateOnly _recordDate;
         private string _diagnosis;
         private string _treatment;
         private string _outcome;
@@ -44,7 +44,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #region Properties
 
-        public DateTime RecordDate
+        public DateOnly RecordDate
         {
             get => _recordDate;
             set => SetProperty(ref _recordDate, value);

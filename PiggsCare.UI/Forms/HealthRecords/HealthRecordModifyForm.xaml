@@ -42,31 +42,31 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!--  //Name  -->
+                <!--  //Record Date  -->
                 <resources:CustomTextBox Grid.Row="0"
                                          Grid.Column="0"
-                                         Data="{Binding RecordDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding RecordDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Record Date"
                                          Placeholder="101" />
 
-                <!--  //Certificate Number  -->
+                <!--  //Diagnosis  -->
                 <resources:CustomTextBox Grid.Row="0"
                                          Grid.Column="1"
-                                         Data="{Binding Diagnosis, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Diagnosis, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Diagnosis"
                                          Placeholder="12" />
 
-                <!--  //Breed  -->
+                <!--  //Treatment  -->
                 <resources:CustomTextBox Grid.Row="1"
                                          Grid.Column="0"
-                                         Data="{Binding Treatment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Treatment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Treatment"
                                          Placeholder="Obolo" />
 
-                <!--  //Gender  -->
+                <!--  //Outcome  -->
                 <resources:CustomTextBox Grid.Row="1"
                                          Grid.Column="1"
-                                         Data="{Binding Outcome, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Outcome, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Outcome"
                                          Placeholder="Male" />
 

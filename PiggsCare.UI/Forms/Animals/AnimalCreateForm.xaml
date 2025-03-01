@@ -36,7 +36,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -47,54 +46,48 @@
                 <!--  //Name  -->
                 <resources:CustomTextBox Grid.Row="0"
                                          Grid.Column="0"
-                                         Data="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Name"
                                          Placeholder="101" />
 
                 <!--  //Certificate Number  -->
                 <resources:CustomTextBox Grid.Row="0"
                                          Grid.Column="1"
-                                         Data="{Binding CertificateNumber, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding CertificateNumber, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Certificate Number"
                                          Placeholder="12" />
 
                 <!--  //Breed  -->
                 <resources:CustomTextBox Grid.Row="1"
                                          Grid.Column="0"
-                                         Data="{Binding Breed, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Breed, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Breed"
                                          Placeholder="Obolo" />
 
                 <!--  //Gender  -->
                 <resources:CustomTextBox Grid.Row="1"
                                          Grid.Column="1"
-                                         Data="{Binding Gender, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Gender, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Gender"
                                          Placeholder="Male" />
 
                 <!--  //Birth Date  -->
                 <resources:CustomTextBox Grid.Row="2"
                                          Grid.Column="0"
-                                         Data="{Binding BirthDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding BirthDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Birth Date"
                                          Placeholder="12-11-2023" />
 
                 <!--  //Back Fat Index  -->
                 <resources:CustomTextBox Grid.Row="2"
                                          Grid.Column="1"
-                                         Data="{Binding BackFatIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding BackFatIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Back Fat Index"
                                          Placeholder="34" />
 
-                <TextBox Grid.Row="3"
-                         Grid.Column="0"
-                         Text="{Binding Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Grid.Row="3"
-                           Grid.Column="1"
-                           Text="{Binding Errors[Name], Converter={StaticResource ErrorConverter}}" />
 
                 <!--  //Cancel Button  -->
-                <Button Grid.Row="4"
+                <Button Grid.Row="3"
                         Grid.Column="0"
                         Command="{Binding CancelRecordCommand}"
                         Content="Cancel"
@@ -102,7 +95,7 @@
                         Style="{StaticResource CancelButton}" />
 
                 <!--  //Submit Button  -->
-                <Button Grid.Row="4"
+                <Button Grid.Row="3"
                         Grid.Column="1"
                         Command="{Binding SubmitRecordCommand}"
                         Content="Submit"

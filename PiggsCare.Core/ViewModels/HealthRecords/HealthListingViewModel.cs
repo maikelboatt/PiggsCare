@@ -100,26 +100,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         public IEnumerable<HealthRecord> HealthRecords => _healthRecords;
         public int AnimalId { get; private set; }
 
-        public DateTime RecordDate
-        {
-            get => _recordDate;
-            set => SetProperty(ref _recordDate, value);
-        }
-        public string Diagnosis
-        {
-            get => _diagnosis;
-            set => SetProperty(ref _diagnosis, value);
-        }
-        public string Treatment
-        {
-            get => _treatment;
-            set => SetProperty(ref _treatment, value);
-        }
-        public string Outcome
-        {
-            get => _outcome;
-            set => SetProperty(ref _outcome, value);
-        }
 
         public bool IsLoading
         {
@@ -132,10 +112,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #region Fields
 
-        private DateTime _recordDate;
-        private string _diagnosis;
-        private string _treatment;
-        private string _outcome;
         private readonly IHealthRecordStore _healthRecordStore;
         private readonly IModalNavigationControl _modalNavigationControl;
         private bool _isLoading;

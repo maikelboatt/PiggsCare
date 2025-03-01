@@ -4,7 +4,7 @@ namespace PiggsCare.Domain.Models
         int animalId,
         int name,
         string breed,
-        DateTime birthDate,
+        DateOnly birthDate,
         int certificateNumber,
         string gender,
         float backFatIndex )
@@ -12,7 +12,7 @@ namespace PiggsCare.Domain.Models
         public int AnimalId { get; init; } = animalId;
         public int Name { get; init; } = name;
         public string Breed { get; init; } = breed;
-        public DateTime BirthDate { get; init; } = birthDate;
+        public DateOnly BirthDate { get; init; } = birthDate;
         public int CertificateNumber { get; init; } = certificateNumber;
         public string Gender { get; init; } = gender;
         public float BackFatIndex { get; init; } = backFatIndex;

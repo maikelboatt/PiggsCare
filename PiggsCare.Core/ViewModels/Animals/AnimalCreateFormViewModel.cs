@@ -1,103 +1,152 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Stores;
+using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
 using System.Collections;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace PiggsCare.Core.ViewModels.Animals
 {
-    public class AnimalCreateFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore ):MvxViewModel<int>, IAnimalCreateFormViewModel, INotifyDataErrorInfo
+    public class AnimalCreateFormViewModel:MvxViewModel<int>, IAnimalCreateFormViewModel, INotifyDataErrorInfo
     {
+        #region ViewModel Life-Cycle
+
         public override void Prepare( int parameter )
         {
             Console.WriteLine(parameter);
         }
 
-        #region Validation
+        #endregion
 
-        private void ValidateProperty<T>( T value, string propertyName )
+        #region Constructor
+
+        public AnimalCreateFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore, IAnimalRecordValidation recordValidation )
         {
-            ValidationContext validationContext = new(this) { MemberName = propertyName };
-            List<ValidationResult> results = [];
+            _modalNavigationStore = modalNavigationStore;
+            _animalStore = animalStore;
+            _recordValidation = recordValidation;
+            _recordValidation.Errors.Clear();
 
-            if (Validator.TryValidateProperty(value, validationContext, results))
-            {
-                ClearErrors(propertyName);
-            }
-            else
-            {
-                AddErrors(propertyName, results.Select(r => r.ErrorMessage));
-            }
+            recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+        }
+
+        private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(e.PropertyName));
+            RaisePropertyChanged(nameof(HasErrors));
+            RaisePropertyChanged(nameof(CanSubmitRecord));
         }
 
         #endregion
+
 
         #region Methods
 
         private void ExecuteCancelCommand()
         {
-            modalNavigationStore.Close();
+            _modalNavigationStore.Close();
         }
 
         private async Task ExecuteSubmitRecord()
         {
             Animal record = GetAnimalFromFields();
-            await animalStore.Create(record);
-            modalNavigationStore.Close();
+            await _animalStore.Create(record);
+            _modalNavigationStore.Close();
         }
 
         private Animal GetAnimalFromFields()
         {
-            return new Animal(1, Name, Breed, DateTime.Now, CertificateNumber, Gender, BackFatIndex);
+            return new Animal(1, Name, Breed, BirthDate, CertificateNumber, Gender, BackFatIndex);
         }
 
         #endregion
 
         #region Properties
 
-        [Required(ErrorMessage = "Please enter the name of the animal")]
         public int Name
         {
             get => _name;
-            set => SetProperty(ref _name, value);
+            set
+            {
+                if (value.Equals(_name)) return;
+                _name = value;
+                _recordValidation.ValidateProp(value);
+                RaisePropertyChanged();
+            }
         }
-        [Required(ErrorMessage = "Please enter the breed of the animal")]
+
         public string Breed
         {
             get => _breed;
-            set => SetProperty(ref _breed, value);
+            set
+            {
+                if (value.Equals(_breed)) return;
+                _breed = value;
+                _recordValidation.ValidateProp(value);
+                RaisePropertyChanged();
+            }
         }
-        public DateTime BirthDate
+
+        public DateOnly BirthDate
         {
             get => _birthDate;
-            set => SetProperty(ref _birthDate, value);
+            set
+            {
+                if (value.Equals(_birthDate)) return;
+                _birthDate = value;
+                _recordValidation.ValidateProp(value);
+                RaisePropertyChanged();
+            }
         }
-        [Required(ErrorMessage = "Please enter the certificate number of the animal")]
+
         public int CertificateNumber
         {
             get => _certificateNumber;
-            set => SetProperty(ref _certificateNumber, value);
+            set
+            {
+                if (value.Equals(_certificateNumber)) return;
+                _certificateNumber = value;
+                _recordValidation.ValidateProp(value);
+                RaisePropertyChanged();
+            }
         }
-        [Required(ErrorMessage = "Please enter the gender of the animal")]
+
         public string Gender
         {
             get => _gender;
-            set => SetProperty(ref _gender, value);
+            set
+            {
+                if (value.Equals(_gender)) return;
+                _gender = value;
+                _recordValidation.ValidateProp(value);
+                RaisePropertyChanged();
+            }
         }
-        [Required(ErrorMessage = "Please enter the back-fat index of the animal")]
+
         public float BackFatIndex
         {
             get => _backFatIndex;
-            set => SetProperty(ref _backFatIndex, value);
+            set
+            {
+                if (value.Equals(_backFatIndex)) return;
+                _backFatIndex = value;
+                _recordValidation.ValidateProp(value);
+                RaisePropertyChanged();
+            }
         }
 
         #endregion
 
         #region Commands
 
-        public IMvxAsyncCommand SubmitRecordCommand => new MvxAsyncCommand(ExecuteSubmitRecord);
+        public IMvxAsyncCommand SubmitRecordCommand => new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+
+        private bool CanSubmitRecord()
+        {
+            return !HasErrors;
+        }
+
         public IMvxCommand CancelRecordCommand => new MvxCommand(ExecuteCancelCommand);
 
         #endregion
@@ -106,52 +155,25 @@ namespace PiggsCare.Core.ViewModels.Animals
         #region Fields
 
         private int _name;
-        private string _breed;
-        private DateTime _birthDate;
+        private string _breed = string.Empty;
+        private DateOnly _birthDate;
         private int _certificateNumber;
-        private string _gender;
+        private string _gender = string.Empty;
         private float _backFatIndex;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IAnimalStore _animalStore;
+        private readonly IAnimalRecordValidation _recordValidation;
 
         #endregion
 
         #region INotifyDataErrorInfo Implementation
 
-        public Dictionary<string, List<string>> Errors { get; } = new();
-        public bool HasErrors => Errors.Count != 0;
+        public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
-        public IEnumerable GetErrors( string? propertyName )
+        public IEnumerable? GetErrors( string? propertyName )
         {
-            if (string.IsNullOrEmpty(propertyName) || !Errors.ContainsKey(propertyName))
-            {
-                return new List<string>(); // Return empty list if no errors
-            }
-
-            return Errors[propertyName]; // Return existing errors
-        }
-
-        private void AddErrors( string propertyName, IEnumerable<string?> errorMessages )
-        {
-            if (!Errors.ContainsKey(propertyName))
-            {
-                Errors[propertyName] = new List<string>();
-            }
-
-            Errors[propertyName].AddRange(errorMessages); // Add the new errors
-
-            OnErrorsChanged(propertyName); // Raise event to notify UI
-        }
-
-        private void ClearErrors( string propertyName )
-        {
-            if (!Errors.ContainsKey(propertyName)) return;
-            Errors.Remove(propertyName);   // Remove errors for the property
-            OnErrorsChanged(propertyName); // Raise event to notify UI
-        }
-
-        protected virtual void OnErrorsChanged( string propertyName )
-        {
-            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            return _recordValidation.GetErrors(propertyName);
         }
 
         #endregion

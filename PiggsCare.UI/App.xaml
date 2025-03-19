@@ -19,6 +19,8 @@
             <resources:LongDateConverter x:Key="LongDateConverter" />
             <resources:ShortDateConverter x:Key="ShortDateConverter" />
             <resources:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <resources:EnumToBooleanConverter x:Key="EnumToBoolConverter" />
+            <resources:RadioButtonConverter x:Key="RadioButtonConverter" />
             <resources:ErrorConverter x:Key="ErrorConverter" />
         </ResourceDictionary>
     </views:MvxApplication.Resources>

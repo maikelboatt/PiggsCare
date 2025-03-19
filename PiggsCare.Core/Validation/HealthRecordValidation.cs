@@ -1,20 +1,16 @@
 using PiggsCare.Domain.Models;
 using System.Collections;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace PiggsCare.Core.Validation
 {
-    public class HealthRecordValidation:INotifyDataErrorInfo, IHealthRecordValidation
+    public class HealthRecordValidation:INotifyDataErrorInfo, IHealthRecordValidation, INotifyPropertyChanged
     {
         #region Fields
 
+        // Dictionary to hold errors with property names as keys
         public Dictionary<string, List<string>> Errors { get; set; } = new();
-
-        #endregion
-
-        #region Events
-
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         #endregion
 
@@ -33,15 +29,37 @@ namespace PiggsCare.Core.Validation
 
         #endregion
 
+
         #region Event Handler
 
         private void RaiseErrorsChanged( string propertyName )
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            RaisePropertyChanged(nameof(HasErrors));
+        }
+
+
+        protected virtual void RaisePropertyChanged( [CallerMemberName] string? propertyName = null )
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected bool SetField<T>( ref T field, T value, [CallerMemberName] string? propertyName = null )
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            RaisePropertyChanged(propertyName);
+            return true;
         }
 
         #endregion
 
+        #region Events
+
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        #endregion
 
         #region Error Mutation
 
@@ -93,7 +111,7 @@ namespace PiggsCare.Core.Validation
         private void ValidateStringProperty( string value, string propertyName, string errorMessage, int minLength, int maxLength )
         {
             ClearError(propertyName);
-            if (string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
             {
                 AddError(propertyName, errorMessage);
             }

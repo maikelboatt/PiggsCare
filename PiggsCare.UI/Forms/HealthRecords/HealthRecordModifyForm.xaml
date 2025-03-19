@@ -6,6 +6,7 @@
                   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:resources="clr-namespace:PiggsCare.UI.Resources"
+                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
                   d:DataContext="{d:DesignInstance Type=healthRecords:HealthRecordModifyFormViewModel}"
                   d:DesignHeight="auto"
@@ -14,6 +15,7 @@
     <Border Background="{DynamicResource TertiaryBackgroundColor}">
         <Grid Margin="30,20">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -29,8 +31,35 @@
                                             Style="{DynamicResource FormButtonIcon}" />
             </TextBlock>
 
+            <!--  Record Date  -->
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="20,10">
+                <TextBlock Margin="0,0,0,8"
+                           FontSize="13"
+                           Foreground="#97a5b4"
+                           Text="Date" />
+
+                <StackPanel Orientation="Horizontal">
+                    <ui:CalendarDatePicker x:Name="CalendarDatePicker"
+                                           Margin="10,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Content="Pick a date"
+                                           Date="{Binding RecordDate, Mode=TwoWay}"
+                                           IsTodayHighlighted="True"
+                                           Style="{StaticResource CancelButton}" />
+
+                    <TextBlock x:Name="CalendarDate"
+                               Margin="10"
+                               VerticalAlignment="Center"
+                               FontSize="20"
+                               Text="{Binding ElementName=CalendarDatePicker, Path=Date}" />
+                </StackPanel>
+
+            </StackPanel>
+
             <!--  Input Elements  -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -42,34 +71,31 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!--  //Record Date  -->
-                <resources:CustomTextBox Grid.Row="0"
-                                         Grid.Column="0"
-                                         Data="{Binding RecordDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
-                                         Description="Record Date"
-                                         Placeholder="101" />
 
                 <!--  //Diagnosis  -->
                 <resources:CustomTextBox Grid.Row="0"
-                                         Grid.Column="1"
-                                         Data="{Binding Diagnosis, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                                         Grid.Column="0"
+                                         Margin="0,0,0,5"
+                                         Data="{Binding Diagnosis, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Diagnosis"
-                                         Placeholder="12" />
+                                         Placeholder="Fever" />
+
 
                 <!--  //Treatment  -->
-                <resources:CustomTextBox Grid.Row="1"
-                                         Grid.Column="0"
+                <resources:CustomTextBox Grid.Row="0"
+                                         Grid.Column="1"
+                                         Margin="0,0,0,5"
                                          Data="{Binding Treatment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Treatment"
-                                         Placeholder="Obolo" />
+                                         Placeholder="Antibiotics" />
 
                 <!--  //Outcome  -->
                 <resources:CustomTextBox Grid.Row="1"
-                                         Grid.Column="1"
+                                         Grid.Column="0"
+                                         Margin="0,0,0,5"
                                          Data="{Binding Outcome, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Outcome"
-                                         Placeholder="Male" />
-
+                                         Placeholder="Recovered" />
 
                 <!--  //Cancel Button  -->
                 <Button Grid.Row="2"

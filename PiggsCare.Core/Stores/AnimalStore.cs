@@ -25,9 +25,15 @@ namespace PiggsCare.Core.Stores
 
         public async Task Create( Animal animal )
         {
-            await _animalService.CreateAnimalAsync(animal);
-            _animals.Add(animal);
-            OnSave?.Invoke(animal);
+            int result = await _animalService.CreateAnimalAsync(animal);
+            Animal outcome = CreateAnimalWithCorrectId(result, animal);
+            _animals.Add(outcome);
+            OnSave?.Invoke(outcome);
+        }
+
+        private Animal CreateAnimalWithCorrectId( int id, Animal animal )
+        {
+            return new Animal(id, animal.Name, animal.Breed, animal.BirthDate, animal.CertificateNumber, animal.Gender, animal.BackFatIndex);
         }
 
         public async Task Modify( Animal animal )
@@ -72,7 +78,7 @@ namespace PiggsCare.Core.Stores
             {
                 await _initializeTask.Value;
             }
-            catch (Exception )
+            catch (Exception)
             {
                 _initializeTask = new Lazy<Task>(Init);
                 throw;

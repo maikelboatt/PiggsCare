@@ -37,29 +37,6 @@ namespace PiggsCare.DataAccess.Repositories
                 : null;
         }
 
-        public async Task CreateAnimalAsync( Animal animal )
-        {
-            // Convert Animal Object to an AnimalDto Object
-            AnimalDto record = new()
-            {
-                Name = animal.Name,
-                Breed = animal.Breed,
-                BirthDate = dateConverterService.GetDateTime(animal.BirthDate),
-                CertificateNumber = animal.CertificateNumber,
-                Gender = animal.Gender,
-                BackFatIndex = animal.BackFatIndex
-            };
-
-            // Inserts record into the database
-            await dataAccess.CommandAsync("dbo.InsertAnimal",
-                                          new
-                                          {
-                                              record.Name, record.Breed, record.BirthDate, record.CertificateNumber, record.Gender, record.BackFatIndex
-                                          },
-                                          Connectionstring
-                );
-        }
-
         public async Task UpdateAnimalAsync( Animal animal )
         {
             // Convert Animal Object to an AnimalDto Object
@@ -107,6 +84,32 @@ namespace PiggsCare.DataAccess.Repositories
 
             // Convert AnimalDto Object to Animal Object
             return result.Select(x => new Animal(x.AnimalId, x.Name, x.Breed, dateConverterService.GetDateOnly(x.BirthDate), x.CertificateNumber, x.Gender, x.BackFatIndex));
+        }
+
+        public async Task<int> CreateAnimalAsync( Animal animal )
+        {
+            // Convert Animal Object to an AnimalDto Object
+            AnimalDto record = new()
+            {
+                Name = animal.Name,
+                Breed = animal.Breed,
+                BirthDate = dateConverterService.GetDateTime(animal.BirthDate),
+                CertificateNumber = animal.CertificateNumber,
+                Gender = animal.Gender,
+                BackFatIndex = animal.BackFatIndex
+            };
+
+            // Inserts record into the database
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>("dbo.InsertAnimal",
+                                                                                new
+                                                                                {
+                                                                                    record.Name, record.Breed, record.BirthDate, record.CertificateNumber, record.Gender,
+                                                                                    record.BackFatIndex
+                                                                                },
+                                                                                Connectionstring
+                );
+
+            return result.Single();
         }
     }
 }

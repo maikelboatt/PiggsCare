@@ -21,8 +21,8 @@ namespace PiggsCare.Domain.Services
         ///     Creates a new animal record
         /// </summary>
         /// <param name="animal" > Details of the animal</param>
-        /// <returns>the created animal</returns>
-        Task CreateAnimalAsync( Animal animal );
+        /// <returns>the id of created animal</returns>
+        Task<int> CreateAnimalAsync( Animal animal );
 
         /// <summary>
         ///     Updates an existing record

@@ -15,11 +15,6 @@ namespace PiggsCare.Domain.Services
             return await animalRepository.GetAnimalByIdAsync(id);
         }
 
-        public async Task CreateAnimalAsync( Animal animal )
-        {
-            await animalRepository.CreateAnimalAsync(animal);
-        }
-
         public async Task UpdateAnimalAsync( Animal animal )
         {
             await animalRepository.UpdateAnimalAsync(animal);
@@ -38,6 +33,11 @@ namespace PiggsCare.Domain.Services
         public async Task<IEnumerable<Animal>> GetAnimalByBreedAsync( string breed )
         {
             return await animalRepository.GetAnimalByBreedAsync(breed);
+        }
+
+        public async Task<int> CreateAnimalAsync( Animal animal )
+        {
+            return await animalRepository.CreateAnimalAsync(animal);
         }
     }
 }

@@ -7,7 +7,11 @@ using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Breeding
 {
-    public class BreedingEventDeleteFormViewModel( IBreedingEventStore breedingEventStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
+    public class BreedingEventDeleteFormViewModel(
+        IBreedingEventStore breedingEventStore,
+        ModalNavigationStore modalNavigationStore,
+        IDateConverterService dateConverterService,
+        IMessageService messageService )
         :MvxViewModel<int>, IBreedingEventDeleteFormViewModel
     {
         public override Task Initialize()
@@ -77,7 +81,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         private async Task ExecuteSubmitRecord()
         {
-            MessageBoxResult confirm = MessageBox.Show("Are you sure you want to delete the record?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            MessageBoxResult confirm = messageService.Show("Are you sure you want to delete the record?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (confirm == MessageBoxResult.OK)
                 await OnDeleteConfirm();
         }

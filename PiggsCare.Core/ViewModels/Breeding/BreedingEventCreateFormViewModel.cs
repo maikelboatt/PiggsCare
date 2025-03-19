@@ -6,9 +6,23 @@ using PiggsCare.Domain.Services;
 
 namespace PiggsCare.Core.ViewModels.Breeding
 {
-    public class BreedingEventCreateFormViewModel( IBreedingEventStore breedingEventStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
-        :MvxViewModel<int>, IBreedingEventCreateFormViewModel
+    public class BreedingEventCreateFormViewModel:MvxViewModel<int>, IBreedingEventCreateFormViewModel
     {
+        #region Constructor
+
+        public BreedingEventCreateFormViewModel( IBreedingEventStore breedingEventStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
+        {
+            _breedingEventStore = breedingEventStore;
+            _modalNavigationStore = modalNavigationStore;
+            _dateConverterService = dateConverterService;
+
+            // Initialize commands once so that RaiseCanExecuteChanged works as expected
+            SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+            CancelRecordCommand = new MvxCommand(ExecuteCancelCommand);
+        }
+
+        #endregion
+
         #region ViewModel Life Cycle
 
         public override void Prepare( int parameter )
@@ -29,6 +43,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
                 _aiDate = value;
                 RaisePropertyChanged();
                 CalculateExpectedFarDate();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
         public DateOnly ExpectedFarrowDate
@@ -44,15 +59,25 @@ namespace PiggsCare.Core.ViewModels.Breeding
         private DateTime _aiDate;
         private DateOnly _expectedFarrowDate;
         private int _animalId;
+        private readonly IBreedingEventStore _breedingEventStore;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IDateConverterService _dateConverterService;
+
         private const int GestationPeriod = 114;
 
         #endregion
 
         #region Commands
 
-        public IMvxAsyncCommand SubmitRecordCommand => new MvxAsyncCommand(ExecuteSubmitRecord);
+        public IMvxAsyncCommand SubmitRecordCommand { get; }
 
-        public IMvxCommand CancelRecordCommand => new MvxCommand(ExecuteCancelCommand);
+        private bool CanSubmitRecord()
+        {
+            bool noFieldEmpty = !ExpectedFarrowDate.Equals(default) && !AiDate.Equals(default);
+            return noFieldEmpty;
+        }
+
+        public IMvxCommand CancelRecordCommand { get; }
 
         #endregion
 
@@ -61,25 +86,25 @@ namespace PiggsCare.Core.ViewModels.Breeding
         private async Task ExecuteSubmitRecord()
         {
             BreedingEvent record = GetBreedingEventFromFields();
-            await breedingEventStore.Create(record);
-            modalNavigationStore.Close();
+            await _breedingEventStore.Create(record);
+            _modalNavigationStore.Close();
         }
 
         private void ExecuteCancelCommand()
         {
-            modalNavigationStore.Close();
+            _modalNavigationStore.Close();
         }
 
         private BreedingEvent GetBreedingEventFromFields()
         {
-            return new BreedingEvent(1, _animalId, dateConverterService.GetDateOnly(_aiDate), _expectedFarrowDate);
+            return new BreedingEvent(1, _animalId, _dateConverterService.GetDateOnly(_aiDate), _expectedFarrowDate, null);
         }
 
         private void CalculateExpectedFarDate()
         {
 
             DateTime result = AiDate.AddDays(GestationPeriod);
-            ExpectedFarrowDate = dateConverterService.GetDateOnly(result);
+            ExpectedFarrowDate = _dateConverterService.GetDateOnly(result);
         }
 
         #endregion

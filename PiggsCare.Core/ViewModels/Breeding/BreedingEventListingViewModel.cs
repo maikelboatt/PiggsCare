@@ -1,9 +1,11 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Control;
+using PiggsCare.Core.Factory;
 using PiggsCare.Core.Stores;
+using PiggsCare.Core.ViewModels.Farrowing;
+using PiggsCare.Core.ViewModels.Pregnancy;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
 using System.Collections.Specialized;
 
 namespace PiggsCare.Core.ViewModels.Breeding
@@ -12,11 +14,15 @@ namespace PiggsCare.Core.ViewModels.Breeding
     {
         #region Constructor
 
-        public BreedingEventListingViewModel( IBreedingEventStore breedingEventStore, IModalNavigationControl modalNavigationControl, IBreedingEventService breedingEventService )
+        public BreedingEventListingViewModel( IBreedingEventStore breedingEventStore, IModalNavigationControl modalNavigationControl, IViewModelFactory viewModelFactory,
+            ICurrentViewModelStore currentViewModelStore )
         {
             _breedingEventStore = breedingEventStore;
             _modalNavigationControl = modalNavigationControl;
-            _breedingEventService = breedingEventService;
+            _viewModelFactory = viewModelFactory;
+            _currentViewModelStore = currentViewModelStore;
+
+            _breedingEvents = new MvxObservableCollection<BreedingEvent>(_breedingEventStore.BreedingEvents);
 
             _breedingEvents.CollectionChanged += BreedingEventsOnCollectionChanged;
             _breedingEventStore.OnUpdate += BreedingEventStoreOnOnUpdate;
@@ -57,6 +63,8 @@ namespace PiggsCare.Core.ViewModels.Breeding
         public IMvxCommand OpenInsertRecordDialogCommand => new MvxCommand(ExecuteOpenInsertRecordDialog);
         public IMvxCommand<int> OpenModifyRecordDialogCommand => new MvxCommand<int>(ExecuteOpenModifyRecordDialog);
         public IMvxCommand<int> OpenRemoveRecordDialogCommand => new MvxCommand<int>(ExecuteOpenRemoveRecordDialog);
+        public IMvxCommand<int> OpenPregnancyEventDialogCommand => new MvxCommand<int>(ExecuteOpenPregnancyEventDialog);
+        public IMvxCommand<int> OpenFarrowingEventDialogCommand => new MvxCommand<int>(ExecuteOpenFarrowingEventDialog);
 
         #endregion
 
@@ -69,6 +77,12 @@ namespace PiggsCare.Core.ViewModels.Breeding
             {
                 _breedingEvents!.Clear();
                 await _breedingEventStore.Load(AnimalId);
+
+                foreach (BreedingEvent breedingEvent in _breedingEventStore.BreedingEvents)
+                {
+                    _breedingEvents.Add(breedingEvent);
+                }
+
                 UpdateView();
             }
             catch (Exception e)
@@ -96,6 +110,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
         {
             // Open the AnimalModifyForm dialog
             _modalNavigationControl.PopUp<BreedingEventModifyFormViewModel>(id);
+
         }
 
         private void ExecuteOpenRemoveRecordDialog( int id )
@@ -104,15 +119,39 @@ namespace PiggsCare.Core.ViewModels.Breeding
             _modalNavigationControl.PopUp<BreedingEventDeleteFormViewModel>(id);
         }
 
+        // Opens the PregnancyListingViewModel and passes in the breeding event id
+        private void ExecuteOpenPregnancyEventDialog( int id )
+        {
+            // if (id <= 0)
+            // {
+            //     Console.WriteLine("Attempted to navigate with an invalid breeding event id: " + id);
+            //     return; // or handle the error appropriately
+            // }
+            PregnancyListingViewModel? viewmodel = _viewModelFactory.CreateViewModel<PregnancyListingViewModel, int>(id);
+            _currentViewModelStore.CurrentViewModel = viewmodel;
+            _currentViewModelStore.CurrentProcessStage = ProcessStage.Pregnancy;
+            viewmodel?.Initialize();
+        }
+
+        // Opens the FarrowingListingViewModel and passes in the breeding event id
+        private void ExecuteOpenFarrowingEventDialog( int id )
+        {
+            FarrowListingViewModel? viewmodel = _viewModelFactory.CreateViewModel<FarrowListingViewModel, int>(id);
+            _currentViewModelStore.CurrentViewModel = viewmodel;
+            _currentViewModelStore.CurrentProcessStage = ProcessStage.Farrowing;
+            viewmodel?.Initialize();
+        }
+
         #endregion
 
         #region Fields
 
-        private MvxObservableCollection<BreedingEvent> _breedingEvents => new(_breedingEventStore.BreedingEvents);
+        private readonly MvxObservableCollection<BreedingEvent> _breedingEvents;
         private bool _isLoading;
         private readonly IBreedingEventStore _breedingEventStore;
         private readonly IModalNavigationControl _modalNavigationControl;
-        private readonly IBreedingEventService _breedingEventService;
+        private readonly IViewModelFactory _viewModelFactory;
+        private readonly ICurrentViewModelStore _currentViewModelStore;
 
         #endregion
 

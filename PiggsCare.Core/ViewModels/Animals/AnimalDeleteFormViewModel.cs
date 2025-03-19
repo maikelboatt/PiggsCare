@@ -2,11 +2,17 @@ using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
+using PiggsCare.Domain.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Animals
 {
-    public class AnimalDeleteFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore ):MvxViewModel<int>, IAnimalDeleteFormViewModel
+    public class AnimalDeleteFormViewModel(
+        ModalNavigationStore modalNavigationStore,
+        IAnimalStore animalStore,
+        IMessageService messageService,
+        IDateConverterService dateConverterService )
+        :MvxViewModel<int>, IAnimalDeleteFormViewModel
     {
         #region Methods
 
@@ -14,7 +20,7 @@ namespace PiggsCare.Core.ViewModels.Animals
         {
             _name = animal.Name;
             _breed = animal.Breed;
-            _birthDate = animal.BirthDate;
+            _birthDate = dateConverterService.GetDateTime(animal.BirthDate);
             _certificateNumber = animal.CertificateNumber;
             _gender = animal.Gender;
             _backFatIndex = animal.BackFatIndex;
@@ -27,7 +33,7 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         private async Task ExecuteSubmitRecord()
         {
-            MessageBoxResult confirm = MessageBox.Show("Are you sure you want to delete the record?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            MessageBoxResult confirm = messageService.Show("Are you sure you want to delete the record?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (confirm == MessageBoxResult.OK)
                 await OnDeleteConfirm();
         }
@@ -62,10 +68,10 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         private int _animalId;
         private int _name;
-        private string _breed;
-        private DateOnly _birthDate;
+        private string _breed = string.Empty;
+        private DateTime _birthDate;
         private int _certificateNumber;
-        private string _gender;
+        private string _gender = string.Empty;
         private float _backFatIndex;
 
         #endregion
@@ -89,7 +95,7 @@ namespace PiggsCare.Core.ViewModels.Animals
             get => _breed;
             set => SetProperty(ref _breed, value);
         }
-        public DateOnly BirthDate
+        public DateTime BirthDate
         {
             get => _birthDate;
             set => SetProperty(ref _birthDate, value);

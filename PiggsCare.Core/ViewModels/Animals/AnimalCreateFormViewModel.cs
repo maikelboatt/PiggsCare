@@ -3,6 +3,7 @@ using MvvmCross.ViewModels;
 using PiggsCare.Core.Stores;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
+using PiggsCare.Domain.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -17,18 +18,30 @@ namespace PiggsCare.Core.ViewModels.Animals
             Console.WriteLine(parameter);
         }
 
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            base.ViewDestroy(viewFinishing);
+            _recordValidation.ErrorsChanged -= RecordValidationOnErrorsChanged;
+        }
+
         #endregion
 
         #region Constructor
 
-        public AnimalCreateFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore, IAnimalRecordValidation recordValidation )
+        public AnimalCreateFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore, IAnimalRecordValidation recordValidation,
+            IDateConverterService dateConverterService )
         {
             _modalNavigationStore = modalNavigationStore;
             _animalStore = animalStore;
             _recordValidation = recordValidation;
+            _dateConverterService = dateConverterService;
             _recordValidation.Errors.Clear();
 
             recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+
+            // Initialize commands once so that RaiseCanExecuteChanged works as expected
+            SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+            CancelRecordCommand = new MvxCommand(ExecuteCancelCommand);
         }
 
         private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
@@ -39,7 +52,6 @@ namespace PiggsCare.Core.ViewModels.Animals
         }
 
         #endregion
-
 
         #region Methods
 
@@ -57,7 +69,7 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         private Animal GetAnimalFromFields()
         {
-            return new Animal(1, Name, Breed, BirthDate, CertificateNumber, Gender, BackFatIndex);
+            return new Animal(1, Name, Breed, _dateConverterService.GetDateOnly(BirthDate), CertificateNumber, Gender, BackFatIndex);
         }
 
         #endregion
@@ -73,6 +85,7 @@ namespace PiggsCare.Core.ViewModels.Animals
                 _name = value;
                 _recordValidation.ValidateProp(value);
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -85,18 +98,20 @@ namespace PiggsCare.Core.ViewModels.Animals
                 _breed = value;
                 _recordValidation.ValidateProp(value);
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
-        public DateOnly BirthDate
+        public DateTime BirthDate
         {
             get => _birthDate;
             set
             {
                 if (value.Equals(_birthDate)) return;
                 _birthDate = value;
-                _recordValidation.ValidateProp(value);
+                _recordValidation.ValidateProp(_dateConverterService.GetDateOnly(_birthDate));
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -109,6 +124,7 @@ namespace PiggsCare.Core.ViewModels.Animals
                 _certificateNumber = value;
                 _recordValidation.ValidateProp(value);
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -121,6 +137,7 @@ namespace PiggsCare.Core.ViewModels.Animals
                 _gender = value;
                 _recordValidation.ValidateProp(value);
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -133,6 +150,7 @@ namespace PiggsCare.Core.ViewModels.Animals
                 _backFatIndex = value;
                 _recordValidation.ValidateProp(value);
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -140,29 +158,35 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         #region Commands
 
-        public IMvxAsyncCommand SubmitRecordCommand => new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+        public IMvxAsyncCommand SubmitRecordCommand { get; }
 
         private bool CanSubmitRecord()
         {
-            return !HasErrors;
+            bool noFieldEmpty = !string.IsNullOrWhiteSpace(Breed) &&
+                                !string.IsNullOrWhiteSpace(Gender) &&
+                                // !BackFatIndex.Equals(default) &&
+                                // !CertificateNumber.Equals(default) &&
+                                // !Name.Equals(default) &&
+                                !BirthDate.Equals(default);
+            return noFieldEmpty && !HasErrors;
         }
 
-        public IMvxCommand CancelRecordCommand => new MvxCommand(ExecuteCancelCommand);
+        public IMvxCommand CancelRecordCommand { get; }
 
         #endregion
-
 
         #region Fields
 
         private int _name;
         private string _breed = string.Empty;
-        private DateOnly _birthDate;
+        private DateTime _birthDate;
         private int _certificateNumber;
         private string _gender = string.Empty;
         private float _backFatIndex;
         private readonly ModalNavigationStore _modalNavigationStore;
         private readonly IAnimalStore _animalStore;
         private readonly IAnimalRecordValidation _recordValidation;
+        private readonly IDateConverterService _dateConverterService;
 
         #endregion
 

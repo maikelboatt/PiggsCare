@@ -144,7 +144,7 @@ namespace PiggsCare.Core.ViewModels
         private void ExecuteNavigateToFarrowing()
         {
             if (_messageService.Show(
-                    "Please right-click on a Insemination event and choose Farrowing from the options to successfully view data on farrowing",
+                    "Please select the second of two option under Navigation to successfully view data on farrowing",
                     "Information",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information) != MessageBoxResult.OK)
@@ -159,7 +159,7 @@ namespace PiggsCare.Core.ViewModels
         private void ExecuteNavigateToPregnancy()
         {
             if (_messageService.Show(
-                    "Please right-click on a Insemination event and choose Pregnancy from the options to successfully view data on pregnancy",
+                    "Please select the first of two options under under Navigation to successfully view data on pregnancy",
                     "Information",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information) != MessageBoxResult.OK)
@@ -174,7 +174,7 @@ namespace PiggsCare.Core.ViewModels
         private void ExecuteNavigateToWeaning()
         {
             if (_messageService.Show(
-                    "Please right-click on a Farrowing event and choose Weaning from the options to successfully view data on weaning",
+                    "Please select the option under Weaning to successfully view data on weaning",
                     "Information",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information) != MessageBoxResult.OK)

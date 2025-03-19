@@ -6,6 +6,7 @@ namespace PiggsCare.DataAccess.DTO
         public required int BreedingEventId { get; init; }
         public required DateTime FarrowDate { get; set; }
         public required int LitterSize { get; set; }
+
         public required int BornAlive { get; set; }
         public required int BornDead { get; set; }
         public required int Mummified { get; set; }

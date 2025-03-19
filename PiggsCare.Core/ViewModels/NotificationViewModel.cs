@@ -1,5 +1,6 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.Core.Stores;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
@@ -7,21 +8,21 @@ namespace PiggsCare.Core.ViewModels
 {
     public class NotificationViewModel:MvxViewModel
     {
-        private ObservableCollection<string> _messages =
-        [
-            "A new record has been successfully created!",
-            "Record already exists!",
-            "Record has been successfully updated!",
-            "Record has been successfully deleted!",
-            "404: The record was not found!",
-            "500: Internal Server Error!"
-        ];
+        #region Fields
+
+        private readonly INotificationStore _notificationStore;
+
+        #endregion
+
+        private ObservableCollection<string> _messages = [];
 
 
-        public NotificationViewModel()
+        public NotificationViewModel( INotificationStore notificationStore )
         {
+            _notificationStore = notificationStore;
             // ClearCommand = new ClearNotificationCommand(this);
 
+            _notificationStore.NotificationsChanged += NotificationStoreOnNotificationsChanged;
             _messages.CollectionChanged += MessagesOnCollectionChanged;
         }
 
@@ -35,9 +36,14 @@ namespace PiggsCare.Core.ViewModels
 
         #endregion
 
+        private void NotificationStoreOnNotificationsChanged()
+        {
+            RaisePropertyChanged(nameof(Messages));
+        }
+
         public override Task Initialize()
         {
-            Console.WriteLine("Initialized NotificationViewModel");
+            _messages = new MvxObservableCollection<string>(_notificationStore.Notifications);
             return base.Initialize();
         }
 

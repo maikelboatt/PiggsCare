@@ -9,8 +9,5 @@ namespace PiggsCare.DataAccess.DTO
         public required int MalesWeaned { get; set; }
         public required int FemalesWeaned { get; set; }
         public required float AverageWeaningWeight { get; set; }
-
-        // Navigation property
-        public FarrowingEventDto FarrowingEventDto { get; set; }
     }
 }

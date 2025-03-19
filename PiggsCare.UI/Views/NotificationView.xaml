@@ -28,7 +28,7 @@
                 <!--  The label of the view  -->
                 <Label HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Content="Notification"
+                       Content="Notifications"
                        FontSize="30"
                        FontWeight="Bold"
                        Foreground="{DynamicResource PrimaryTextColor}" />
@@ -61,7 +61,14 @@
                                 Background="{DynamicResource TertiaryBackgroundColor}"
                                 CornerRadius="5">
                             <Grid>
-                                <TextBlock Foreground="{DynamicResource TertiaryTextColor}" Text="{Binding}" />
+                                <TextBlock Height="25"
+                                           Padding="3"
+                                           VerticalAlignment="Center"
+                                           FontFamily="Raleway"
+                                           FontSize="13"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource TertiaryTextColor}"
+                                           Text="{Binding}" />
                             </Grid>
                         </Border>
                     </DataTemplate>

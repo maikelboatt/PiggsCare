@@ -18,6 +18,7 @@ namespace PiggsCare.Core.ViewModels
             NavigateToHome = new MvxCommand(ShowHomeView);
             NavigateToAnalytics = new MvxCommand(ShowAnalyticsView);
             NavigateToNotifications = new MvxCommand(ShowNotificationView);
+            NavigateToSynchronization = new MvxCommand(ShowSynchronizationView);
 
             modalNavigationStore.CurrentModalViewModelChanged += ModalNavigationStoreOnCurrentModalViewModelChanged;
 
@@ -33,19 +34,27 @@ namespace PiggsCare.Core.ViewModels
         {
             NotificationViewModel? viewmodel = _viewModelFactory.CreateViewModel<NotificationViewModel>();
             CurrentViewModel = viewmodel;
+            viewmodel?.Prepare();
             viewmodel?.Initialize();
         }
 
         private void ShowHomeView()
         {
             HomeViewModel? viewmodel = _viewModelFactory.CreateViewModel<HomeViewModel>();
-            viewmodel?.Initialize();
             CurrentViewModel = viewmodel;
+            viewmodel?.Initialize();
         }
 
         private void ShowAnalyticsView()
         {
             AnalyticsViewModel? viewmodel = _viewModelFactory.CreateViewModel<AnalyticsViewModel>();
+            CurrentViewModel = viewmodel;
+            viewmodel?.Initialize();
+        }
+
+        private void ShowSynchronizationView()
+        {
+            EstrusViewModel? viewmodel = _viewModelFactory.CreateViewModel<EstrusViewModel>();
             CurrentViewModel = viewmodel;
             viewmodel?.Initialize();
         }
@@ -76,6 +85,8 @@ namespace PiggsCare.Core.ViewModels
         public MvxCommand NavigateToHome { get; private set; }
         public MvxCommand NavigateToAnalytics { get; private set; }
         public MvxCommand NavigateToNotifications { get; private set; }
+
+        public MvxCommand NavigateToSynchronization { get; private set; }
 
         #endregion
     }

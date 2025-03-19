@@ -7,13 +7,23 @@
                   xmlns:breedingEventViewModel="clr-namespace:PiggsCare.Core.ViewModels.Breeding;assembly=PiggsCare.Core"
                   xmlns:components="clr-namespace:PiggsCare.UI.Components"
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:farrowEventForm="clr-namespace:PiggsCare.UI.Forms.Farrowing"
+                  xmlns:farrowEventViewModel="clr-namespace:PiggsCare.Core.ViewModels.Farrowing;assembly=PiggsCare.Core"
                   xmlns:healthRecordViewModel="clr-namespace:PiggsCare.Core.ViewModels.HealthRecords;assembly=PiggsCare.Core"
                   xmlns:healthRecordsForm="clr-namespace:PiggsCare.UI.Forms.HealthRecords"
                   xmlns:local="clr-namespace:PiggsCare.UI.Views"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:modalDialogControl="clr-namespace:ModalDialogControl;assembly=ModalDialogControl"
+                  xmlns:pregnancyForm="clr-namespace:PiggsCare.UI.Forms.Pregnancy"
+                  xmlns:pregnancyViewModel="clr-namespace:PiggsCare.Core.ViewModels.Pregnancy;assembly=PiggsCare.Core"
+                  xmlns:removalForm="clr-namespace:PiggsCare.UI.Forms.Removal"
+                  xmlns:removalViewModel="clr-namespace:PiggsCare.Core.ViewModels.Removal;assembly=PiggsCare.Core"
+                  xmlns:synchronizationEventViewModel="clr-namespace:PiggsCare.Core.ViewModels.Synchronization;assembly=PiggsCare.Core"
+                  xmlns:synchronizationForm="clr-namespace:PiggsCare.UI.Forms.Synchronization"
                   xmlns:viewModels="clr-namespace:PiggsCare.Core.ViewModels;assembly=PiggsCare.Core"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
+                  xmlns:weaningForm="clr-namespace:PiggsCare.UI.Forms.Weaning"
+                  xmlns:weaningViewModel="clr-namespace:PiggsCare.Core.ViewModels.Weaning;assembly=PiggsCare.Core"
                   x:Name="Home"
                   d:DataContext="{d:DesignInstance Type=viewModels:ShellViewModel}"
                   d:DesignHeight="600"
@@ -34,6 +44,10 @@
             <local:NotificationView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type viewModels:EstrusViewModel}">
+            <local:EstrusView />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type animalViewModels:AnimalListingViewModel}">
             <components:AnimalListing />
         </DataTemplate>
@@ -46,8 +60,28 @@
             <components:HealthListing />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type synchronizationEventViewModel:SynchronizationListingViewModel}">
+            <components:SynchronizationListing />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type breedingEventViewModel:BreedingEventListingViewModel}">
             <components:BreedingListing />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type farrowEventViewModel:FarrowListingViewModel}">
+            <components:FarrowListing />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type pregnancyViewModel:PregnancyListingViewModel}">
+            <components:PregnancyListing />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type weaningViewModel:WeaningListingViewModel}">
+            <components:WeaningListing />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type removalViewModel:RemovalListingViewModel}">
+            <components:RemovalListing />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type viewModels:SelectedAnimalDetailsViewModel}">
@@ -88,6 +122,66 @@
 
         <DataTemplate DataType="{x:Type breedingEventViewModel:BreedingEventDeleteFormViewModel}">
             <breedingEventForm:BreedingEventDeleteForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type farrowEventViewModel:FarrowingCreateFormViewModel}">
+            <farrowEventForm:FarrowingCreateForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type farrowEventViewModel:FarrowingModifyFormViewModel}">
+            <farrowEventForm:FarrowingModifyForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type farrowEventViewModel:FarrowingDeleteFormViewModel}">
+            <farrowEventForm:FarrowingDeleteForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type pregnancyViewModel:PregnancyCreateFormViewModel}">
+            <pregnancyForm:PregnancyCreateForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type pregnancyViewModel:PregnancyModifyFormViewModel}">
+            <pregnancyForm:PregnancyModifyForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type pregnancyViewModel:PregnancyDeleteFormViewModel}">
+            <pregnancyForm:PregnancyDeleteForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type weaningViewModel:WeaningCreateFormViewModel}">
+            <weaningForm:WeaningCreateForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type weaningViewModel:WeaningModifyFormViewModel}">
+            <weaningForm:WeaningModifyForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type weaningViewModel:WeaningDeleteFormViewModel}">
+            <weaningForm:WeaningDeleteForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type removalViewModel:RemovalEventCreateFormViewModel}">
+            <removalForm:RemovalEventCreateForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type removalViewModel:RemovalEventModifyFormViewModel}">
+            <removalForm:RemovalEventModifyForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type removalViewModel:RemovalEventDeleteFormViewModel}">
+            <removalForm:RemovalEventDeleteForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type synchronizationEventViewModel:SynchronizationEventCreateFormViewModel}">
+            <synchronizationForm:SynchronizationEventCreateForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type synchronizationEventViewModel:SynchronizationEventModifyFormViewModel}">
+            <synchronizationForm:SynchronizationEventModifyForm />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type synchronizationEventViewModel:SynchronizationEventDeleteFormViewModel}">
+            <synchronizationForm:SynchronizationEventDeleteForm />
         </DataTemplate>
 
 
@@ -167,14 +261,6 @@
                                              Style="{DynamicResource MenuRadioButtonStyle}"
                                              Tag="{DynamicResource Home}" />
 
-                                <RadioButton Content="Messages"
-                                             Style="{DynamicResource MenuRadioButtonStyle}"
-                                             Tag="{DynamicResource Messages}" />
-
-                                <RadioButton Margin="0,1,0,1"
-                                             Content="Collections"
-                                             Style="{DynamicResource MenuRadioButtonStyle}"
-                                             Tag="{DynamicResource Collections}" />
 
                                 <Separator Margin="20,20" Background="{DynamicResource TertiaryBackgroundColor}" />
 
@@ -184,9 +270,6 @@
                                              Style="{DynamicResource MenuRadioButtonStyle}"
                                              Tag="{DynamicResource Notifications}" />
 
-                                <RadioButton Content="Settings"
-                                             Style="{DynamicResource MenuRadioButtonStyle}"
-                                             Tag="{DynamicResource Settings}" />
                             </StackPanel>
                             <!--  End Navigation Buttons  -->
 

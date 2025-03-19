@@ -19,7 +19,8 @@ namespace PiggsCare.DataAccess.Repositories
             return result.Select(x => new BreedingEvent(x.BreedingEventId,
                                                         x.AnimalId,
                                                         dateConverterService.GetDateOnly(x.AiDate),
-                                                        dateConverterService.GetDateOnly(x.ExpectedFarrowDate)));
+                                                        dateConverterService.GetDateOnly(x.ExpectedFarrowDate),
+                                                        x.SynchronizationEventId));
         }
 
         public async Task<BreedingEvent?> GetBreedingEventByIdAsync( int id )
@@ -33,7 +34,8 @@ namespace PiggsCare.DataAccess.Repositories
                 ? new BreedingEvent(breedingEventDto.BreedingEventId,
                                     breedingEventDto.AnimalId,
                                     dateConverterService.GetDateOnly(breedingEventDto.AiDate),
-                                    dateConverterService.GetDateOnly(breedingEventDto.ExpectedFarrowDate))
+                                    dateConverterService.GetDateOnly(breedingEventDto.ExpectedFarrowDate),
+                                    breedingEventDto.SynchronizationEventId)
                 : null;
         }
 
@@ -44,11 +46,12 @@ namespace PiggsCare.DataAccess.Repositories
             {
                 AnimalId = breeding.AnimalId,
                 AiDate = dateConverterService.GetDateTime(breeding.AiDate),
-                ExpectedFarrowDate = dateConverterService.GetDateTime(breeding.ExpectedFarrowDate)
+                ExpectedFarrowDate = dateConverterService.GetDateTime(breeding.ExpectedFarrowDate),
+                SynchronizationEventId = breeding.SynchronizationEventId
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync("dbo.InsertBreedingEvent", new { record.AnimalId, record.AiDate, record.ExpectedFarrowDate }, Connectionstring);
+            await dataAccess.CommandAsync("dbo.Breeding_Insert", new { record.AnimalId, record.AiDate, record.ExpectedFarrowDate, record.SynchronizationEventId }, Connectionstring);
         }
 
         public async Task UpdateBreedingEventAsync( BreedingEvent breeding )
@@ -59,7 +62,8 @@ namespace PiggsCare.DataAccess.Repositories
                 BreedingEventId = breeding.BreedingEventId,
                 AnimalId = breeding.AnimalId,
                 AiDate = dateConverterService.GetDateTime(breeding.AiDate),
-                ExpectedFarrowDate = dateConverterService.GetDateTime(breeding.ExpectedFarrowDate)
+                ExpectedFarrowDate = dateConverterService.GetDateTime(breeding.ExpectedFarrowDate),
+                SynchronizationEventId = breeding.SynchronizationEventId
             };
 
             // Update existing record in the database

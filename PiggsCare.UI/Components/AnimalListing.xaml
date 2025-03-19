@@ -10,7 +10,6 @@
                   d:DataContext="{d:DesignInstance Type=animals:AnimalListingViewModel}"
                   d:DesignHeight="300"
                   d:DesignWidth="auto"
-                  DataContext=""
                   mc:Ignorable="d">
 
     <views:MvxWpfView.Resources>
@@ -34,7 +33,6 @@
             <Grid Margin="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50" />
-                    <RowDefinition Height="30" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
@@ -42,12 +40,13 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <StackPanel Margin="15,0,0,0"
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal">
                         <!--  Search Button  -->
-                        <TextBox Width="260"
+                        <TextBox Width="200"
                                  Margin="0,0,-10,0"
                                  Style="{DynamicResource TextBoxStyle}"
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
@@ -63,6 +62,16 @@
 
                     <Button Grid.Column="1"
                             Width="100"
+                            Margin="30,0"
+                            HorizontalAlignment="Right"
+                            Command="{Binding OpenSynchronizationEventDialogCommand}"
+                            IsDefault="True"
+                            Style="{DynamicResource CreateBtn}">
+                        <iconPacks:PackIconMaterial Kind="HeatWave" Style="{StaticResource IconButtonIcon}" />
+                    </Button>
+
+                    <Button Grid.Column="2"
+                            Width="100"
                             Margin="10,0"
                             HorizontalAlignment="Right"
                             Command="{Binding OpenInsertRecordDialogCommand}"
@@ -72,20 +81,23 @@
                     </Button>
                 </Grid>
 
-                <TextBlock Grid.Row="1"
-                           Foreground="Red"
-                           Text="{Binding ErrorMessage}"
-                           Visibility="{Binding ErrorMessage, Converter={StaticResource ToVisibilityConverter}}" />
-
-                <DataGrid Grid.Row="2"
+                <DataGrid Grid.Row="1"
                           Background="{DynamicResource SecondaryBackgroundColor}"
                           CellStyle="{StaticResource DataGridCellStyle1}"
                           ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle1}"
-                          ItemsSource="{Binding Animals, UpdateSourceTrigger=PropertyChanged}"
+                          ItemsSource="{Binding AnimalCollectionView, UpdateSourceTrigger=PropertyChanged}"
                           RowStyle="{StaticResource DataGridRowStyle1}"
                           Style="{DynamicResource DataGridStyle1}"
                           VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
+                        <!--  Select Animal Checkbox  -->
+                        <DataGridTemplateColumn Width="Auto" Header="Select">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Width="*"
                                             Binding="{Binding Name}"
                                             CanUserResize="False"

@@ -6,6 +6,7 @@
                   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:resources="clr-namespace:PiggsCare.UI.Resources"
+                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
                   d:DataContext="{d:DesignInstance Type=animals:AnimalDeleteFormViewModel}"
                   d:DesignHeight="auto"
@@ -29,8 +30,32 @@
                                             Style="{StaticResource FormButtonIcon}" />
             </TextBlock>
 
+            <!--  Birth Date  -->
+            <StackPanel Grid.Row="1" Margin="20,0,0,0">
+                <TextBlock FontSize="13"
+                           Foreground="#97a5b4"
+                           Text="Date" />
+
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                    <ui:CalendarDatePicker x:Name="CalendarDatePicker"
+                                           Margin="0,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Content="Pick the birth date"
+                                           Date="{Binding BirthDate, Mode=TwoWay}"
+                                           IsTodayHighlighted="True"
+                                           Style="{StaticResource CancelButton}" />
+
+                    <ui:TextBlock x:Name="CalendarDate"
+                                  Margin="10"
+                                  VerticalAlignment="Center"
+                                  FontSize="20"
+                                  Text="{Binding ElementName=CalendarDatePicker, Path=Date}" />
+                </StackPanel>
+
+            </StackPanel>
+
             <!--  Input Elements  -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -46,42 +71,44 @@
                 <!--  //Name  -->
                 <resources:CustomTextBox Grid.Row="0"
                                          Grid.Column="0"
-                                         Data="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Name"
                                          Placeholder="101" />
 
                 <!--  //Certificate Number  -->
                 <resources:CustomTextBox Grid.Row="0"
                                          Grid.Column="1"
-                                         Data="{Binding CertificateNumber, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding CertificateNumber, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Certificate Number"
                                          Placeholder="12" />
 
                 <!--  //Breed  -->
                 <resources:CustomTextBox Grid.Row="1"
                                          Grid.Column="0"
-                                         Data="{Binding Breed, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Data="{Binding Breed, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Breed"
-                                         Placeholder="Obolo" />
+                                         Placeholder="Duroc" />
 
-                <!--  //Gender  -->
-                <resources:CustomTextBox Grid.Row="1"
-                                         Grid.Column="1"
-                                         Data="{Binding Gender, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                         Description="Gender"
-                                         Placeholder="Male" />
+                <StackPanel Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="20,10"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                    <RadioButton Content="Male"
+                                 GroupName="GenderGroup"
+                                 IsChecked="{Binding Gender, Mode=TwoWay, Converter={StaticResource RadioButtonConverter}, ConverterParameter=Male}" />
+                    <RadioButton Margin="20,0,0,0"
+                                 Content="Female"
+                                 GroupName="GenderGroup"
+                                 IsChecked="{Binding Gender, Mode=TwoWay, Converter={StaticResource RadioButtonConverter}, ConverterParameter=Female}" />
+                </StackPanel>
 
-                <!--  //Birth Date  -->
-                <resources:CustomTextBox Grid.Row="2"
-                                         Grid.Column="0"
-                                         Data="{Binding BirthDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                         Description="Birth Date"
-                                         Placeholder="12-11-2023" />
 
                 <!--  //Back Fat Index  -->
                 <resources:CustomTextBox Grid.Row="2"
-                                         Grid.Column="1"
-                                         Data="{Binding BackFatIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Grid.Column="0"
+                                         Data="{Binding BackFatIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                          Description="Back Fat Index"
                                          Placeholder="34" />
 

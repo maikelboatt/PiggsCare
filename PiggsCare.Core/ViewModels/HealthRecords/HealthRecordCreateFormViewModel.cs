@@ -3,6 +3,7 @@ using MvvmCross.ViewModels;
 using PiggsCare.Core.Stores;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
+using PiggsCare.Domain.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -12,14 +13,20 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
     {
         #region Constructor
 
-        public HealthRecordCreateFormViewModel( IHealthRecordStore healthRecordStore, ModalNavigationStore modalNavigationStore, IHealthRecordValidation recordValidation )
+        public HealthRecordCreateFormViewModel( IHealthRecordStore healthRecordStore, ModalNavigationStore modalNavigationStore, IHealthRecordValidation recordValidation,
+            IDateConverterService dateConverterService )
         {
             _healthRecordStore = healthRecordStore;
             _modalNavigationStore = modalNavigationStore;
             _recordValidation = recordValidation;
+            _dateConverterService = dateConverterService;
             _recordValidation.Errors.Clear();
 
             recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+
+            // Initialize commands once so that RaiseCanExecuteChanged works as expected
+            SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+            CancelRecordCommand = new MvxCommand(ExecuteCancelCommand);
         }
 
         #endregion
@@ -38,11 +45,10 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         {
             ErrorsChanged?.Invoke(this, e);
             RaisePropertyChanged(nameof(HasErrors));
-            RaisePropertyChanged(nameof(CanSubmitRecord));
+            SubmitRecordCommand.RaiseCanExecuteChanged();
         }
 
         #endregion
-
 
         #region ViewModel Life-Cycle
 
@@ -61,7 +67,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #region Fields
 
-        private DateOnly _recordDate;
+        private DateTime _recordDate;
         private string _diagnosis = string.Empty;
         private string _treatment = string.Empty;
         private string _outcome = string.Empty;
@@ -69,20 +75,22 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         private readonly IHealthRecordStore _healthRecordStore;
         private readonly ModalNavigationStore _modalNavigationStore;
         private readonly IHealthRecordValidation _recordValidation;
+        private readonly IDateConverterService _dateConverterService;
 
         #endregion
 
         #region Properties
 
-        public DateOnly RecordDate
+        public DateTime RecordDate
         {
             get => _recordDate;
             set
             {
                 if (value.Equals(_recordDate)) return;
                 _recordDate = value;
-                _recordValidation.ValidateProp(value);
+                _recordValidation.ValidateProp(_dateConverterService.GetDateOnly(_recordDate));
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -95,6 +103,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
                 _diagnosis = value;
                 _recordValidation.ValidateProp(value);
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
         public string Treatment
@@ -106,6 +115,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
                 _treatment = value;
                 _recordValidation.ValidateProp(_treatment);
                 RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
         public string Outcome
@@ -116,7 +126,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
                 if (value.Equals(_outcome)) return;
                 _outcome = value;
                 _recordValidation.ValidateProp(_outcome);
-                RaisePropertyChanged();
+                SubmitRecordCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -124,14 +134,15 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #region Commands
 
-        public IMvxAsyncCommand SubmitRecordCommand => new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+        public IMvxAsyncCommand SubmitRecordCommand { get; }
 
         private bool CanSubmitRecord()
         {
-            return !HasErrors;
+            bool noFieldEmpty = !string.IsNullOrWhiteSpace(Diagnosis) && !string.IsNullOrWhiteSpace(Treatment) && !string.IsNullOrWhiteSpace(Outcome) && !RecordDate.Equals(default);
+            return noFieldEmpty && !HasErrors;
         }
 
-        public IMvxCommand CancelRecordCommand => new MvxCommand(ExecuteCancelCommand);
+        public IMvxCommand CancelRecordCommand { get; }
 
         #endregion
 
@@ -144,7 +155,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
             _modalNavigationStore.Close();
         }
 
-
         private void ExecuteCancelCommand()
         {
             _modalNavigationStore.Close();
@@ -152,7 +162,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         private HealthRecord GetHealthRecordFromFields()
         {
-            return new HealthRecord(1, _animalId, RecordDate, _diagnosis, _treatment, _outcome);
+            return new HealthRecord(1, _animalId, _dateConverterService.GetDateOnly(RecordDate), _diagnosis, _treatment, _outcome);
         }
 
         #endregion

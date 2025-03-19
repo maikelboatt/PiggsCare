@@ -2,11 +2,17 @@ using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
+using PiggsCare.Domain.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.HealthRecords
 {
-    public class HealthRecordDeleteFormViewModel( IHealthRecordStore healthRecordStore, ModalNavigationStore modalNavigationStore ):MvxViewModel<int>, IHealthRecordDeleteFormViewModel
+    public class HealthRecordDeleteFormViewModel(
+        IHealthRecordStore healthRecordStore,
+        ModalNavigationStore modalNavigationStore,
+        IMessageService messageService,
+        IDateConverterService dateConverterService )
+        :MvxViewModel<int>, IHealthRecordDeleteFormViewModel
     {
         public override void Prepare( int parameter )
         {
@@ -17,14 +23,14 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         {
             HealthRecord? record = healthRecordStore?.HealthRecords.FirstOrDefault(x => x.HealthRecordId == _healthRecordId);
             if (record == null) return base.Initialize();
-            PopulateEditForm(record);
+            PopulateDeleteForm(record);
             _animalId = record.AnimalId;
             return base.Initialize();
         }
 
-        private void PopulateEditForm( HealthRecord record )
+        private void PopulateDeleteForm( HealthRecord record )
         {
-            _recordDate = record.RecordDate;
+            _recordDate = dateConverterService.GetDateTime(record.RecordDate);
             _diagnosis = record.Diagnosis;
             _treatment = record.Treatment;
             _outcome = record.Outcome;
@@ -33,10 +39,10 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #region Fields
 
-        private DateOnly _recordDate;
-        private string _diagnosis;
-        private string _treatment;
-        private string _outcome;
+        private DateTime _recordDate;
+        private string _diagnosis = string.Empty;
+        private string _treatment = string.Empty;
+        private string _outcome = string.Empty;
         private int _healthRecordId;
         private int _animalId;
 
@@ -44,7 +50,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #region Properties
 
-        public DateOnly RecordDate
+        public DateTime RecordDate
         {
             get => _recordDate;
             set => SetProperty(ref _recordDate, value);
@@ -84,7 +90,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         private async Task ExecuteSubmitRecord()
         {
-            MessageBoxResult confirm = MessageBox.Show("Are you sure you want to delete the record?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            MessageBoxResult confirm = messageService.Show("Are you sure you want to delete the record?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (confirm == MessageBoxResult.OK)
                 await OnDeleteConfirm();
         }

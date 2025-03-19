@@ -83,7 +83,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         public override void Prepare( int parameter )
         {
-            Console.WriteLine(parameter);
             AnimalId = parameter;
         }
 
@@ -108,7 +107,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         }
 
         #endregion
-
 
         #region Fields
 

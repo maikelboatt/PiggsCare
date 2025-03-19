@@ -7,7 +7,7 @@ namespace PiggsCare.Domain.Services
         /// <summary>
         ///     Method to Get all HealthRecords in the database
         /// </summary>
-        /// <param name="i" ></param>
+        /// <param name="id" ></param>
         /// <returns>All health records in the database</returns>
         Task<IEnumerable<HealthRecord>> GetAllHealthRecordsAsync( int id );
 

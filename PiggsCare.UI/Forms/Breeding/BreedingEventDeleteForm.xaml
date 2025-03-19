@@ -23,7 +23,7 @@
             <TextBlock Grid.Row="0"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TertiaryTextColor}"
-                       Text="Delete Breeding Event for Pig"
+                       Text="Delete Insemination Event for Pig"
                        TextAlignment="Center">
                 <iconPacks:PackIconMaterial VerticalAlignment="Center"
                                             Kind="AccountPlusOutline"

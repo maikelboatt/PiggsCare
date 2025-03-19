@@ -73,7 +73,8 @@
                 </Grid>
 
 
-                <DataGrid Grid.Row="1"
+                <DataGrid x:Name="MainDatGrid"
+                          Grid.Row="1"
                           Background="{DynamicResource SecondaryBackgroundColor}"
                           CellStyle="{StaticResource DataGridCellStyle1}"
                           ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle1}"
@@ -81,6 +82,8 @@
                           RowStyle="{StaticResource DataGridRowStyle1}"
                           Style="{DynamicResource DataGridStyle1}"
                           VerticalScrollBarVisibility="Auto">
+
+
                     <DataGrid.Columns>
                         <DataGridTextColumn Width="*"
                                             Binding="{Binding AiDate, Converter={StaticResource LongDateConverter}}"
@@ -93,6 +96,30 @@
                                             CanUserResize="False"
                                             Header="Expected Farrow Date "
                                             IsReadOnly="True" />
+
+                        <DataGridTemplateColumn Width="auto"
+                                                Header="Navigation"
+                                                IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Margin="0,0,5,0"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.OpenPregnancyEventDialogCommand}"
+                                                CommandParameter="{Binding BreedingEventId}"
+                                                Style="{DynamicResource CreateBtn}">
+                                            <iconPacks:PackIconMaterial Kind="HumanPregnant" Style="{StaticResource IconButtonIcon}" />
+                                        </Button>
+
+                                        <Button Margin="0,0,5,0"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.OpenFarrowingEventDialogCommand}"
+                                                CommandParameter="{Binding BreedingEventId}"
+                                                Style="{DynamicResource CreateBtn}">
+                                            <iconPacks:PackIconMaterial Kind="RelationOnlyOneToMany" Style="{StaticResource IconButtonIcon}" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
 
                         <DataGridTemplateColumn Width="auto"

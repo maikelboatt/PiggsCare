@@ -23,7 +23,7 @@
             <TextBlock Grid.Row="0"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TertiaryTextColor}"
-                       Text="Add Breeding Event for Pig"
+                       Text="Add Insemination Event for Pig"
                        TextAlignment="Center">
                 <iconPacks:PackIconMaterial VerticalAlignment="Center"
                                             Kind="AccountPlusOutline"
@@ -68,13 +68,6 @@
                     </StackPanel>
 
                 </StackPanel>
-
-                <!--  //Expected Farrow Date  -->
-                <!--  <resources:CustomTextBox Grid.Row="0"  -->
-                <!--  Grid.Column="1"  -->
-                <!--  Data="{Binding ExpectedFarrowDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  -->
-                <!--  Description="Expected Farrow Date"  -->
-                <!--  Placeholder="2025-02-12 (YY-MM-DD)" />  -->
 
                 <resources:CustomTextBox Grid.Row="0"
                                          Grid.Column="1"

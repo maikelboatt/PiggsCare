@@ -17,6 +17,8 @@ namespace PiggsCare.Domain.Models
         public string Gender { get; init; } = gender;
         public float BackFatIndex { get; init; } = backFatIndex;
 
+        public bool IsSelected { get; set; } = false;
+
         public override string ToString()
         {
             return

@@ -11,10 +11,10 @@ namespace PiggsCare.DataAccess.DTO
         public required string Gender { get; init; }
 
         public required float BackFatIndex { get; init; }
-
-        // // Navigation properties (for relationships)
-        // public List<BreedingEventDto> BreedingEvents { get; set; }
-        // public List<HealthRecordDto> HealthRecords { get; set; }
-        // public RemovalEventDto RemovalEventDto { get; set; }
+        
+    // // Navigation properties (for relationships)
+    // public List<BreedingEventDto> BreedingEvents { get; set; }
+    // public List<HealthRecordDto> HealthRecords { get; set; }
+    // public RemovalEventDto RemovalEventDto { get; set; }
     }
 }

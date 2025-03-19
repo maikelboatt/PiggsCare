@@ -26,9 +26,18 @@
                        Text="{Binding ElementName=Root, Path=Placeholder}"
                        Visibility="{Binding ElementName=TextBox, Path=Text.IsEmpty, Converter={StaticResource ToVisibilityConverter}}" />
 
-            <TextBox x:Name="TextBox"
-                     Style="{StaticResource TextBoxStyle}"
-                     Text="{Binding ElementName=Root, Path=Data, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox x:Name="TextBox" Text="{Binding ElementName=Root, Path=Data, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}">
+
+                <TextBox.Style>
+                    <Style BasedOn="{StaticResource TextBoxStyle}" TargetType="TextBox">
+                        <Style.Triggers>
+                            <Trigger Property="Validation.HasError" Value="True">
+                                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
         </Grid>
     </StackPanel>
 </views:MvxWpfView>

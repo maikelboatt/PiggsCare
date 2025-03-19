@@ -45,9 +45,10 @@
                                 <!--  Style="{DynamicResource MenuRadioButtonStyle}"  -->
                                 <!--  Tag="{DynamicResource Analytics}" />  -->
 
+                                <!--  Health Button  -->
                                 <RadioButton Margin="12,1,0,1"
                                              Command="{Binding NavigateToHealth}"
-                                             IsChecked="True"
+                                             IsChecked="{Binding CurrentProcessStage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Health, Mode=TwoWay}"
                                              Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconMaterial Kind="Stethoscope" />
@@ -55,51 +56,66 @@
                                     </StackPanel>
                                 </RadioButton>
 
+                                <!--  Synchronization Button  -->
                                 <RadioButton Margin="12,1,0,1"
-                                             Command="{Binding NavigateToBreeding}"
+                                             Command="{Binding NavigateToSynchronization}"
+                                             IsChecked="{Binding CurrentProcessStage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Synchronization, Mode=TwoWay}"
                                              Style="{StaticResource MenuButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <iconPacks:PackIconMaterial Kind="Stethoscope" />
-                                        <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Breeding " />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <iconPacks:PackIconMaterial Kind="Stethoscope" />
-                                        <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Farrowing " />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconMaterial Kind="Stethoscope" />
                                         <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Estrus Synchronization" />
                                     </StackPanel>
                                 </RadioButton>
 
-                                <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
+                                <!--  Insemination Button  -->
+                                <RadioButton Margin="12,1,0,1"
+                                             Command="{Binding NavigateToBreeding}"
+                                             IsChecked="{Binding CurrentProcessStage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Breeding, Mode=TwoWay}"
+                                             Style="{StaticResource MenuButton}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Stethoscope" />
+                                        <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Insemination " />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <!--  Pregnancy Button  -->
+                                <RadioButton Margin="12,1,0,1"
+                                             Command="{Binding NavigateToPregnancy}"
+                                             IsChecked="{Binding CurrentProcessStage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Pregnancy, Mode=TwoWay}"
+                                             Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconMaterial Kind="Stethoscope" />
                                         <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Pregnancy" />
                                     </StackPanel>
                                 </RadioButton>
 
-                                <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
+                                <!--  Farrowing Button  -->
+                                <RadioButton Margin="12,1,0,1"
+                                             Command="{Binding NavigateToFarrowing}"
+                                             IsChecked="{Binding CurrentProcessStage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Farrowing, Mode=TwoWay}"
+                                             Style="{StaticResource MenuButton}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Stethoscope" />
+                                        <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Farrowing " />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <!--  Weaning Button  -->
+                                <RadioButton Margin="12,1,0,1"
+                                             Command="{Binding NavigateToWeaning}"
+                                             IsChecked="{Binding CurrentProcessStage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Weaning, Mode=TwoWay}"
+                                             Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconMaterial Kind="Stethoscope" />
                                         <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Weaning" />
                                     </StackPanel>
                                 </RadioButton>
 
-                                <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <iconPacks:PackIconMaterial Kind="Stethoscope" />
-                                        <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Piglet" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton Margin="12,1,0,1" Style="{StaticResource MenuButton}">
+                                <!--  Removal Button  -->
+                                <RadioButton Margin="12,1,0,1"
+                                             Command="{Binding NavigateToRemoval}"
+                                             IsChecked="{Binding CurrentProcessStage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Removal, Mode=TwoWay}"
+                                             Style="{StaticResource MenuButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconMaterial Kind="Stethoscope" />
                                         <TextBlock Style="{StaticResource SecondaryMenuButton}" Text="Removal" />

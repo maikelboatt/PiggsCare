@@ -1,6 +1,7 @@
 using PiggsCare.Domain.Models;
 using System.Collections;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace PiggsCare.Core.Validation
 {
@@ -40,7 +41,7 @@ namespace PiggsCare.Core.Validation
 
         #region Validation Methods
 
-        public void ValidateProp( object value, string propertyName = "" )
+        public void ValidateProp( object value, [CallerMemberName] string propertyName = "" )
         {
             switch (propertyName)
             {

@@ -33,7 +33,7 @@ namespace PiggsCare.Core.ViewModels
 
         private void ExecuteNavigateToInsemination()
         {
-            BreedingEventListingViewModel? viewmodel = _viewModelFactory.CreateViewModel<BreedingEventListingViewModel, int>(_synchronizationId);
+            BreedingBatchListingViewModel? viewmodel = _viewModelFactory.CreateViewModel<BreedingBatchListingViewModel, int>(_synchronizationId);
             _currentViewModelStore.CurrentViewModel = viewmodel;
             _currentViewModelStore.CurrentProcessStage = ProcessStage.Breeding;
             viewmodel?.Initialize();

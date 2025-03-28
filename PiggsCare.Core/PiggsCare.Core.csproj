@@ -5,18 +5,19 @@
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <ImplicitUsings>enable</ImplicitUsings>
+        <Platforms>AnyCPU;x64;x86</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\PiggsCare.DataAccess\PiggsCare.DataAccess.csproj"/>
-        <ProjectReference Include="..\PiggsCare.Domain\PiggsCare.Domain.csproj"/>
+        <ProjectReference Include="..\PiggsCare.DataAccess\PiggsCare.DataAccess.csproj" />
+        <ProjectReference Include="..\PiggsCare.Domain\PiggsCare.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="LiveCharts.Wpf" Version="0.9.7"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.1"/>
-        <PackageReference Include="MvvmCross" Version="9.3.0"/>
-        <PackageReference Include="MvvmCross.Plugin.Messenger" Version="9.3.0"/>
+        <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.1" />
+        <PackageReference Include="MvvmCross" Version="9.3.0" />
+        <PackageReference Include="MvvmCross.Plugin.Messenger" Version="9.3.0" />
     </ItemGroup>
 
     <ItemGroup>

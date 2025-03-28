@@ -12,5 +12,3 @@ namespace PiggsCare.DataAccess.DTO
 }
 
 
-//tonyboateng90@gmail.com
-// taobynot

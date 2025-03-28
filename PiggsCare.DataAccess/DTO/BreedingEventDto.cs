@@ -8,11 +8,6 @@ namespace PiggsCare.DataAccess.DTO
         public required DateTime ExpectedFarrowDate { get; init; } // Nullable DateTime
 
         public int? SynchronizationEventId { get; init; }
-
-        // // Navigation properties
-        // public AnimalDto AnimalDto { get; set; }
-        // public PregnancyScanDto PregnancyScanDto { get; set; }
-        // public FarrowingEventDto FarrowingEventDto { get; set; }
     }
 }
 

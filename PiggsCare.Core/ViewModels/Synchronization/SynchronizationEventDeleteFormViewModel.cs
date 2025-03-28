@@ -134,7 +134,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
 
         private int GetBreedingEventId()
         {
-            breedingEventStore.Load(_synchronizationId);
+            breedingEventStore.LoadForAnimal(_synchronizationId);
             BreedingEvent? result = breedingEventStore.BreedingEvents.FirstOrDefault(x => x.SynchronizationEventId == _synchronizationId);
             // List<int> record = [];
             // record.AddRange(result.Select(bred => bred.BreedingEventId));

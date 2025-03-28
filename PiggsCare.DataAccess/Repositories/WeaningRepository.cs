@@ -7,11 +7,11 @@ namespace PiggsCare.DataAccess.Repositories
 {
     public class WeaningRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IWeaningRepository
     {
-        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggyKare;Integrated Security=True;TrustServerCertificate=True;";
+        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggsCare;Integrated Security=True;TrustServerCertificate=True;";
 
         public async Task<IEnumerable<WeaningEvent>> GetAllWeaningEventAsync( int id )
         {
-            IEnumerable<WeaningEventDto> result = await dataAccess.QueryAsync<WeaningEventDto, dynamic>("dbo.Weaning_GetAll", new { FarrowingEventId = id }, Connectionstring);
+            IEnumerable<WeaningEventDto> result = await dataAccess.QueryAsync<WeaningEventDto, dynamic>("sp.Weaning_GetAll", new { FarrowingEventId = id }, Connectionstring);
             return result.Select(x => new WeaningEvent(x.WeaningEventId,
                                                        x.FarrowingEventId,
                                                        dateConverterService.GetDateOnly(x.WeaningDate),
@@ -24,7 +24,7 @@ namespace PiggsCare.DataAccess.Repositories
         public async Task<WeaningEvent?> GetWeaningEventByIdAsync( int id )
         {
             // Query the database for any record with matching id
-            IEnumerable<WeaningEventDto> result = await dataAccess.QueryAsync<WeaningEventDto, dynamic>("dbo.Weaning_GetUnique", new { WeaningEventId = id }, Connectionstring);
+            IEnumerable<WeaningEventDto> result = await dataAccess.QueryAsync<WeaningEventDto, dynamic>("sp.Weaning_GetUnique", new { WeaningEventId = id }, Connectionstring);
             WeaningEventDto? weaningEventDto = result.FirstOrDefault();
 
             // Convert WeaningEventDto to PregnancyScan Object
@@ -53,7 +53,7 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync("dbo.Weaning_Insert",
+            await dataAccess.CommandAsync("sp.Weaning_Insert",
                                           new
                                           {
                                               record.FarrowingEventId, record.WeaningDate, record.NumberWeaned, record.MalesWeaned, record.FemalesWeaned,
@@ -78,12 +78,12 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Update existing record in the database
-            await dataAccess.CommandAsync("dbo.Weaning_Update", recordDto, Connectionstring);
+            await dataAccess.CommandAsync("sp.Weaning_Modify", recordDto, Connectionstring);
         }
 
         public async Task DeleteWeaningEventAsync( int id )
         {
-            await dataAccess.CommandAsync("dbo.Weaning_Delete", new { WeaningEventId = id }, Connectionstring);
+            await dataAccess.CommandAsync("sp.Weaning_Delete", new { WeaningEventId = id }, Connectionstring);
 
         }
     }

@@ -8,12 +8,12 @@ namespace PiggsCare.DataAccess.Repositories
 {
     public class SynchronizationEventRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):ISynchronizationEventRepository
     {
-        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggyKare;Integrated Security=True;TrustServerCertificate=True;"; // Ideally from config
+        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggsCare;Integrated Security=True;TrustServerCertificate=True;"; // Ideally from config
 
         public async Task<IEnumerable<SynchronizationEvent>> GetAllSynchronizationEventsAsync()
         {
             IEnumerable<EstrusSynchronizationEventDto> results = await dataAccess.QueryAsync<EstrusSynchronizationEventDto, dynamic>( // Querying for SynchronizationEvent Model directly
-                "dbo.Synchronization_GetAll",
+                "sp.Synchronization_GetAll",
                 new { },
                 Connectionstring);
 
@@ -28,7 +28,7 @@ namespace PiggsCare.DataAccess.Repositories
         public async Task<SynchronizationEvent?> GetSynchronizationEventByIdAsync( int synchronizationEventId )
         {
             IEnumerable<EstrusSynchronizationEventDto> results = await dataAccess.QueryAsync<EstrusSynchronizationEventDto, dynamic>( // Querying for SynchronizationEvent Model
-                "dbo.Synchronization_GetUnique",
+                "sp.Synchronization_GetUnique",
                 new { SynchronizationEventId = synchronizationEventId },
                 Connectionstring);
 
@@ -59,7 +59,7 @@ namespace PiggsCare.DataAccess.Repositories
 
             // Insert record into the database
             await dataAccess.CommandAsync(
-                "dbo.Synchronization_Update",
+                "sp.Synchronization_Modify",
                 new
                 {
                     synchronizationEvent.SynchronizationEventId,
@@ -75,7 +75,7 @@ namespace PiggsCare.DataAccess.Repositories
         public async Task DeleteSynchronizationEventAsync( int synchronizationEventId )
         {
             await dataAccess.CommandAsync(
-                "dbo.Synchronization_Delete",
+                "sp.Synchronization_Delete",
                 new { SynchronizationEventId = synchronizationEventId },
                 Connectionstring);
         }
@@ -95,7 +95,7 @@ namespace PiggsCare.DataAccess.Repositories
 
             // Insert record into the database
             IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
-                "dbo.Synchronization_Insert",
+                "sp.Synchronization_Insert",
                 new
                 {
                     StartDate = dateConverterService.GetDateTime(synchronizationEvent.StartDate), // Convert DateOnly to DateTime

@@ -8,12 +8,12 @@ namespace PiggsCare.DataAccess.Repositories
 {
     public class RemovalEventRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IRemovalEventRepository
     {
-        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggyKare;Integrated Security=True;TrustServerCertificate=True;"; // Ideally from config
+        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggsCare;Integrated Security=True;TrustServerCertificate=True;"; // Ideally from config
 
         public async Task<IEnumerable<RemovalEvent>> GetAllRemovalEventsAsync( int animalId )
         {
             IEnumerable<RemovalEventDto> results = await dataAccess.QueryAsync<RemovalEventDto, dynamic>(
-                "dbo.Removal_GetAll", // Stored procedure name for GetAll
+                "sp.Removal_GetAll", // Stored procedure name for GetAll
                 new { AnimalId = animalId },
                 Connectionstring);
 
@@ -26,7 +26,7 @@ namespace PiggsCare.DataAccess.Repositories
         public async Task<RemovalEvent?> GetRemovalEventByIdAsync( int removalEventId )
         {
             IEnumerable<RemovalEventDto> results = await dataAccess.QueryAsync<RemovalEventDto, dynamic>(
-                "dbo.Removal_GetUnique", // Stored procedure name for GetById
+                "sp.Removal_GetUnique", // Stored procedure name for GetById
                 new { RemovalEventId = removalEventId },
                 Connectionstring);
 
@@ -52,7 +52,7 @@ namespace PiggsCare.DataAccess.Repositories
 
             // Insert record into the database
             await dataAccess.CommandAsync(
-                "dbo.Removal_Insert", // Stored procedure name for Insert
+                "sp.Removal_Insert", // Stored procedure name for Insert
                 new
                 {
                     removalEvent.AnimalId,
@@ -73,7 +73,7 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             await dataAccess.CommandAsync(
-                "dbo.Removal_Update", // Stored procedure name for Update
+                "sp.Removal_Modify", // Stored procedure name for Update
                 new
                 {
                     removalEvent.RemovalEventId,
@@ -87,7 +87,7 @@ namespace PiggsCare.DataAccess.Repositories
         public async Task DeleteRemovalEventAsync( int removalEventId )
         {
             await dataAccess.CommandAsync(
-                "dbo.Removal_Delete", // Stored procedure name for Delete
+                "sp.Removal_Delete", // Stored procedure name for Delete
                 new { RemovalEventId = removalEventId },
                 Connectionstring);
         }

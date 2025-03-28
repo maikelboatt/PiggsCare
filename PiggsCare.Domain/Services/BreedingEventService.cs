@@ -10,6 +10,11 @@ namespace PiggsCare.Domain.Services
             return await breedingEventRepository.GetAllBreedingEventsAsync(id);
         }
 
+        public async Task<IEnumerable<BreedingEventWithAnimal>> GetAllBreedingEventBySynchronizationBatchAsync( int synchronizationId )
+        {
+            return await breedingEventRepository.GetAllBreedingEventBySynchronizationBatchAsync(synchronizationId);
+        }
+
         public async Task<BreedingEvent?> GetBreedingEventByIdAsync( int id )
         {
             return await breedingEventRepository.GetBreedingEventByIdAsync(id);

@@ -12,6 +12,13 @@ namespace PiggsCare.Domain.Services
         Task<IEnumerable<BreedingEvent>> GetAllBreedingEventsAsync( int id );
 
         /// <summary>
+        ///     Method to get all breeding events by synchronization batch
+        /// </summary>
+        /// <param name="synchronizationId" >Unique identification of synchronization batch</param>
+        /// <returns>All breeding events associated with the synchronization batch</returns>
+        Task<IEnumerable<BreedingEventWithAnimal>> GetAllBreedingEventBySynchronizationBatchAsync( int synchronizationId );
+
+        /// <summary>
         ///     Method that returns breeding event that has a unique id
         /// </summary>
         /// <param name="id" >Unique identification of breeding event </param>

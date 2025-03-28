@@ -7,11 +7,11 @@ namespace PiggsCare.Domain.Models
         public DateOnly AiDate { get; init; } = aiDate;
         public DateOnly ExpectedFarrowDate { get; init; } = expectedFarrowDate;
 
-        public int? SynchronizationEventId { get; set; } = synchronizationEventId;
+        public int? SynchronizationEventId { get; init; } = synchronizationEventId;
 
         public override string ToString()
         {
-            return $"Breeding Event Id: {BreedingEventId}, Animal Id: {AnimalId}, AiDate: {AiDate}, Expected FarrowDate: {ExpectedFarrowDate}";
+            return $"Breeding Event Id: {BreedingEventId}, Animal Id: {AnimalId}, AiDate: {AiDate}, Expected FarrowDate: {ExpectedFarrowDate}, Sync Event Id: {{SynchronizationEventId}}";
         }
     }
 }

@@ -54,7 +54,7 @@ namespace PiggsCare.Core.ViewModels
 
         private void ShowSynchronizationView()
         {
-            EstrusViewModel? viewmodel = _viewModelFactory.CreateViewModel<EstrusViewModel>();
+            SynchronizationViewModel? viewmodel = _viewModelFactory.CreateViewModel<SynchronizationViewModel>();
             CurrentViewModel = viewmodel;
             viewmodel?.Initialize();
         }

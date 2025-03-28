@@ -48,7 +48,7 @@
             <local:EstrusView />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type synchronizationEventViewModel:SynchronizationViewModel}">
+        <DataTemplate DataType="{x:Type viewModels:SynchronizationViewModel}">
             <local:Synchronization />
         </DataTemplate>
 

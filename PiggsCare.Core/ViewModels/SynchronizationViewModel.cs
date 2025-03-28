@@ -1,7 +1,8 @@
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Factory;
+using PiggsCare.Core.ViewModels.Synchronization;
 
-namespace PiggsCare.Core.ViewModels.Synchronization
+namespace PiggsCare.Core.ViewModels
 {
     public class SynchronizationViewModel( IViewModelFactory viewModelFactory ):MvxViewModel, ISynchronizationViewModel
     {

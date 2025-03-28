@@ -5,7 +5,6 @@ using PiggsCare.Core.Stores;
 using PiggsCare.Core.ViewModels.Breeding;
 using PiggsCare.Core.ViewModels.HealthRecords;
 using PiggsCare.Core.ViewModels.Removal;
-using PiggsCare.Core.ViewModels.Synchronization;
 using PiggsCare.Domain.Services;
 using System.Windows;
 
@@ -29,12 +28,6 @@ namespace PiggsCare.Core.ViewModels
 
         #endregion
 
-        public MvxCommand PowerOffCommand => new(ExecutePowerOff);
-
-        private void ExecutePowerOff()
-        {
-            _modalNavigationStore.Close();
-        }
 
         #region Event Handler
 
@@ -112,10 +105,16 @@ namespace PiggsCare.Core.ViewModels
         public IMvxCommand NavigateToPregnancy => new MvxCommand(ExecuteNavigateToPregnancy);
         public IMvxCommand NavigateToWeaning => new MvxCommand(ExecuteNavigateToWeaning);
         public IMvxCommand NavigateToRemoval => new MvxCommand(ExecuteNavigateToRemoval);
+        public MvxCommand PowerOffCommand => new(ExecutePowerOff);
 
         #endregion
 
         #region Methods
+
+        private void ExecutePowerOff()
+        {
+            _modalNavigationStore.Close();
+        }
 
         private void ExecuteNavigateToHealth()
         {
@@ -127,7 +126,7 @@ namespace PiggsCare.Core.ViewModels
 
         private void ExecuteNavigateToSynchronization()
         {
-            SynchronizationListingViewModel? viewmodel = _viewModelFactory.CreateViewModel<SynchronizationListingViewModel, int>(_animalId);
+            EstrusViewModel? viewmodel = _viewModelFactory.CreateViewModel<EstrusViewModel, int>(_animalId);
             _currentViewModelStore.CurrentViewModel = viewmodel;
             CurrentProcessStage = ProcessStage.Synchronization;
             viewmodel?.Initialize();

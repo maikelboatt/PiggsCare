@@ -5,14 +5,19 @@ namespace PiggsCare.Core.Stores
     public interface IBreedingEventStore
     {
         IEnumerable<BreedingEvent> BreedingEvents { get; }
+        IEnumerable<BreedingEventWithAnimal> BreedingEventsBatch { get; }
 
-        Task Load( int id );
+        Task LoadForAnimal( int id );
+
+        Task LoadForBatch( int id );
 
         Task Create( BreedingEvent breedingEvent );
 
         Task Modify( BreedingEvent breedingEvent );
 
         Task Remove( int id );
+
+        Task<BreedingEvent> GetUnique( int id );
 
         event Action OnLoad;
         event Action<BreedingEvent> OnSave;

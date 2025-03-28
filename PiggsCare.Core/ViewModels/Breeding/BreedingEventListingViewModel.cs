@@ -48,13 +48,13 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         public IEnumerable<BreedingEvent> BreedingEvents => _breedingEvents;
 
-        public int AnimalId { get; private set; }
-
         public bool IsLoading
         {
             get => _isLoading;
             set => SetProperty(ref _isLoading, value);
         }
+
+        public int AnimalId { get; set; }
 
         #endregion
 
@@ -76,7 +76,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
             try
             {
                 _breedingEvents!.Clear();
-                await _breedingEventStore.Load(AnimalId);
+                await _breedingEventStore.LoadForAnimal(AnimalId);
 
                 foreach (BreedingEvent breedingEvent in _breedingEventStore.BreedingEvents)
                 {
@@ -146,8 +146,9 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         #region Fields
 
-        private readonly MvxObservableCollection<BreedingEvent> _breedingEvents;
         private bool _isLoading;
+
+        private readonly MvxObservableCollection<BreedingEvent> _breedingEvents;
         private readonly IBreedingEventStore _breedingEventStore;
         private readonly IModalNavigationControl _modalNavigationControl;
         private readonly IViewModelFactory _viewModelFactory;

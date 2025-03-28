@@ -6,13 +6,13 @@
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:viewModels="clr-namespace:PiggsCare.Core.ViewModels;assembly=PiggsCare.Core"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
+                  MaxWidth="700"
+                  MaxHeight="400"
                   d:DataContext="{d:DesignInstance Type=viewModels:EstrusViewModel}"
                   d:DesignHeight="auto"
                   d:DesignWidth="auto"
                   mc:Ignorable="d">
-    <Border Background="{DynamicResource SecondaryBackgroundColor}" CornerRadius="8">
-        <Grid>
-            <components:SynchronizationListing DataContext="{Binding Synchronization}" />
-        </Grid>
-    </Border>
+    <Grid>
+        <components:SynchronizationListing DataContext="{Binding Synchronization}" />
+    </Grid>
 </views:MvxWpfView>

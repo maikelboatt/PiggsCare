@@ -48,6 +48,10 @@
             <local:EstrusView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type synchronizationEventViewModel:SynchronizationViewModel}">
+            <local:Synchronization />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type animalViewModels:AnimalListingViewModel}">
             <components:AnimalListing />
         </DataTemplate>
@@ -86,6 +90,10 @@
 
         <DataTemplate DataType="{x:Type viewModels:SelectedAnimalDetailsViewModel}">
             <components:SelectedAnimalDetails />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:SelectedBatchDetailsViewModel}">
+            <components:SelectedBatchDetails />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type animalViewModels:AnimalCreateFormViewModel}">
@@ -260,6 +268,12 @@
                                              Content="Home"
                                              Style="{DynamicResource MenuRadioButtonStyle}"
                                              Tag="{DynamicResource Home}" />
+
+                                <RadioButton Margin="0,1,0,1"
+                                             Command="{Binding NavigateToSynchronization}"
+                                             Content="Synchronizations"
+                                             Style="{DynamicResource MenuRadioButtonStyle}"
+                                             Tag="{DynamicResource Collections}" />
 
 
                                 <Separator Margin="20,20" Background="{DynamicResource TertiaryBackgroundColor}" />

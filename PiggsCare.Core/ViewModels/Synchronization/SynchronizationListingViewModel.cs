@@ -1,41 +1,69 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using PiggsCare.Core.Control;
+using PiggsCare.Core.Factory;
 using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 using System.Collections.Specialized;
 
 namespace PiggsCare.Core.ViewModels.Synchronization
 {
+    /// <summary>
+    ///     ViewModel for handling synchronization listing operations.
+    /// </summary>
     public class SynchronizationListingViewModel:MvxViewModel, ISynchronizationListingViewModel
     {
         #region Constructor
 
-        public SynchronizationListingViewModel( ISynchronizationEventStore synchronizationEventStore, IModalNavigationControl modalNavigationControl )
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SynchronizationListingViewModel" /> class.
+        /// </summary>
+        /// <param name="synchronizationEventStore" >The synchronization event store.</param>
+        /// <param name="modalNavigationControl" >The modal navigation control.</param>
+        /// <param name="viewModelFactory" >The view model factory.</param>
+        /// <param name="currentViewModelStore" >The current view model store.</param>
+        public SynchronizationListingViewModel( ISynchronizationEventStore synchronizationEventStore, IModalNavigationControl modalNavigationControl, IViewModelFactory viewModelFactory,
+            ICurrentViewModelStore currentViewModelStore )
         {
             _synchronizationEventStore = synchronizationEventStore;
             _modalNavigationControl = modalNavigationControl;
+            _viewModelFactory = viewModelFactory;
+            _currentViewModelStore = currentViewModelStore;
 
             _synchronizationEvents.CollectionChanged += SynchronizationEventsOnCollectionChanged;
         }
 
         #endregion
 
+        #region Event Handlers
+
+        /// <summary>
+        ///     Handles the collection changed event for synchronization events.
+        /// </summary>
+        /// <param name="sender" >The event sender.</param>
+        /// <param name="e" >The event arguments.</param>
+        private void SynchronizationEventsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
+        {
+            RaisePropertyChanged(nameof(SynchronizationEvents));
+        }
+
+        #endregion
+
         #region ViewModel Life-Cycle
 
+        /// <summary>
+        ///     Initializes the ViewModel asynchronously.
+        /// </summary>
         public override async Task Initialize()
         {
             await LoadSynchronizationEventDetailsAsync();
             await base.Initialize();
         }
 
-        #endregion
-
-        #region Event Handlers
-
-        private void SynchronizationEventsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
+        public override void ViewDestroy( bool viewFinishing = true )
         {
-            RaisePropertyChanged(nameof(SynchronizationEvents));
+            base.ViewDestroy(viewFinishing);
+            _synchronizationEvents.CollectionChanged -= SynchronizationEventsOnCollectionChanged;
         }
 
         #endregion
@@ -47,6 +75,8 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         private MvxObservableCollection<SynchronizationEvent> _synchronizationEvents => new(_synchronizationEventStore.SynchronizationEvents);
         private readonly ISynchronizationEventStore _synchronizationEventStore;
         private readonly IModalNavigationControl _modalNavigationControl;
+        private readonly IViewModelFactory _viewModelFactory;
+        private readonly ICurrentViewModelStore _currentViewModelStore;
 
         #endregion
 
@@ -69,11 +99,15 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         public IMvxCommand OpenInsertRecordDialogCommand => new MvxCommand(ExecuteOpenInsertRecordDialog);
         public IMvxCommand<int> OpenModifyRecordDialogCommand => new MvxCommand<int>(ExecuteOpenModifyRecordDialog);
         public IMvxCommand<int> OpenRemoveRecordDialogCommand => new MvxCommand<int>(ExecuteOpenRemoveRecordDialog);
+        public IMvxCommand<int> OpenBatchDetailsDialogCommand => new MvxCommand<int>(ExecuteOpenBatchDetailsDialog);
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        ///     Loads the synchronization event details asynchronously.
+        /// </summary>
         private async Task LoadSynchronizationEventDetailsAsync()
         {
             IsLoading = true;
@@ -94,9 +128,12 @@ namespace PiggsCare.Core.ViewModels.Synchronization
             }
         }
 
+        /// <summary>
+        ///     Updates the view by raising property changed for synchronization events.
+        /// </summary>
         private void UpdateView()
         {
-            RaisePropertyChanged(nameof(SynchronizationEvents)); // Raise property changed for SynchronizationEvents
+            RaisePropertyChanged(nameof(SynchronizationEvents));
         }
 
         private void ExecuteOpenInsertRecordDialog()
@@ -115,6 +152,15 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         {
             // Open the SynchronizationEventDeleteForm dialog
             _modalNavigationControl.PopUp<SynchronizationEventDeleteFormViewModel>(id); // Pass SynchronizationEventId to Delete form
+        }
+
+        /// <summary>
+        ///     Executes the command to open the batch details dialog.
+        /// </summary>
+        /// <param name="synchronizationId" >The synchronization event ID.</param>
+        private void ExecuteOpenBatchDetailsDialog( int synchronizationId )
+        {
+            _modalNavigationControl.PopUp<SelectedBatchDetailsViewModel>(synchronizationId);
         }
 
         #endregion

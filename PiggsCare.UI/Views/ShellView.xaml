@@ -72,6 +72,10 @@
             <components:BreedingListing />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type breedingEventViewModel:BreedingBatchListingViewModel}">
+            <components:BreedingBatchListing />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type farrowEventViewModel:FarrowListingViewModel}">
             <components:FarrowListing />
         </DataTemplate>
@@ -201,10 +205,6 @@
                 <VisualBrush Visual="{Binding ElementName=Border}" />
             </Grid.OpacityMask>
 
-            <!-- <modalControl:Modal Panel.ZIndex="10" IsOpen="{Binding IsModalOpen, UpdateSourceTrigger=PropertyChanged}"> -->
-            <!--     <ContentControl Margin="50,25" Content="{Binding CurrentModalViewModel}" /> -->
-            <!-- </modalControl:Modal> -->
-
             <modalDialogControl:ModalDialog Panel.ZIndex="1"
                                             IsOpen="{Binding IsModalOpen, UpdateSourceTrigger=PropertyChanged}"
                                             TheBackground="{DynamicResource TertiaryBackgroundColor}"
@@ -322,13 +322,6 @@
                                           Fill="{DynamicResource PrimaryWhiteColor}"
                                           Stretch="Fill" />
                                 </StackPanel>
-                                <!--<Border.BitmapEffect>
-        <DropShadowBitmapEffect
-                        ShadowDepth="1"
-                        Direction="0"
-                        Color="#5B8DEF"
-                        Softness="0.8"/>
-    </Border.BitmapEffect>-->
                             </Border>
                             <!--  End Theme Switcher  -->
                         </Grid>

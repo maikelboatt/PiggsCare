@@ -7,8 +7,6 @@
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:synchronization="clr-namespace:PiggsCare.Core.ViewModels.Synchronization;assembly=PiggsCare.Core"
                   xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
-                  MaxWidth="700"
-                  MaxHeight="400"
                   d:DataContext="{d:DesignInstance Type=synchronization:SynchronizationListingViewModel}"
                   d:DesignHeight="auto"
                   d:DesignWidth="auto"
@@ -33,7 +31,7 @@
         <Grid Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
             <Grid Margin="3">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="50" />
+                    <RowDefinition Height="30" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
@@ -112,6 +110,20 @@
                                             Header="Comments"
                                             IsReadOnly="True" />
 
+                        <DataGridTemplateColumn Width="auto"
+                                                Header="Insemination"
+                                                IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Margin="0,0,5,0"
+                                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.OpenBatchDetailsDialogCommand}"
+                                            CommandParameter="{Binding SynchronizationEventId}"
+                                            Style="{DynamicResource CreateBtn}">
+                                        <iconPacks:PackIconMaterial Kind="Needle" Style="{StaticResource IconButtonIcon}" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
                         <DataGridTemplateColumn Width="auto"
                                                 Header="Operations"
@@ -138,20 +150,6 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
-
-                    <!--  Context Menu  -->
-                    <DataGrid.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Command="{Binding DataContext.OpenModifyRecordDialogCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                      CommandParameter="{Binding SelectedItem.SynchronizationEventId, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
-                                      Header="Edit" />
-
-                            <MenuItem Command="{Binding DataContext.OpenRemoveRecordDialogCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                      CommandParameter="{Binding SelectedItem.SynchronizationEventId, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
-                                      Header="Delete" />
-
-                        </ContextMenu>
-                    </DataGrid.ContextMenu>
                 </DataGrid>
 
             </Grid>

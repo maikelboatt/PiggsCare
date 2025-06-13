@@ -72,6 +72,6 @@ Open an issue with the tag "enhancement" for feature requests or "bug" for bug r
 Distributed under the MIT License. See the LICENSE file in the repository for more information.
 
 📧 Contact
-[Your Name/Company Name] - [Your Email Address] - [Your LinkedIn Profile URL or Website (Optional)]
+[maikelboatt@gmail.com ] 
 
 Project Link: https://github.com/YourUsername/PiggsCare

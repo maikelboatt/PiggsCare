@@ -1,30 +1,28 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MvvmCross.IoC;
 using MvvmCross.Platforms.Wpf.Core;
 using Serilog;
 using Serilog.Extensions.Logging;
+using System.IO;
 
 namespace PiggsCare.UI
 {
     public class Setup:MvxWpfSetup<Core.App>
     {
-        protected override ILoggerProvider? CreateLogProvider()
-        {
-            return new SerilogLoggerProvider();
-        }
+        protected override ILoggerProvider? CreateLogProvider() => new SerilogLoggerProvider();
 
         protected override ILoggerFactory? CreateLogFactory()
         {
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                                               .SetBasePath(Directory.GetCurrentDirectory())
+                                               .AddJsonFile("appsettings.json", false, true)
+                                               .Build();
+
             Log.Logger = new LoggerConfiguration()
-                         .MinimumLevel.Debug()
+                         .ReadFrom.Configuration(configuration)
                          .CreateLogger();
 
             return new SerilogLoggerFactory();
-        }
-
-        protected override void InitializeFirstChance( IMvxIoCProvider iocProvider )
-        {
-            base.InitializeFirstChance(iocProvider);
         }
     }
 }

@@ -116,7 +116,7 @@ namespace PiggsCare.Core.ViewModels.Animals
             set => SetProperty(ref _isLoading, value);
         }
 
-        public List<Animal> SelectedAnimals => Animals.Where(animal => animal.IsSelected).ToList();
+        public List<Animal> SelectedAnimals => [.. Animals.Where(animal => animal.IsSelected)];
 
         public ICollectionView AnimalCollectionView { get; }
 

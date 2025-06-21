@@ -1,30 +1,59 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 namespace PiggsCare.DataAccess.DatabaseAccess
 {
-    public class SqlDataAccess( IConfiguration config ):ISqlDataAccess
+    /// <summary>
+    ///     Provides methods for executing commands and queries against a SQL database using Dapper.
+    /// </summary>
+    /// <param name="connectionString" >The connection string to the SQL database.</param>
+    /// <param name="logger" >The logger instance for logging errors.</param>
+    public class SqlDataAccess( string connectionString, ILogger<SqlDataAccess> logger ):ISqlDataAccess
     {
-        private const string DefaultConnectionName = "DefaultConnection";
-
-        public async Task<IEnumerable<T>> QueryAsync<T, TU>( string storedProcedure, TU parameters, string connectionString = DefaultConnectionName )
+        /// <summary>
+        ///     Executes a stored procedure command asynchronously.
+        /// </summary>
+        /// <typeparam name="T" >The type of the parameters object.</typeparam>
+        /// <param name="storedProcedure" >The name of the stored procedure to execute.</param>
+        /// <param name="parameters" >The parameters to pass to the stored procedure.</param>
+        public async Task CommandAsync<T>( string storedProcedure, T parameters )
         {
-            string? output = config.GetConnectionString("DefaultConnection");
-            if (string.IsNullOrEmpty(output))
-                Console.WriteLine($"Connection {connectionString} not found");
-            if (string.IsNullOrWhiteSpace(output))
-                Console.WriteLine($"Connection {connectionString} not configured");
-
-            using IDbConnection connection = new SqlConnection(config.GetConnectionString(connectionString));
-            return await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            try
+            {
+                await using SqlConnection connection = new(connectionString);
+                await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                // Log the exception using Serilog
+                logger.LogError(e, "Error executing command: {Message}", e.Message);
+                throw;
+            }
         }
 
-        public async Task CommandAsync<T>( string storedProcedure, T parameters, string connectionString = "DefaultConnection" )
+        /// <summary>
+        ///     Executes a stored procedure query asynchronously and returns the result set.
+        /// </summary>
+        /// <typeparam name="T" >The type of the result objects.</typeparam>
+        /// <typeparam name="TU" >The type of the parameters object.</typeparam>
+        /// <param name="storedProcedure" >The name of the stored procedure to execute.</param>
+        /// <param name="parameters" >The parameters to pass to the stored procedure.</param>
+        /// <returns>An enumerable of result objects of type <typeparamref name="T" />.</returns>
+        public async Task<IEnumerable<T>> QueryAsync<T, TU>( string storedProcedure, TU parameters )
         {
-            using IDbConnection connection = new SqlConnection(config.GetConnectionString(connectionString));
-            await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            try
+            {
+                await using SqlConnection connection = new(connectionString);
+                return await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                // Log the exception using Serilog
+                logger.LogError(e, "Error executing query: {Message}", e.Message);
+                throw;
+            }
         }
     }
 }

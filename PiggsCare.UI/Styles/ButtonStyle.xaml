@@ -4,7 +4,7 @@
     <Style x:Key="ProButtonStyle" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="{DynamicResource TertiaryWhiteColor}" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryBlackColor}" />
-        <Setter Property="FontWeight" Value="600" />
+        <Setter Property="FontWeight" Value="ExtraBold" />
         <Setter Property="Padding" Value="12,6" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Height" Value="40" />

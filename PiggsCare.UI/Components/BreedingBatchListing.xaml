@@ -50,13 +50,13 @@
                                             IsReadOnly="True" />
 
                         <DataGridTextColumn Width="*"
-                                            Binding="{Binding AiDate, Converter={StaticResource LongDateConverter}}"
+                                            Binding="{Binding AiDate, Converter={StaticResource ShortDateConverter}}"
                                             CanUserResize="False"
                                             Header="Artificial Insemination Date"
                                             IsReadOnly="True" />
 
                         <DataGridTextColumn Width="*"
-                                            Binding="{Binding ExpectedFarrowDate, Converter={StaticResource LongDateConverter}}"
+                                            Binding="{Binding ExpectedFarrowDate, Converter={StaticResource ShortDateConverter}}"
                                             CanUserResize="False"
                                             Header="Expected Farrow Date "
                                             IsReadOnly="True" />

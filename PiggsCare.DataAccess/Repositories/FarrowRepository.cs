@@ -7,35 +7,35 @@ namespace PiggsCare.DataAccess.Repositories
 {
     public class FarrowRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IFarrowRepository
     {
-        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggsCare;Integrated Security=True;TrustServerCertificate=True;";
-
         public async Task<IEnumerable<FarrowEvent>> GetAllFarrowEventAsync( int id )
         {
-            IEnumerable<FarrowingEventDto> result = await dataAccess.QueryAsync<FarrowingEventDto, dynamic>("sp.Farrowing_GetAll", new { BreedingEventId = id }, Connectionstring);
-            return result.Select(x => new FarrowEvent(x.FarrowingEventId,
-                                                      x.BreedingEventId,
-                                                      dateConverterService.GetDateOnly(x.FarrowDate),
-                                                      x.LitterSize,
-                                                      x.BornAlive,
-                                                      x.BornDead,
-                                                      x.Mummified));
+            IEnumerable<FarrowingEventDto> result = await dataAccess.QueryAsync<FarrowingEventDto, dynamic>("sp.Farrowing_GetAll", new { BreedingEventId = id });
+            return result.Select(x => new FarrowEvent(
+                                     x.FarrowingEventId,
+                                     x.BreedingEventId,
+                                     dateConverterService.GetDateOnly(x.FarrowDate),
+                                     x.LitterSize,
+                                     x.BornAlive,
+                                     x.BornDead,
+                                     x.Mummified));
         }
 
         public async Task<FarrowEvent?> GetFarrowEventByIdAsync( int id )
         {
             // Query the database for any record with matching id
-            IEnumerable<FarrowingEventDto> result = await dataAccess.QueryAsync<FarrowingEventDto, dynamic>("sp.Farrowing_GetUnique", new { FarrowingEventId = id }, Connectionstring);
+            IEnumerable<FarrowingEventDto> result = await dataAccess.QueryAsync<FarrowingEventDto, dynamic>("sp.Farrowing_GetUnique", new { FarrowingEventId = id });
             FarrowingEventDto? farrowingEventDto = result.FirstOrDefault();
 
             // Convert FarrowingEventDto to PregnancyScan Object
             return farrowingEventDto is not null
-                ? new FarrowEvent(farrowingEventDto.FarrowingEventId,
-                                  farrowingEventDto.BreedingEventId,
-                                  dateConverterService.GetDateOnly(farrowingEventDto.FarrowDate),
-                                  farrowingEventDto.LitterSize,
-                                  farrowingEventDto.BornAlive,
-                                  farrowingEventDto.BornDead,
-                                  farrowingEventDto.Mummified)
+                ? new FarrowEvent(
+                    farrowingEventDto.FarrowingEventId,
+                    farrowingEventDto.BreedingEventId,
+                    dateConverterService.GetDateOnly(farrowingEventDto.FarrowDate),
+                    farrowingEventDto.LitterSize,
+                    farrowingEventDto.BornAlive,
+                    farrowingEventDto.BornDead,
+                    farrowingEventDto.Mummified)
                 : null;
         }
 
@@ -53,13 +53,17 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync("sp.Farrowing_Insert",
-                                          new
-                                          {
-                                              record.BreedingEventId, record.FarrowDate, record.LitterSize, record.BornAlive, record.BornDead, record.Mummified
-                                          },
-                                          Connectionstring
-                );
+            await dataAccess.CommandAsync(
+                "sp.Farrowing_Insert",
+                new
+                {
+                    record.BreedingEventId,
+                    record.FarrowDate,
+                    record.LitterSize,
+                    record.BornAlive,
+                    record.BornDead,
+                    record.Mummified
+                });
         }
 
         public async Task UpdateFarrowEventAsync( FarrowEvent farrow )
@@ -77,12 +81,12 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Update existing record in the database
-            await dataAccess.CommandAsync("sp.Farrowing_Modify", recordDto, Connectionstring);
+            await dataAccess.CommandAsync("sp.Farrowing_Modify", recordDto);
         }
 
         public async Task DeleteFarrowEventAsync( int id )
         {
-            await dataAccess.CommandAsync("sp.Farrowing_Delete", new { FarrowingEventId = id }, Connectionstring);
+            await dataAccess.CommandAsync("sp.Farrowing_Delete", new { FarrowingEventId = id });
         }
     }
 }

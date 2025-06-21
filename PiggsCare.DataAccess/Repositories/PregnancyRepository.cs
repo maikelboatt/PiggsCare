@@ -8,19 +8,17 @@ namespace PiggsCare.DataAccess.Repositories
 {
     public class PregnancyRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IPregnancyRepository
     {
-        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggsCare;Integrated Security=True;TrustServerCertificate=True;";
-
         public async Task<IEnumerable<PregnancyScan>> GetAllPregnancyScansAsync( int id )
         {
             IEnumerable<PregnancyScanDto> result =
-                await dataAccess.QueryAsync<PregnancyScanDto, dynamic>("sp.PregnancyScan_GetAll", new { BreedingEventId = id }, Connectionstring);
+                await dataAccess.QueryAsync<PregnancyScanDto, dynamic>("sp.PregnancyScan_GetAll", new { BreedingEventId = id });
             return result.Select(x => new PregnancyScan(x.ScanId, x.BreedingEventId, dateConverterService.GetDateOnly(x.ScanDate), x.ScanResults));
         }
 
         public async Task<PregnancyScan?> GetPregnancyScanByIdAsync( int id )
         {
             // Query the database for any record with matching id
-            IEnumerable<PregnancyScanDto> result = await dataAccess.QueryAsync<PregnancyScanDto, dynamic>("sp.PregnancyScan_GetUnique", new { ScanId = id }, Connectionstring);
+            IEnumerable<PregnancyScanDto> result = await dataAccess.QueryAsync<PregnancyScanDto, dynamic>("sp.PregnancyScan_GetUnique", new { ScanId = id });
             PregnancyScanDto? pregnancyScanDto = result.FirstOrDefault();
 
             // Convert PregnancyScanDto to PregnancyScan Object
@@ -41,13 +39,15 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync("sp.PregnancyScan_Insert",
-                                          new
-                                          {
-                                              record.BreedingEventId, record.ScanDate, record.ScanResults
-                                          },
-                                          Connectionstring
-                );
+            await dataAccess.CommandAsync(
+                "sp.PregnancyScan_Insert",
+                new
+                {
+                    record.BreedingEventId,
+                    record.ScanDate,
+                    record.ScanResults
+                }
+            );
         }
 
         public async Task UpdatePregnancyScanAsync( PregnancyScan scan )
@@ -62,12 +62,12 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Update existing record in the database
-            await dataAccess.CommandAsync("sp.PregnancyScan_Modify", recordDto, Connectionstring);
+            await dataAccess.CommandAsync("sp.PregnancyScan_Modify", recordDto);
         }
 
         public async Task DeletePregnancyScanAsync( int id )
         {
-            await dataAccess.CommandAsync("sp.PregnancyScan_Delete", new { ScanId = id }, Connectionstring);
+            await dataAccess.CommandAsync("sp.PregnancyScan_Delete", new { ScanId = id });
         }
     }
 }

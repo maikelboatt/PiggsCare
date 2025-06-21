@@ -8,39 +8,37 @@ namespace PiggsCare.DataAccess.Repositories
 {
     public class SynchronizationEventRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):ISynchronizationEventRepository
     {
-        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggsCare;Integrated Security=True;TrustServerCertificate=True;"; // Ideally from config
-
         public async Task<IEnumerable<SynchronizationEvent>> GetAllSynchronizationEventsAsync()
         {
             IEnumerable<EstrusSynchronizationEventDto> results = await dataAccess.QueryAsync<EstrusSynchronizationEventDto, dynamic>( // Querying for SynchronizationEvent Model directly
                 "sp.Synchronization_GetAll",
-                new { },
-                Connectionstring);
+                new { });
 
-            return results.Select(x => new SynchronizationEvent(x.SynchronizationEventId,
-                                                                dateConverterService.GetDateOnly(x.StartDate),
-                                                                dateConverterService.GetDateOnly(x.EndDate),
-                                                                x.BatchNumber,
-                                                                x.SynchronizationProtocol,
-                                                                x.Comments));
+            return results.Select(x => new SynchronizationEvent(
+                                      x.SynchronizationEventId,
+                                      dateConverterService.GetDateOnly(x.StartDate),
+                                      dateConverterService.GetDateOnly(x.EndDate),
+                                      x.BatchNumber,
+                                      x.SynchronizationProtocol,
+                                      x.Comments));
         }
 
         public async Task<SynchronizationEvent?> GetSynchronizationEventByIdAsync( int synchronizationEventId )
         {
             IEnumerable<EstrusSynchronizationEventDto> results = await dataAccess.QueryAsync<EstrusSynchronizationEventDto, dynamic>( // Querying for SynchronizationEvent Model
                 "sp.Synchronization_GetUnique",
-                new { SynchronizationEventId = synchronizationEventId },
-                Connectionstring);
+                new { SynchronizationEventId = synchronizationEventId });
 
             EstrusSynchronizationEventDto? eventDto = results.FirstOrDefault();
 
             return eventDto is not null
-                ? new SynchronizationEvent(eventDto.SynchronizationEventId,
-                                           dateConverterService.GetDateOnly(eventDto.StartDate),
-                                           dateConverterService.GetDateOnly(eventDto.EndDate),
-                                           eventDto.BatchNumber,
-                                           eventDto.SynchronizationProtocol,
-                                           eventDto.Comments)
+                ? new SynchronizationEvent(
+                    eventDto.SynchronizationEventId,
+                    dateConverterService.GetDateOnly(eventDto.StartDate),
+                    dateConverterService.GetDateOnly(eventDto.EndDate),
+                    eventDto.BatchNumber,
+                    eventDto.SynchronizationProtocol,
+                    eventDto.Comments)
                 : null;
         }
 
@@ -68,16 +66,14 @@ namespace PiggsCare.DataAccess.Repositories
                     synchronizationEvent.BatchNumber,
                     synchronizationEvent.SynchronizationProtocol,
                     synchronizationEvent.Comments
-                },
-                Connectionstring);
+                });
         }
 
         public async Task DeleteSynchronizationEventAsync( int synchronizationEventId )
         {
             await dataAccess.CommandAsync(
                 "sp.Synchronization_Delete",
-                new { SynchronizationEventId = synchronizationEventId },
-                Connectionstring);
+                new { SynchronizationEventId = synchronizationEventId });
         }
 
         public async Task<int> CreateSynchronizationEventAsync( SynchronizationEvent synchronizationEvent )
@@ -103,8 +99,7 @@ namespace PiggsCare.DataAccess.Repositories
                     synchronizationEvent.BatchNumber,
                     synchronizationEvent.SynchronizationProtocol,
                     synchronizationEvent.Comments
-                },
-                Connectionstring);
+                });
 
             return result.Single();
         }

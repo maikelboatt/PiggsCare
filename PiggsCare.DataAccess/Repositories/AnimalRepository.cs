@@ -8,12 +8,13 @@ namespace PiggsCare.DataAccess.Repositories
 {
     public class AnimalRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IAnimalRepository
     {
-        private const string Connectionstring = @"Server=--THEBARON--\SQLEXPRESS;Database=PiggsCare;Integrated Security=True;TrustServerCertificate=True;";
+        // private const string Connectionstring = @"Server=--THEBARON--\BOATT;Database=PiggsCare;User ID=PiggsCare_Admin;Password=1Passcode.;TrustServerCertificate=True;";
+        //private const string Connectionstring = @"Server=--THEBARON--\BOATT;Database=PiggsCare;User ID=PiggsCare_Admin;Password=Merlin;TrustServerCertificate=True;";
 
         public async Task<IEnumerable<Animal>> GetAllAnimalsAsync()
         {
             // Query the database for all animal record in the database
-            IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("sp.Animal_GetAll", new { }, Connectionstring);
+            IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("sp.Animal_GetAll", new { });
 
             // Convert AnimalDto Object to Animal Object
             return result.Select(x => new Animal(x.AnimalId, x.Name, x.Breed, dateConverterService.GetDateOnly(x.BirthDate), x.CertificateNumber, x.Gender, x.BackFatIndex));
@@ -22,18 +23,19 @@ namespace PiggsCare.DataAccess.Repositories
         public async Task<Animal?> GetAnimalByIdAsync( int id )
         {
             // Query the database for any record with matching id
-            IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("sp.Animal_GetUnique", new { AnimalID = id }, Connectionstring);
+            IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("sp.Animal_GetUnique", new { AnimalID = id });
             AnimalDto? animalDto = result.FirstOrDefault();
 
             // Converts AnimalDto to Animal object
             return animalDto != null
-                ? new Animal(animalDto.AnimalId,
-                             animalDto.Name,
-                             animalDto.Breed,
-                             dateConverterService.GetDateOnly(animalDto.BirthDate),
-                             animalDto.CertificateNumber,
-                             animalDto.Gender,
-                             animalDto.BackFatIndex)
+                ? new Animal(
+                    animalDto.AnimalId,
+                    animalDto.Name,
+                    animalDto.Breed,
+                    dateConverterService.GetDateOnly(animalDto.BirthDate),
+                    animalDto.CertificateNumber,
+                    animalDto.Gender,
+                    animalDto.BackFatIndex)
                 : null;
         }
 
@@ -52,35 +54,36 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Update existing record in the database
-            await dataAccess.CommandAsync("sp.Animal_Modify", record, Connectionstring);
+            await dataAccess.CommandAsync("sp.Animal_Modify", record);
         }
 
         public async Task DeleteAnimalAsync( int id )
         {
-            await dataAccess.CommandAsync("sp.Animal_Delete", new { AnimalId = id }, Connectionstring);
+            await dataAccess.CommandAsync("sp.Animal_Delete", new { AnimalId = id });
         }
 
         public async Task<Animal?> GetAnimalByNameAsync( int name )
         {
             // Query the database for record with matching name
-            IEnumerable<AnimalDto?> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("dbo.GetAnimalByIdentification", new { Name = name }, Connectionstring);
+            IEnumerable<AnimalDto?> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("dbo.GetAnimalByIdentification", new { Name = name });
             AnimalDto? animalDto = result.FirstOrDefault();
 
             // Converts AnimalDto to Animal object
             return animalDto != null
-                ? new Animal(animalDto.AnimalId,
-                             animalDto.Name,
-                             animalDto.Breed,
-                             dateConverterService.GetDateOnly(animalDto.BirthDate),
-                             animalDto.CertificateNumber,
-                             animalDto.Gender,
-                             animalDto.BackFatIndex)
+                ? new Animal(
+                    animalDto.AnimalId,
+                    animalDto.Name,
+                    animalDto.Breed,
+                    dateConverterService.GetDateOnly(animalDto.BirthDate),
+                    animalDto.CertificateNumber,
+                    animalDto.Gender,
+                    animalDto.BackFatIndex)
                 : null;
         }
 
         public async Task<IEnumerable<Animal>> GetAnimalByBreedAsync( string breed )
         {
-            IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("GetAnimalByBreed", new { Breed = breed }, Connectionstring);
+            IEnumerable<AnimalDto> result = await dataAccess.QueryAsync<AnimalDto, dynamic>("GetAnimalByBreed", new { Breed = breed });
 
             // Convert AnimalDto Object to Animal Object
             return result.Select(x => new Animal(x.AnimalId, x.Name, x.Breed, dateConverterService.GetDateOnly(x.BirthDate), x.CertificateNumber, x.Gender, x.BackFatIndex));
@@ -100,14 +103,18 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Inserts record into the database
-            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>("sp.Animal_Insert",
-                                                                                new
-                                                                                {
-                                                                                    record.Name, record.Breed, record.BirthDate, record.CertificateNumber, record.Gender,
-                                                                                    record.BackFatIndex
-                                                                                },
-                                                                                Connectionstring
-                );
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
+                "sp.Animal_Insert",
+                new
+                {
+                    record.Name,
+                    record.Breed,
+                    record.BirthDate,
+                    record.CertificateNumber,
+                    record.Gender,
+                    record.BackFatIndex
+                }
+            );
 
             return result.Single();
         }

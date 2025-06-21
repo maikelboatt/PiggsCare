@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MvvmCross;
 using MvvmCross.Exceptions;
 using MvvmCross.IoC;
@@ -11,7 +12,6 @@ using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.Repositories;
 using PiggsCare.Domain.Repositories;
 using PiggsCare.Domain.Services;
-using System.IO;
 using System.Reflection;
 
 namespace PiggsCare.Core
@@ -20,15 +20,20 @@ namespace PiggsCare.Core
     {
         public override void Initialize()
         {
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                                            .SetBasePath(Directory.GetCurrentDirectory())
-                                            .AddJsonFile("appsettings.json", true, true);
-
-            IConfiguration config = builder.Build();
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                                               .SetBasePath(AppContext.BaseDirectory)
+                                               .AddJsonFile("appsettings.json", false, true)
+                                               .Build();
 
             // Register the configuration file
-            Mvx.IoCProvider?.RegisterSingleton(config);
+            Mvx.IoCProvider?.RegisterSingleton(configuration);
 
+            // Register ISqlDataAccess with the connection string
+            Mvx.IoCProvider.LazyConstructAndRegisterSingleton<ISqlDataAccess>(() =>
+            {
+                ILogger<SqlDataAccess> logger = Mvx.IoCProvider.Resolve<ILogger<SqlDataAccess>>();
+                return new SqlDataAccess(configuration.GetConnectionString("DefaultConnection"), logger);
+            });
 
             Assembly[] assembliesToScan =
             [
@@ -72,10 +77,6 @@ namespace PiggsCare.Core
                     .RegisterAsDynamic();
             }
 
-
-            // Register ISqlDataAccess
-            // Mvx.IoCProvider.LazyConstructAndRegisterSingleton<ISqlDataAccess, SqlDataAccess>();
-            Mvx.IoCProvider.LazyConstructAndRegisterSingleton<ISqlDataAccess, TestDataAccess>();
 
             // Register ModalNavigationStore
             Mvx.IoCProvider?.RegisterSingleton(new ModalNavigationStore());

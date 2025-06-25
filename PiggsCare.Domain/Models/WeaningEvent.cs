@@ -17,10 +17,21 @@ namespace PiggsCare.Domain.Models
         public int FemalesWeaned { get; set; } = femalesWeaned;
         public float AverageWeaningWeight { get; set; } = averageWeaningWeight;
 
-        public override string ToString()
+        public override string ToString() =>
+            $"Weaning Event Id: {WeaningEventId}, Farrowing Event Id: {FarrowingEventId}, Weaning Date: {WeaningDate}, Numbers Weaned: {NumberWeaned}, Males Weaned: {MalesWeaned}, Females Weaned: {FemalesWeaned}, Average Weaning Weight: {AverageWeaningWeight}";
+
+        public override bool Equals( object? obj )
         {
-            return
-                $"Weaning Event Id: {WeaningEventId}, Farrowing Event Id: {FarrowingEventId}, Weaning Date: {WeaningDate}, Numbers Weaned: {NumberWeaned}, Males Weaned: {MalesWeaned}, Females Weaned: {FemalesWeaned}, Average Weaning Weight: {AverageWeaningWeight}";
+            if (obj is not WeaningEvent other)
+                return false;
+
+            return WeaningEventId == other.WeaningEventId;
         }
+
+        /// <summary>
+        ///     Returns a hash code for the current animal.
+        /// </summary>
+        /// <returns>A hash code for the current animal.</returns>
+        public override int GetHashCode() => WeaningEventId.GetHashCode();
     }
 }

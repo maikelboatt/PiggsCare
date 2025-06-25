@@ -15,9 +15,21 @@ namespace PiggsCare.Domain.Models
         public string Treatment { get; init; } = treatment;
         public string Outcome { get; init; } = outcome;
 
-        public override string ToString()
+        public override string ToString() =>
+            $"Health Record Key: {HealthRecordId}, Animal Identifier: {AnimalId}, Record Date: {RecordDate}, Diagnosis: {Diagnosis}, Treatment: {Treatment}, Outcome: {Outcome}";
+
+        public override bool Equals( object? obj )
         {
-            return $"Health Record Key: {HealthRecordId}, Animal Identifier: {AnimalId}, Record Date: {RecordDate}, Diagnosis: {Diagnosis}, Treatment: {Treatment}, Outcome: {Outcome}";
+            if (obj is not HealthRecord other)
+                return false;
+
+            return HealthRecordId == other.HealthRecordId;
         }
+
+        /// <summary>
+        ///     Returns a hash code for the current animal.
+        /// </summary>
+        /// <returns>A hash code for the current animal.</returns>
+        public override int GetHashCode() => HealthRecordId.GetHashCode();
     }
 }

@@ -7,9 +7,20 @@ namespace PiggsCare.Domain.Models
         public DateOnly ScanDate { get; set; } = scanDate;
         public string ScanResults { get; set; } = scanResults;
 
-        public override string ToString()
+        public override string ToString() => $"Scan Id: {ScanId}, Breeding Event Id: {BreedingEventId}, ScanDate: {ScanDate}, ScanResults: {ScanResults}";
+
+        public override bool Equals( object? obj )
         {
-            return $"Scan Id: {ScanId}, Breeding Event Id: {BreedingEventId}, ScanDate: {ScanDate}, ScanResults: {ScanResults}";
+            if (obj is not PregnancyScan other)
+                return false;
+
+            return ScanId == other.ScanId;
         }
+
+        /// <summary>
+        ///     Returns a hash code for the current animal.
+        /// </summary>
+        /// <returns>A hash code for the current animal.</returns>
+        public override int GetHashCode() => ScanId.GetHashCode();
     }
 }

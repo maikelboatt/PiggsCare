@@ -1,4 +1,4 @@
-namespace PiggsCare.Domain.Models
+namespace PiggsCare.Domain.Enums
 {
     public enum Gender
     {

@@ -1,18 +1,28 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Insemination;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
 namespace PiggsCare.Core.ViewModels.Breeding
 {
     public class BreedingEventCreateFormViewModel:MvxViewModel<int>, IBreedingEventCreateFormViewModel
     {
+        private const int GestationPeriod = 114;
+        private readonly IDateConverterService _dateConverterService;
+        private readonly IInseminationService _inseminationService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+
+        private DateTime _aiDate;
+        private int _animalId;
+        private DateOnly _expectedFarrowDate = DateOnly.FromDateTime(DateTime.Now);
+
         #region Constructor
 
-        public BreedingEventCreateFormViewModel( IBreedingEventStore breedingEventStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
+        public BreedingEventCreateFormViewModel( IInseminationService inseminationService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
         {
-            _breedingEventStore = breedingEventStore;
+            _inseminationService = inseminationService;
             _modalNavigationStore = modalNavigationStore;
             _dateConverterService = dateConverterService;
 
@@ -54,19 +64,6 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         #endregion
 
-        #region Fields
-
-        private DateTime _aiDate;
-        private DateOnly _expectedFarrowDate;
-        private int _animalId;
-        private readonly IBreedingEventStore _breedingEventStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IDateConverterService _dateConverterService;
-
-        private const int GestationPeriod = 114;
-
-        #endregion
-
         #region Commands
 
         public IMvxAsyncCommand SubmitRecordCommand { get; }
@@ -85,8 +82,8 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         private async Task ExecuteSubmitRecord()
         {
-            BreedingEvent record = GetBreedingEventFromFields();
-            await _breedingEventStore.Create(record);
+            InseminationEvent record = GetBreedingEventFromFields();
+            await _inseminationService.CreateInseminationEventAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -95,10 +92,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
             _modalNavigationStore.Close();
         }
 
-        private BreedingEvent GetBreedingEventFromFields()
-        {
-            return new BreedingEvent(1, _animalId, _dateConverterService.GetDateOnly(_aiDate), _expectedFarrowDate, null);
-        }
+        private InseminationEvent GetBreedingEventFromFields() => new(1, _animalId, _dateConverterService.GetDateOnly(_aiDate), _expectedFarrowDate, null);
 
         private void CalculateExpectedFarDate()
         {

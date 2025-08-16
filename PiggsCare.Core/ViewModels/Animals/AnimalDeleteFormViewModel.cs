@@ -1,15 +1,17 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Animals;
+using PiggsCare.Business.Services.Message;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Animals
 {
     public class AnimalDeleteFormViewModel(
         ModalNavigationStore modalNavigationStore,
-        IAnimalStore animalStore,
+        IAnimalService animalService,
         IMessageService messageService,
         IDateConverterService dateConverterService )
         :MvxViewModel<int>, IAnimalDeleteFormViewModel
@@ -41,7 +43,7 @@ namespace PiggsCare.Core.ViewModels.Animals
         private async Task OnDeleteConfirm()
         {
 
-            await animalStore.Remove(_animalId);
+            await animalService.DeleteAnimalAsync(_animalId);
             modalNavigationStore.Close();
         }
 
@@ -56,7 +58,7 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         public override Task Initialize()
         {
-            Animal? record = animalStore.Animals.FirstOrDefault(x => x.AnimalId == _animalId);
+            Animal? record = animalService.GetAnimalById(_animalId);
             if (record != null)
                 PopulateEditForm(record);
             return base.Initialize();

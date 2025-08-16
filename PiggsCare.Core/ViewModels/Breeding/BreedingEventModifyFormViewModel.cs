@@ -1,18 +1,31 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Insemination;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
 namespace PiggsCare.Core.ViewModels.Breeding
 {
     public class BreedingEventModifyFormViewModel:MvxViewModel<int>, IBreedingEventModifyFormViewModel
     {
+        private const int GestationPeriod = 114;
+        private readonly IDateConverterService _dateConverterService;
+        private readonly IInseminationService _inseminationService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+
+
+        private DateTime _aiDate;
+        private int _animalId;
+        private int _breedingEventId;
+        private DateOnly _expectedFarrowDate;
+
         #region Constructor
 
-        public BreedingEventModifyFormViewModel( IBreedingEventStore breedingEventStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
+        public BreedingEventModifyFormViewModel( IInseminationService inseminationService, ModalNavigationStore modalNavigationStore,
+            IDateConverterService dateConverterService )
         {
-            _breedingEventStore = breedingEventStore;
+            _inseminationService = inseminationService;
             _modalNavigationStore = modalNavigationStore;
             _dateConverterService = dateConverterService;
 
@@ -25,7 +38,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         public override Task Initialize()
         {
-            BreedingEvent? record = _breedingEventStore?.BreedingEvents.FirstOrDefault(x => x.BreedingEventId == _breedingEventId);
+            InseminationEvent? record = _inseminationService.GetInseminationEventByIdAsync(_breedingEventId);
             if (record == null) return base.Initialize();
             PopulateModifyForm(record);
             _animalId = record.AnimalId;
@@ -37,28 +50,14 @@ namespace PiggsCare.Core.ViewModels.Breeding
             _breedingEventId = parameter;
         }
 
-        private void PopulateModifyForm( BreedingEvent breedingEvent )
+        private void PopulateModifyForm( InseminationEvent inseminationEvent )
         {
-            _breedingEventId = breedingEvent.BreedingEventId;
-            _animalId = breedingEvent.AnimalId;
-            _aiDate = _dateConverterService.GetDateTime(breedingEvent.AiDate);
-            _expectedFarrowDate = breedingEvent.ExpectedFarrowDate;
+            _breedingEventId = inseminationEvent.BreedingEventId;
+            _animalId = inseminationEvent.AnimalId;
+            _aiDate = _dateConverterService.GetDateTime(inseminationEvent.AiDate);
+            _expectedFarrowDate = inseminationEvent.ExpectedFarrowDate;
         }
 
-        #region Fields
-
-        private DateTime _aiDate;
-        private DateOnly _expectedFarrowDate;
-        private int _animalId;
-        private int _breedingEventId;
-        private readonly IBreedingEventStore _breedingEventStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IDateConverterService _dateConverterService;
-
-
-        private const int GestationPeriod = 114;
-
-        #endregion
 
         #region Properties
 
@@ -100,8 +99,8 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         private async Task ExecuteSubmitRecord()
         {
-            BreedingEvent record = GetBreedingEventFromFields();
-            await _breedingEventStore.Modify(record);
+            InseminationEvent record = GetBreedingEventFromFields();
+            await _inseminationService.UpdateInseminationEventAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -110,10 +109,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
             _modalNavigationStore.Close();
         }
 
-        private BreedingEvent GetBreedingEventFromFields()
-        {
-            return new BreedingEvent(_breedingEventId, _animalId, _dateConverterService.GetDateOnly(_aiDate), _expectedFarrowDate, 0);
-        }
+        private InseminationEvent GetBreedingEventFromFields() => new(_breedingEventId, _animalId, _dateConverterService.GetDateOnly(_aiDate), _expectedFarrowDate, 0);
 
         private void CalculateExpectedFarDate()
         {

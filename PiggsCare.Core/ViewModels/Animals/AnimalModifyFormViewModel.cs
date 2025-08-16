@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Animals;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -13,11 +14,11 @@ namespace PiggsCare.Core.ViewModels.Animals
     {
         #region Constructor
 
-        public AnimalModifyFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore, IAnimalRecordValidation recordValidation,
+        public AnimalModifyFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalService animalService, IAnimalRecordValidation recordValidation,
             IDateConverterService dateConverterService )
         {
             _modalNavigationStore = modalNavigationStore;
-            _animalStore = animalStore;
+            _animalService = animalService;
             _recordValidation = recordValidation;
             _dateConverterService = dateConverterService;
             _recordValidation.Errors.Clear();
@@ -42,7 +43,7 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         public override Task Initialize()
         {
-            Animal? record = _animalStore.Animals?.FirstOrDefault(animal => animal.AnimalId == _animalId);
+            Animal? record = _animalService.GetAnimalById(_animalId);
             if (record is not null)
                 PopulateEditForm(record);
             return base.Initialize();
@@ -81,14 +82,11 @@ namespace PiggsCare.Core.ViewModels.Animals
         private async Task ExecuteSubmitRecord()
         {
             Animal record = GetAnimalFromFields();
-            await _animalStore.Modify(record);
+            await _animalService.UpdateAnimalAsync(record);
             _modalNavigationStore.Close();
         }
 
-        private Animal GetAnimalFromFields()
-        {
-            return new Animal(_animalId, Name, Breed, _dateConverterService.GetDateOnly(BirthDate), CertificateNumber, Gender, BackFatIndex);
-        }
+        private Animal GetAnimalFromFields() => new(_animalId, Name, Breed, _dateConverterService.GetDateOnly(BirthDate), CertificateNumber, Gender, BackFatIndex);
 
         #endregion
 
@@ -102,7 +100,7 @@ namespace PiggsCare.Core.ViewModels.Animals
         private string _gender = string.Empty;
         private float _backFatIndex;
         private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IAnimalStore _animalStore;
+        private readonly IAnimalService _animalService;
         private readonly IAnimalRecordValidation _recordValidation;
         private readonly IDateConverterService _dateConverterService;
 
@@ -212,10 +210,7 @@ namespace PiggsCare.Core.ViewModels.Animals
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
-        public IEnumerable? GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable? GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         #endregion
     }

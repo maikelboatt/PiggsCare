@@ -1,10 +1,12 @@
+using Microsoft.Extensions.Logging;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores.Animals;
+using PiggsCare.Business.Services.Animals;
+using PiggsCare.Business.Services.Message;
 using PiggsCare.Core.Control;
-using PiggsCare.Core.Stores;
 using PiggsCare.Core.ViewModels.Synchronization;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
@@ -14,6 +16,40 @@ namespace PiggsCare.Core.ViewModels.Animals
 {
     public class AnimalListingViewModel:MvxViewModel
     {
+        private readonly MvxObservableCollection<Animal> _animals;
+        private readonly IAnimalService _animalService;
+        private readonly IAnimalStore _animalStore;
+        private readonly ILogger<AnimalListingViewModel> _logger;
+        private readonly IMessageService _messageService;
+
+        private readonly IModalNavigationControl _modalNavigationControl;
+        private bool _isLoading;
+        private string _searchText = string.Empty;
+
+        #region Constructor
+
+        public AnimalListingViewModel( IModalNavigationControl modalNavigationControl, IAnimalService animalService, IAnimalStore animalStore, IMessageService messageService,
+            ILogger<AnimalListingViewModel> logger )
+        {
+            _modalNavigationControl = modalNavigationControl;
+            _animalService = animalService;
+            _animalStore = animalStore;
+            _messageService = messageService;
+            _logger = logger;
+            _animals = new MvxObservableCollection<Animal>(_animalStore.Animals);
+            _animals.CollectionChanged += AnimalsOnCollectionChanged;
+
+            _animalStore.OnAnimalAdded += AnimalStoreOnOnAnimalAdded;
+            _animalStore.OnAnimalUpdated += AnimalStoreOnOnAnimalUpdated;
+            _animalStore.OnAnimalDeleted += AnimalStoreOnOnAnimalDeleted;
+
+
+            AnimalCollectionView = CollectionViewSource.GetDefaultView(_animals);
+            AnimalCollectionView.Filter = FilterAnimals;
+        }
+
+        #endregion
+
         #region ViewModelLifeCycle
 
         public override async Task Initialize()
@@ -21,6 +57,14 @@ namespace PiggsCare.Core.ViewModels.Animals
             await LoadAnimalsAsync();
             SetSelectedAnimalToFalse();
             await base.Initialize();
+        }
+
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            _animalStore.OnAnimalAdded -= AnimalStoreOnOnAnimalAdded;
+            _animalStore.OnAnimalUpdated -= AnimalStoreOnOnAnimalUpdated;
+            _animalStore.OnAnimalDeleted -= AnimalStoreOnOnAnimalDeleted;
+            base.ViewDestroy(viewFinishing);
         }
 
         #endregion
@@ -32,53 +76,29 @@ namespace PiggsCare.Core.ViewModels.Animals
             RaisePropertyChanged(nameof(Animals));
         }
 
-        #endregion
-
-        #region Constructor
-
-        public AnimalListingViewModel( IModalNavigationControl modalNavigationControl, IAnimalStore animalStore, IMessageService messageService )
+        private void AnimalStoreOnOnAnimalDeleted( Animal animal )
         {
-            _modalNavigationControl = modalNavigationControl;
-            _animalStore = animalStore;
-            _messageService = messageService;
-            _animals = new MvxObservableCollection<Animal>(_animalStore.Animals);
-            _animals.CollectionChanged += AnimalsOnCollectionChanged;
-
-            _animalStore.OnSave += AnimalStoreOnOnSave;
-            _animalStore.OnUpdate += AnimalStoreOnOnUpdate;
-            _animalStore.OnDelete += AnimalStoreOnOnDelete;
-
-
-            AnimalCollectionView = CollectionViewSource.GetDefaultView(_animals);
-            AnimalCollectionView.Filter = FilterAnimals;
-        }
-
-        private void AnimalStoreOnOnUpdate( Animal obj )
-        {
-            RaisePropertyChanged(nameof(Animals));
-        }
-
-        private void AnimalStoreOnOnDelete( int id )
-        {
-            Animal? animal = _animals.FirstOrDefault(a => a.AnimalId == id);
-            if (animal == null) return;
             _animals.Remove(animal);
-            RaisePropertyChanged(nameof(Animals));
         }
 
-        private void AnimalStoreOnOnSave( Animal animal )
+        private void AnimalStoreOnOnAnimalUpdated( Animal animal )
+        {
+            // Update the animal in the local collection if it exists
+            int index = _animals.IndexOf(animal);
+            if (index >= 0)
+            {
+                _animals.RemoveAt(index);
+                _animals.Insert(index, animal);
+            }
+            else
+            {
+                _logger.LogWarning("Animal with ID {AnimalId} not found in local collection for update.", animal.AnimalId);
+            }
+        }
+
+        private void AnimalStoreOnOnAnimalAdded( Animal animal )
         {
             _animals.Add(animal);
-        }
-
-        private bool FilterAnimals( object obj )
-        {
-            if (obj is Animal animal)
-            {
-                // return animal.Breed.Contains(SearchText, StringComparison.InvariantCultureIgnoreCase);
-                return animal.Name.ToString().Contains(SearchText, StringComparison.InvariantCultureIgnoreCase);
-            }
-            return false;
         }
 
         #endregion
@@ -93,18 +113,6 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         // Command for Creating Synchronization Event
         public IMvxCommand OpenSynchronizationEventDialogCommand => new MvxCommand(ExecuteOpenSynchronizationEventDialog);
-
-        #endregion
-
-        #region Fields
-
-        private readonly MvxObservableCollection<Animal> _animals;
-
-        private readonly IModalNavigationControl _modalNavigationControl;
-        private readonly IAnimalStore _animalStore;
-        private readonly IMessageService _messageService;
-        private bool _isLoading;
-        private string _searchText = string.Empty;
 
         #endregion
 
@@ -140,7 +148,7 @@ namespace PiggsCare.Core.ViewModels.Animals
             IsLoading = true;
             try
             {
-                await _animalStore.Load();
+                await _animalService.GetAllAnimalsAsync();
                 _animals.Clear();
                 // Add each animal loaded from the store
                 foreach (Animal animal in _animalStore.Animals)
@@ -148,11 +156,6 @@ namespace PiggsCare.Core.ViewModels.Animals
                     _animals.Add(animal);
                 }
                 UpdateView();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
             finally
             {
@@ -210,6 +213,16 @@ namespace PiggsCare.Core.ViewModels.Animals
         private void ExecuteOpenAnimalDetailsDialog( int id )
         {
             _modalNavigationControl.PopUp<SelectedAnimalDetailsViewModel>(id);
+        }
+
+        private bool FilterAnimals( object obj )
+        {
+            if (obj is Animal animal)
+            {
+                // return animal.Breed.Contains(SearchText, StringComparison.InvariantCultureIgnoreCase);
+                return animal.Name.ToString().Contains(SearchText, StringComparison.InvariantCultureIgnoreCase);
+            }
+            return false;
         }
 
         #endregion

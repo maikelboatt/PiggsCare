@@ -1,14 +1,18 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.ApplicationState.Stores.Insemination;
+using PiggsCare.Business.Services.Insemination;
+using PiggsCare.Business.Services.Message;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Breeding
 {
     public class BreedingEventDeleteFormViewModel(
-        IBreedingEventStore breedingEventStore,
+        IInseminationEventStore inseminationEventStore,
+        IInseminationService inseminationService,
         ModalNavigationStore modalNavigationStore,
         IDateConverterService dateConverterService,
         IMessageService messageService )
@@ -16,7 +20,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
     {
         public override Task Initialize()
         {
-            BreedingEvent? record = breedingEventStore?.BreedingEvents.FirstOrDefault(x => x.BreedingEventId == _breedingEventId);
+            InseminationEvent? record = inseminationService.GetInseminationEventByIdAsync(_breedingEventId);
             if (record == null) return base.Initialize();
             PopulateDeleteForm(record);
             _animalId = record.AnimalId;
@@ -28,12 +32,12 @@ namespace PiggsCare.Core.ViewModels.Breeding
             _breedingEventId = parameter;
         }
 
-        private void PopulateDeleteForm( BreedingEvent breedingEvent )
+        private void PopulateDeleteForm( InseminationEvent inseminationEvent )
         {
-            _breedingEventId = breedingEvent.BreedingEventId;
-            _animalId = breedingEvent.AnimalId;
-            _aiDate = dateConverterService.GetDateTime(breedingEvent.AiDate);
-            _expectedFarrowDate = breedingEvent.ExpectedFarrowDate;
+            _breedingEventId = inseminationEvent.BreedingEventId;
+            _animalId = inseminationEvent.AnimalId;
+            _aiDate = dateConverterService.GetDateTime(inseminationEvent.AiDate);
+            _expectedFarrowDate = inseminationEvent.ExpectedFarrowDate;
         }
 
 
@@ -88,7 +92,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         private async Task OnDeleteConfirm()
         {
-            await breedingEventStore.Remove(_breedingEventId);
+            await inseminationService.DeleteInseminationEventAsync(_breedingEventId);
             modalNavigationStore.Close();
         }
 

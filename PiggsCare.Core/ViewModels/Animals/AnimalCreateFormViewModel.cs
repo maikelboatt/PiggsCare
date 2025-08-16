@@ -1,22 +1,30 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Animals;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
 namespace PiggsCare.Core.ViewModels.Animals
 {
-    public class AnimalCreateFormViewModel:MvxViewModel<int>, IAnimalCreateFormViewModel, INotifyDataErrorInfo
+    public class AnimalCreateFormViewModel:MvxViewModel, IAnimalCreateFormViewModel, INotifyDataErrorInfo
     {
-        #region ViewModel Life-Cycle
+        private readonly IAnimalService _animalService;
+        private readonly IDateConverterService _dateConverterService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IAnimalRecordValidation _recordValidation = new AnimalRecordValidation();
+        private float _backFatIndex;
+        private DateTime _birthDate = DateTime.Now;
+        private string _breed = string.Empty;
+        private int _certificateNumber;
+        private string _gender = string.Empty;
 
-        public override void Prepare( int parameter )
-        {
-            Console.WriteLine(parameter);
-        }
+        private int _name;
+
+        #region ViewModel Life-Cycle
 
         public override void ViewDestroy( bool viewFinishing = true )
         {
@@ -26,18 +34,16 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         #endregion
 
+
         #region Constructor
 
-        public AnimalCreateFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalStore animalStore, IAnimalRecordValidation recordValidation,
-            IDateConverterService dateConverterService )
+        public AnimalCreateFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalService animalService, IDateConverterService dateConverterService )
         {
             _modalNavigationStore = modalNavigationStore;
-            _animalStore = animalStore;
-            _recordValidation = recordValidation;
+            _animalService = animalService;
             _dateConverterService = dateConverterService;
-            _recordValidation.Errors.Clear();
 
-            recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
 
             // Initialize commands once so that RaiseCanExecuteChanged works as expected
             SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
@@ -53,6 +59,7 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         #endregion
 
+
         #region Methods
 
         private void ExecuteCancelCommand()
@@ -63,14 +70,11 @@ namespace PiggsCare.Core.ViewModels.Animals
         private async Task ExecuteSubmitRecord()
         {
             Animal record = GetAnimalFromFields();
-            await _animalStore.Create(record);
+            await _animalService.CreateAnimalAsync(record);
             _modalNavigationStore.Close();
         }
 
-        private Animal GetAnimalFromFields()
-        {
-            return new Animal(1, Name, Breed, _dateConverterService.GetDateOnly(BirthDate), CertificateNumber, Gender, BackFatIndex);
-        }
+        private Animal GetAnimalFromFields() => new(1, Name, Breed, _dateConverterService.GetDateOnly(BirthDate), CertificateNumber, Gender, BackFatIndex);
 
         #endregion
 
@@ -175,30 +179,13 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         #endregion
 
-        #region Fields
-
-        private int _name;
-        private string _breed = string.Empty;
-        private DateTime _birthDate;
-        private int _certificateNumber;
-        private string _gender = string.Empty;
-        private float _backFatIndex;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IAnimalStore _animalStore;
-        private readonly IAnimalRecordValidation _recordValidation;
-        private readonly IDateConverterService _dateConverterService;
-
-        #endregion
 
         #region INotifyDataErrorInfo Implementation
 
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
-        public IEnumerable? GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable? GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         #endregion
     }

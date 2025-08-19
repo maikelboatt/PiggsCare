@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Removal;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -13,10 +14,10 @@ namespace PiggsCare.Core.ViewModels.Removal
     {
         #region Constructor
 
-        public RemovalEventModifyFormViewModel( IRemovalEventStore eventStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
+        public RemovalEventModifyFormViewModel( IRemovalService removalService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
             IRemovalEventValidation recordValidation )
         {
-            _eventStore = eventStore;
+            _removalService = removalService;
             _modalNavigationStore = modalNavigationStore;
             _dateConverterService = dateConverterService;
             _recordValidation = recordValidation;
@@ -40,7 +41,7 @@ namespace PiggsCare.Core.ViewModels.Removal
 
         public override Task Initialize()
         {
-            RemovalEvent? record = _eventStore?.RemovalEvents.FirstOrDefault(x => x.RemovalEventId == _removalId);
+            RemovalEvent? record = _removalService.GetRemovalEventByIdAsync(_removalId);
             if (record is null) return base.Initialize();
             PopulateModifyForm(record);
             _animalId = record.AnimalId;
@@ -57,10 +58,7 @@ namespace PiggsCare.Core.ViewModels.Removal
 
         #region INotifyDataErrorInfo Implementation
 
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
@@ -78,7 +76,7 @@ namespace PiggsCare.Core.ViewModels.Removal
 
         private readonly IDateConverterService _dateConverterService;
         private readonly IRemovalEventValidation _recordValidation;
-        private readonly IRemovalEventStore _eventStore;
+        private readonly IRemovalService _removalService;
         private readonly ModalNavigationStore _modalNavigationStore;
         private int _removalId;
         private int _animalId;
@@ -143,7 +141,7 @@ namespace PiggsCare.Core.ViewModels.Removal
         private async Task ExecuteSubmitRecord()
         {
             RemovalEvent record = GetRemovalEventFromFields();
-            await _eventStore.ModifyAsync(record);
+            await _removalService.UpdateRemovalEventAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -152,10 +150,7 @@ namespace PiggsCare.Core.ViewModels.Removal
             _modalNavigationStore.Close();
         }
 
-        private RemovalEvent GetRemovalEventFromFields()
-        {
-            return new RemovalEvent(_removalId, _animalId, _dateConverterService.GetDateOnly(_removalDate), _reasonForRemoval);
-        }
+        private RemovalEvent GetRemovalEventFromFields() => new(_removalId, _animalId, _dateConverterService.GetDateOnly(_removalDate), _reasonForRemoval);
 
         #endregion
     }

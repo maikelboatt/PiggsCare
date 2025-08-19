@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Synchronization;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -13,10 +14,10 @@ namespace PiggsCare.Core.ViewModels.Synchronization
     {
         #region Constructor
 
-        public SynchronizationEventModifyFormViewModel( ISynchronizationEventStore synchronizationEventStore, ModalNavigationStore modalNavigationStore,
+        public SynchronizationEventModifyFormViewModel( ISynchronizationService synchronizationService, ModalNavigationStore modalNavigationStore,
             ISynchronizationRecordValidation recordValidation, IDateConverterService dateConverterService )
         {
-            _synchronizationEventStore = synchronizationEventStore;
+            _synchronizationService = synchronizationService;
             _modalNavigationStore = modalNavigationStore;
             _recordValidation = recordValidation;
             _dateConverterService = dateConverterService;
@@ -40,7 +41,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
 
         public override Task Initialize()
         {
-            SynchronizationEvent? record = _synchronizationEventStore.SynchronizationEvents.FirstOrDefault(x => x.SynchronizationEventId == _synchronizationId);
+            SynchronizationEvent? record = _synchronizationService.GetSynchronizationEventByIdAsync(_synchronizationId);
             if (record is null) return base.Initialize();
             PopulateModifyForm(record);
             return base.Initialize();
@@ -56,10 +57,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
 
         #region INotifyDataErrorInfo Implementation
 
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
@@ -82,7 +80,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         private string _comments = string.Empty;
         private int _synchronizationId;
 
-        private readonly ISynchronizationEventStore _synchronizationEventStore;
+        private readonly ISynchronizationService _synchronizationService;
         private readonly ModalNavigationStore _modalNavigationStore;
         private readonly ISynchronizationRecordValidation _recordValidation;
         private readonly IDateConverterService _dateConverterService;
@@ -178,7 +176,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         private async Task ExecuteSubmitRecord()
         {
             SynchronizationEvent record = GetSynchronizationEventFromFields();
-            await _synchronizationEventStore.ModifyAsync(record);
+            await _synchronizationService.UpdateSynchronizationEventAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -197,15 +195,13 @@ namespace PiggsCare.Core.ViewModels.Synchronization
             _comments = synchronizationEvent.Comments;
         }
 
-        private SynchronizationEvent GetSynchronizationEventFromFields()
-        {
-            return new SynchronizationEvent(_synchronizationId,
-                                            _dateConverterService.GetDateOnly(_startDate),
-                                            _endDate,
-                                            _batchNumber,
-                                            _synchronizationProtocol,
-                                            _comments);
-        }
+        private SynchronizationEvent GetSynchronizationEventFromFields() => new(
+            _synchronizationId,
+            _dateConverterService.GetDateOnly(_startDate),
+            _endDate,
+            _batchNumber,
+            _synchronizationProtocol,
+            _comments);
 
         private void CalculateEndDate()
         {

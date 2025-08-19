@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Health;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -11,20 +12,17 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 {
     public class HealthRecordModifyFormViewModel:MvxViewModel<int>, IHealthRecordModifyFormViewModel, INotifyDataErrorInfo
     {
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         #region Constructor
 
-        public HealthRecordModifyFormViewModel( IHealthRecordStore healthRecordStore, ModalNavigationStore modalNavigationStore, IHealthRecordValidation recordValidation,
+        public HealthRecordModifyFormViewModel( IHealthService healthService, ModalNavigationStore modalNavigationStore, IHealthRecordValidation recordValidation,
             IDateConverterService dateConverterService )
         {
-            _healthRecordStore = healthRecordStore;
+            _healthService = healthService;
             _modalNavigationStore = modalNavigationStore;
             _recordValidation = recordValidation;
             _dateConverterService = dateConverterService;
@@ -55,7 +53,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         public override Task Initialize()
         {
-            HealthRecord? record = _healthRecordStore?.HealthRecords.FirstOrDefault(x => x.HealthRecordId == _healthRecordId);
+            HealthRecord? record = _healthService.GetHealthRecordByIdAsync(_healthRecordId);
             if (record == null) return base.Initialize();
             PopulateEditForm(record);
             _animalId = record.AnimalId;
@@ -72,7 +70,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         private string _outcome = string.Empty;
         private int _healthRecordId;
         private int _animalId;
-        private readonly IHealthRecordStore _healthRecordStore;
+        private readonly IHealthService _healthService;
         private readonly ModalNavigationStore _modalNavigationStore;
         private readonly IHealthRecordValidation _recordValidation;
         private readonly IDateConverterService _dateConverterService;
@@ -159,14 +157,11 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         private async Task ExecuteSubmitRecord()
         {
             HealthRecord record = GetHealthRecordFromFields();
-            await _healthRecordStore.Modify(record);
+            await _healthService.UpdateHealthRecordAsync(record);
             _modalNavigationStore.Close();
         }
 
-        private HealthRecord GetHealthRecordFromFields()
-        {
-            return new HealthRecord(_healthRecordId, _animalId, _dateConverterService.GetDateOnly(RecordDate), _diagnosis, _treatment, _outcome);
-        }
+        private HealthRecord GetHealthRecordFromFields() => new(_healthRecordId, _animalId, _dateConverterService.GetDateOnly(RecordDate), _diagnosis, _treatment, _outcome);
 
         private void ExecuteCancelCommand()
         {

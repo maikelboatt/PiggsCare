@@ -12,6 +12,20 @@ namespace PiggsCare.Core.ViewModels.Animals
 {
     public class AnimalModifyFormViewModel:MvxViewModel<int>, IAnimalModifyFormViewModel, INotifyDataErrorInfo
     {
+        private readonly IAnimalService _animalService;
+        private readonly IDateConverterService _dateConverterService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IAnimalRecordValidation _recordValidation;
+
+
+        private int _animalId;
+        private float _backFatIndex;
+        private DateTime _birthDate;
+        private string _breed = string.Empty;
+        private int _certificateNumber;
+        private string _gender = string.Empty;
+        private int _name;
+
         #region Constructor
 
         public AnimalModifyFormViewModel( ModalNavigationStore modalNavigationStore, IAnimalService animalService, IAnimalRecordValidation recordValidation,
@@ -90,22 +104,6 @@ namespace PiggsCare.Core.ViewModels.Animals
 
         #endregion
 
-        #region Fields
-
-        private int _animalId;
-        private int _name;
-        private string _breed = string.Empty;
-        private DateTime _birthDate;
-        private int _certificateNumber;
-        private string _gender = string.Empty;
-        private float _backFatIndex;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IAnimalService _animalService;
-        private readonly IAnimalRecordValidation _recordValidation;
-        private readonly IDateConverterService _dateConverterService;
-
-        #endregion
-
         #region Commands
 
         public IMvxAsyncCommand SubmitRecordCommand { get; }
@@ -114,9 +112,6 @@ namespace PiggsCare.Core.ViewModels.Animals
         {
             bool noFieldEmpty = !string.IsNullOrWhiteSpace(Breed) &&
                                 !string.IsNullOrWhiteSpace(Gender) &&
-                                // !BackFatIndex.Equals(default) &&
-                                // !CertificateNumber.Equals(default) &&
-                                // !Name.Equals(default) &&
                                 !BirthDate.Equals(default);
             return noFieldEmpty && !HasErrors;
         }

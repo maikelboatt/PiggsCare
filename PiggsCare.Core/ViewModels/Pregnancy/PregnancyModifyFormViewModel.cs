@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Pregnancy;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -13,10 +14,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
     {
         #region INotifyDataErrorInfo Implementation
 
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
@@ -25,10 +23,10 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 
         #region Constructor
 
-        public PregnancyModifyFormViewModel( IPregnancyStore pregnancyStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
+        public PregnancyModifyFormViewModel( IPregnancyService pregnancyService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
             IPregnancyRecordValidation recordValidation )
         {
-            _pregnancyStore = pregnancyStore;
+            _pregnancyService = pregnancyService;
             _modalNavigationStore = modalNavigationStore;
             _dateConverterService = dateConverterService;
             _recordValidation = recordValidation;
@@ -58,7 +56,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 
         public override Task Initialize()
         {
-            PregnancyScan? record = _pregnancyStore?.PregnancyScans.FirstOrDefault(x => x.ScanId == _pregnancyScanId);
+            PregnancyScan? record = _pregnancyService.GetPregnancyScanByIdAsync(_pregnancyScanId);
             if (record == null) return base.Initialize();
             PopulateEditForm(record);
             _breedingEventId = record.BreedingEventId;
@@ -75,7 +73,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 
         #region Fields
 
-        private readonly IPregnancyStore _pregnancyStore;
+        private readonly IPregnancyService _pregnancyService;
         private readonly ModalNavigationStore _modalNavigationStore;
         private readonly IDateConverterService _dateConverterService;
         private readonly IPregnancyRecordValidation _recordValidation;
@@ -142,7 +140,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
         private async Task ExecuteSubmitRecord()
         {
             PregnancyScan record = GetPregnancyScanFromFields();
-            await _pregnancyStore.Modify(record);
+            await _pregnancyService.UpdatePregnancyScanAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -151,10 +149,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
             _modalNavigationStore.Close();
         }
 
-        private PregnancyScan GetPregnancyScanFromFields()
-        {
-            return new PregnancyScan(_pregnancyScanId, _breedingEventId, _dateConverterService.GetDateOnly(ScanDate), ScanResults);
-        }
+        private PregnancyScan GetPregnancyScanFromFields() => new(_pregnancyScanId, _breedingEventId, _dateConverterService.GetDateOnly(ScanDate), ScanResults);
 
         #endregion
     }

@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Weaning;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -11,44 +12,12 @@ namespace PiggsCare.Core.ViewModels.Weaning
 {
     public class WeaningModifyFormViewModel:MvxViewModel<int>, IWeaningModifyFormViewModel, INotifyDataErrorInfo
     {
-        public override void Prepare( int parameter )
-        {
-            _weaningEventId = parameter;
-        }
-
-        public override Task Initialize()
-        {
-            WeaningEvent? record = _weaningStore.WeaningEvents.FirstOrDefault(x => x.WeaningEventId == _weaningEventId);
-            if (record == null) return base.Initialize();
-            PopulateEditForm(record);
-            _farrowingEventId = record.FarrowingEventId;
-            return base.Initialize();
-        }
-
-        public override void ViewDestroy( bool viewFinishing = true )
-        {
-            base.ViewDestroy(viewFinishing);
-            _recordValidation.ErrorsChanged -= RecordValidationOnErrorsChanged;
-        }
-
-        #region INotifyDataErrorInfo Implementation
-
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
-
-        public bool HasErrors => _recordValidation.HasErrors;
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-
-        #endregion
-
         #region Constructor
 
-        public WeaningModifyFormViewModel( IWeaningStore weaningStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
+        public WeaningModifyFormViewModel( IWeaningService weaningService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
             IWeaningRecordValidation recordValidation )
         {
-            _weaningStore = weaningStore;
+            _weaningService = weaningService;
             _modalNavigationStore = modalNavigationStore;
             _dateConverterService = dateConverterService;
             _recordValidation = recordValidation;
@@ -70,6 +39,40 @@ namespace PiggsCare.Core.ViewModels.Weaning
 
         #endregion
 
+        #region LifeCycle
+
+        public override void Prepare( int parameter )
+        {
+            _weaningEventId = parameter;
+        }
+
+        public override Task Initialize()
+        {
+            WeaningEvent? record = _weaningService.GetWeaningEventByIdAsync(_weaningEventId);
+            if (record == null) return base.Initialize();
+            PopulateEditForm(record);
+            _farrowingEventId = record.FarrowingEventId;
+            return base.Initialize();
+        }
+
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            base.ViewDestroy(viewFinishing);
+            _recordValidation.ErrorsChanged -= RecordValidationOnErrorsChanged;
+        }
+
+        #endregion
+
+        #region INotifyDataErrorInfo Implementation
+
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
+
+        public bool HasErrors => _recordValidation.HasErrors;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
+        #endregion
+
+
         #region Fields
 
         private int _farrowingEventId;
@@ -82,7 +85,7 @@ namespace PiggsCare.Core.ViewModels.Weaning
 
         private readonly IDateConverterService _dateConverterService;
         private readonly IWeaningRecordValidation _recordValidation;
-        private readonly IWeaningStore _weaningStore;
+        private readonly IWeaningService _weaningService;
         private readonly ModalNavigationStore _modalNavigationStore;
 
         #endregion
@@ -160,7 +163,6 @@ namespace PiggsCare.Core.ViewModels.Weaning
         private bool CanSubmitRecord()
         {
             bool noFieldEmpty = !WeaningDate.Equals(default);
-            // !NumberWeaned.Equals(default) && !MalesWeaned.Equals(default) && !FemalesWeaned.Equals(default);
             return noFieldEmpty && !HasErrors;
         }
 
@@ -182,7 +184,7 @@ namespace PiggsCare.Core.ViewModels.Weaning
         private async Task ExecuteSubmitRecord()
         {
             WeaningEvent record = GetWeaningEventsFromFields();
-            await _weaningStore.Modify(record);
+            await _weaningService.UpdateWeaningEventAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -191,10 +193,14 @@ namespace PiggsCare.Core.ViewModels.Weaning
             _modalNavigationStore.Close();
         }
 
-        private WeaningEvent GetWeaningEventsFromFields()
-        {
-            return new WeaningEvent(_weaningEventId, _farrowingEventId, _dateConverterService.GetDateOnly(WeaningDate), NumberWeaned, MalesWeaned, FemalesWeaned, AverageWeaningWeight);
-        }
+        private WeaningEvent GetWeaningEventsFromFields() => new(
+            _weaningEventId,
+            _farrowingEventId,
+            _dateConverterService.GetDateOnly(WeaningDate),
+            NumberWeaned,
+            MalesWeaned,
+            FemalesWeaned,
+            AverageWeaningWeight);
 
         #endregion
     }

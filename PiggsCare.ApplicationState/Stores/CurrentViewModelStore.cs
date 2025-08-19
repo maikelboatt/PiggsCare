@@ -1,7 +1,7 @@
 using MvvmCross.ViewModels;
-using PiggsCare.Core.ViewModels;
+using PiggsCare.Infrastructure.Enums;
 
-namespace PiggsCare.Core.Stores
+namespace PiggsCare.ApplicationState.Stores
 {
     public class CurrentViewModelStore:ICurrentViewModelStore
     {
@@ -22,11 +22,9 @@ namespace PiggsCare.Core.Stores
             get => _currentProcessStage;
             set
             {
-                if (_currentProcessStage != value)
-                {
-                    _currentProcessStage = value;
-                    CurrentProcessStageChanged?.Invoke();
-                }
+                if (_currentProcessStage == value) return;
+                _currentProcessStage = value;
+                CurrentProcessStageChanged?.Invoke();
             }
         }
 

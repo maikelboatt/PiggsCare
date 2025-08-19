@@ -1,7 +1,7 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores;
 using PiggsCare.Core.Factory;
-using PiggsCare.Core.Stores;
 
 namespace PiggsCare.Core.ViewModels
 {
@@ -17,8 +17,9 @@ namespace PiggsCare.Core.ViewModels
             _viewModelFactory = viewModelFactory;
             NavigateToHome = new MvxCommand(ShowHomeView);
             NavigateToAnalytics = new MvxCommand(ShowAnalyticsView);
-            NavigateToNotifications = new MvxCommand(ShowNotificationView);
             NavigateToSynchronization = new MvxCommand(ShowSynchronizationView);
+            NavigateToReminders = new MvxCommand(ShowReminderView);
+            NavigateToNotifications = new MvxCommand(ShowNotificationView);
 
             modalNavigationStore.CurrentModalViewModelChanged += ModalNavigationStoreOnCurrentModalViewModelChanged;
 
@@ -30,13 +31,6 @@ namespace PiggsCare.Core.ViewModels
             return base.Initialize();
         }
 
-        private void ShowNotificationView()
-        {
-            NotificationViewModel? viewmodel = _viewModelFactory.CreateViewModel<NotificationViewModel>();
-            CurrentViewModel = viewmodel;
-            viewmodel?.Prepare();
-            viewmodel?.Initialize();
-        }
 
         private void ShowHomeView()
         {
@@ -59,13 +53,27 @@ namespace PiggsCare.Core.ViewModels
             viewmodel?.Initialize();
         }
 
+        private void ShowReminderView()
+        {
+            ReminderViewModel? viewModel = _viewModelFactory.CreateViewModel<ReminderViewModel>();
+            CurrentViewModel = viewModel;
+            viewModel?.Initialize();
+        }
+
+        private void ShowNotificationView()
+        {
+            NotificationViewModel? viewmodel = _viewModelFactory.CreateViewModel<NotificationViewModel>();
+            CurrentViewModel = viewmodel;
+            viewmodel?.Prepare();
+            viewmodel?.Initialize();
+        }
+
 
         private void ModalNavigationStoreOnCurrentModalViewModelChanged()
         {
             RaisePropertyChanged(nameof(CurrentModalViewModel));
             RaisePropertyChanged(nameof(IsModalOpen));
         }
-
 
         #region Properties
 
@@ -84,9 +92,9 @@ namespace PiggsCare.Core.ViewModels
 
         public MvxCommand NavigateToHome { get; private set; }
         public MvxCommand NavigateToAnalytics { get; private set; }
-        public MvxCommand NavigateToNotifications { get; private set; }
-
         public MvxCommand NavigateToSynchronization { get; private set; }
+        public MvxCommand NavigateToReminders { get; private set; }
+        public MvxCommand NavigateToNotifications { get; private set; }
 
         #endregion
     }

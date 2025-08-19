@@ -11,9 +11,5 @@ namespace PiggsCare.DataAccess.DTO
         public required int BornDead { get; set; }
         public required int Mummified { get; set; }
 
-        // // Navigation properties
-        // public BreedingEventDto BreedingEventDto { get; set; }
-        // public List<PigletDto> Piglets { get; set; }
-        // public WeaningEventDto WeaningEventDto { get; set; }
     }
 }

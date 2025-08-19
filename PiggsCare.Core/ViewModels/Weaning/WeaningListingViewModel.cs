@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores.Weaning;
+using PiggsCare.Business.Services.Weaning;
 using PiggsCare.Core.Control;
-using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 using System.Collections.Specialized;
 
@@ -9,13 +11,52 @@ namespace PiggsCare.Core.ViewModels.Weaning
 {
     public class WeaningListingViewModel:MvxViewModel<int>, IWeaningListingViewModel
     {
+        private readonly ILogger<WeaningListingViewModel> _logger;
+        private readonly IModalNavigationControl _modalNavigationControl;
+
+        private readonly IWeaningService _weaningService;
+        private readonly IWeaningStore _weaningStore;
+        private bool _isLoading;
+
         #region Constructor
 
-        public WeaningListingViewModel( IWeaningStore weaningStore, IModalNavigationControl modalNavigationControl )
+        public WeaningListingViewModel( IWeaningService weaningService, IWeaningStore weaningStore, IModalNavigationControl modalNavigationControl,
+            ILogger<WeaningListingViewModel> logger )
         {
+            _weaningService = weaningService;
             _weaningStore = weaningStore;
             _modalNavigationControl = modalNavigationControl;
+            _logger = logger;
             _weaningEvents.CollectionChanged += WeaningEventsOnCollectionChanged;
+
+            _weaningStore.OnWeaningEventAdded += WeaningStoreOnOnWeaningEventAdded;
+            _weaningStore.OnWeaningEventUpdated += WeaningStoreOnOnWeaningEventUpdated;
+            _weaningStore.OnWeaningEventDeleted += WeaningStoreOnOnWeaningEventDeleted;
+        }
+
+        #endregion
+
+        private MvxObservableCollection<WeaningEvent> _weaningEvents => new(_weaningStore.WeaningEvents);
+
+        #region ViewModel Life-Cycle
+
+        public override void Prepare( int parameter )
+        {
+            FarrowingEventId = parameter;
+        }
+
+        public override async Task Initialize()
+        {
+            await LoadWeaningEventsDetailsAsync();
+            await base.Initialize();
+        }
+
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            _weaningStore.OnWeaningEventAdded -= WeaningStoreOnOnWeaningEventAdded;
+            _weaningStore.OnWeaningEventUpdated -= WeaningStoreOnOnWeaningEventUpdated;
+            _weaningStore.OnWeaningEventDeleted -= WeaningStoreOnOnWeaningEventDeleted;
+            base.ViewDestroy(viewFinishing);
         }
 
         #endregion
@@ -25,6 +66,31 @@ namespace PiggsCare.Core.ViewModels.Weaning
         private void WeaningEventsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
         {
             RaisePropertyChanged(nameof(WeaningEvents));
+        }
+
+        private void WeaningStoreOnOnWeaningEventDeleted( WeaningEvent weaning )
+        {
+            _weaningEvents.Remove(weaning);
+        }
+
+        private void WeaningStoreOnOnWeaningEventUpdated( WeaningEvent weaning )
+        {
+            // Update the animal in the local collection if it exists
+            int index = _weaningEvents.IndexOf(weaning);
+            if (index >= 0)
+            {
+                _weaningEvents.RemoveAt(index);
+                _weaningEvents.Insert(index, weaning);
+            }
+            else
+            {
+                _logger.LogWarning("Animal with ID {WeaningId} not found in local collection for update.", weaning.WeaningEventId);
+            }
+        }
+
+        private void WeaningStoreOnOnWeaningEventAdded( WeaningEvent weaning )
+        {
+            _weaningEvents.Add(weaning);
         }
 
         #endregion
@@ -39,31 +105,6 @@ namespace PiggsCare.Core.ViewModels.Weaning
         {
             get => _isLoading;
             set => SetProperty(ref _isLoading, value);
-        }
-
-        #endregion
-
-        #region Fields
-
-        private readonly IWeaningStore _weaningStore;
-        private readonly IModalNavigationControl _modalNavigationControl;
-        private bool _isLoading;
-
-        private MvxObservableCollection<WeaningEvent> _weaningEvents => new(_weaningStore.WeaningEvents);
-
-        #endregion
-
-        #region ViewModel Life-Cycle
-
-        public override void Prepare( int parameter )
-        {
-            FarrowingEventId = parameter;
-        }
-
-        public override async Task Initialize()
-        {
-            await LoadWeaningEventsDetailsAsync();
-            await base.Initialize();
         }
 
         #endregion
@@ -84,13 +125,13 @@ namespace PiggsCare.Core.ViewModels.Weaning
             try
             {
                 _weaningEvents!.Clear();
-                await _weaningStore.Load(FarrowingEventId);
+                await _weaningService.GetAllWeaningEventAsync(FarrowingEventId);
+
+                foreach (WeaningEvent weaningEvent in _weaningStore.WeaningEvents)
+                {
+                    _weaningEvents.Add(weaningEvent);
+                }
                 UpdateView();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
             finally
             {
@@ -105,19 +146,19 @@ namespace PiggsCare.Core.ViewModels.Weaning
 
         private void ExecuteOpenInsertRecordDialog()
         {
-            // Open the WeaningEvent Create Form dialog
+            // Open the WeaningEvent AddAnimal Form dialog
             _modalNavigationControl.PopUp<WeaningCreateFormViewModel>(FarrowingEventId);
         }
 
         private void ExecuteOpenModifyRecordDialog( int id )
         {
-            // Open the WeaningEvent Modify Form dialog
+            // Open the WeaningEvent UpdateAnimal Form dialog
             _modalNavigationControl.PopUp<WeaningModifyFormViewModel>(id);
         }
 
         private void ExecuteOpenRemoveRecordDialog( int id )
         {
-            // Open the WeaningEvent Modify Form dialog
+            // Open the WeaningEvent UpdateAnimal Form dialog
             _modalNavigationControl.PopUp<WeaningDeleteFormViewModel>(id);
         }
 

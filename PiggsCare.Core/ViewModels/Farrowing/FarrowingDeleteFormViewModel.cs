@@ -1,14 +1,16 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Farrowing;
+using PiggsCare.Business.Services.Message;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Farrowing
 {
     public class FarrowingDeleteFormViewModel(
-        IFarrowingStore farrowingStore,
+        IFarrowingService farrowingService,
         ModalNavigationStore modalNavigationStore,
         IMessageService messageService,
         IDateConverterService dateConverterService )
@@ -23,7 +25,7 @@ namespace PiggsCare.Core.ViewModels.Farrowing
 
         public override Task Initialize()
         {
-            FarrowEvent? record = farrowingStore.FarrowEvents.FirstOrDefault(x => x.FarrowingEventId == _farrowingEventId);
+            FarrowEvent? record = farrowingService.GetFarrowingById(_farrowingEventId);
             if (record == null) return base.Initialize();
             PopulateDeleteForm(record);
             _breedingEventId = record.BreedingEventId;
@@ -65,7 +67,7 @@ namespace PiggsCare.Core.ViewModels.Farrowing
 
         private async Task OnDeleteConfirm()
         {
-            await farrowingStore.Remove(_farrowingEventId);
+            await farrowingService.DeleteFarrowingAsync(_farrowingEventId);
             modalNavigationStore.Close();
         }
 

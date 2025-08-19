@@ -1,14 +1,16 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Health;
+using PiggsCare.Business.Services.Message;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.HealthRecords
 {
     public class HealthRecordDeleteFormViewModel(
-        IHealthRecordStore healthRecordStore,
+        IHealthService healthService,
         ModalNavigationStore modalNavigationStore,
         IMessageService messageService,
         IDateConverterService dateConverterService )
@@ -21,7 +23,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         public override Task Initialize()
         {
-            HealthRecord? record = healthRecordStore?.HealthRecords.FirstOrDefault(x => x.HealthRecordId == _healthRecordId);
+            HealthRecord? record = healthService.GetHealthRecordByIdAsync(_healthRecordId);
             if (record == null) return base.Initialize();
             PopulateDeleteForm(record);
             _animalId = record.AnimalId;
@@ -97,7 +99,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         private async Task OnDeleteConfirm()
         {
-            await healthRecordStore.Remove(_healthRecordId);
+            await healthService.DeleteHealthRecordAsync(_healthRecordId);
             modalNavigationStore.Close();
         }
 

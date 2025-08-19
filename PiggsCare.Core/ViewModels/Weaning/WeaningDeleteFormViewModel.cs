@@ -1,14 +1,16 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Message;
+using PiggsCare.Business.Services.Weaning;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Weaning
 {
     public class WeaningDeleteFormViewModel(
-        IWeaningStore weaningStore,
+        IWeaningService weaningService,
         ModalNavigationStore modalNavigationStore,
         IDateConverterService dateConverterService,
         IMessageService messageService )
@@ -23,7 +25,7 @@ namespace PiggsCare.Core.ViewModels.Weaning
 
         public override Task Initialize()
         {
-            WeaningEvent? record = weaningStore.WeaningEvents.FirstOrDefault(x => x.WeaningEventId == _weaningEventId);
+            WeaningEvent? record = weaningService.GetWeaningEventByIdAsync(_weaningEventId);
             if (record == null) return base.Initialize();
             PopulateDeleteForm(record);
             _farrowingEventId = record.FarrowingEventId;
@@ -132,7 +134,7 @@ namespace PiggsCare.Core.ViewModels.Weaning
 
         private async Task OnDeleteConfirm()
         {
-            await weaningStore.Remove(_weaningEventId);
+            await weaningService.DeleteWeaningEventAsync(_weaningEventId);
             modalNavigationStore.Close();
         }
 

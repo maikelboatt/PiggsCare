@@ -1,14 +1,16 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Message;
+using PiggsCare.Business.Services.Removal;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Removal
 {
     public class RemovalEventDeleteFormViewModel(
-        IRemovalEventStore eventStore,
+        IRemovalService removalService,
         ModalNavigationStore modalNavigationStore,
         IDateConverterService dateConverterService,
         IMessageService messageService )
@@ -23,7 +25,7 @@ namespace PiggsCare.Core.ViewModels.Removal
 
         public override Task Initialize()
         {
-            RemovalEvent? record = eventStore?.RemovalEvents.FirstOrDefault(x => x.RemovalEventId == _removalId);
+            RemovalEvent? record = removalService.GetRemovalEventByIdAsync(_removalId);
             if (record is null) return base.Initialize();
             PopulateDeleteForm(record);
             _animalId = record.AnimalId;
@@ -94,7 +96,7 @@ namespace PiggsCare.Core.ViewModels.Removal
 
         private async Task OnDeleteConfirm()
         {
-            await eventStore.RemoveAsync(_removalId);
+            await removalService.DeleteRemovalEventAsync(_removalId);
             modalNavigationStore.Close();
         }
 

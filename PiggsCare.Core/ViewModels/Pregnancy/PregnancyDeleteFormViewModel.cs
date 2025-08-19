@@ -1,14 +1,16 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Message;
+using PiggsCare.Business.Services.Pregnancy;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Pregnancy
 {
     public class PregnancyDeleteFormViewModel(
-        IPregnancyStore pregnancyStore,
+        IPregnancyService pregnancyService,
         ModalNavigationStore modalNavigationStore,
         IDateConverterService dateConverterService,
         IMessageService messageService )
@@ -23,7 +25,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 
         public override Task Initialize()
         {
-            PregnancyScan? record = pregnancyStore?.PregnancyScans.FirstOrDefault(x => x.ScanId == _pregnancyScanId);
+            PregnancyScan? record = pregnancyService.GetPregnancyScanByIdAsync(_pregnancyScanId);
             if (record == null) return base.Initialize();
             PopulateDeleteForm(record);
             _breedingEventId = record.BreedingEventId;
@@ -96,7 +98,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 
         private async Task OnDeleteConfirm()
         {
-            await pregnancyStore.Remove(_pregnancyScanId);
+            await pregnancyService.DeletePregnancyScanAsync(_pregnancyScanId);
             modalNavigationStore.Close();
         }
 

@@ -1,15 +1,20 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.ApplicationState.Stores.Insemination;
+using PiggsCare.Business.Services.Insemination;
+using PiggsCare.Business.Services.Message;
+using PiggsCare.Business.Services.Synchronization;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels.Synchronization
 {
     public class SynchronizationEventDeleteFormViewModel(
-        ISynchronizationEventStore synchronizationEventStore,
-        IBreedingEventStore breedingEventStore,
+        ISynchronizationService synchronizationService,
+        IInseminationService inseminationService,
+        IInseminationEventStore inseminationEventStore,
         ModalNavigationStore modalNavigationStore,
         IDateConverterService dateConverterService,
         IMessageService messageService )
@@ -24,7 +29,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
 
         public override Task Initialize()
         {
-            SynchronizationEvent? record = synchronizationEventStore.SynchronizationEvents.FirstOrDefault(x => x.SynchronizationEventId == _synchronizationId);
+            SynchronizationEvent? record = synchronizationService.GetSynchronizationEventByIdAsync(_synchronizationId);
             if (record is null) return base.Initialize();
             PopulateDeleteForm(record);
             return base.Initialize();
@@ -121,25 +126,18 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         private async Task OnDeleteConfirm()
         {
             await DeleteCorrespondingBreedingEvent();
-            await synchronizationEventStore.RemoveAsync(_synchronizationId);
+            await synchronizationService.DeleteSynchronizationEventAsync(_synchronizationId);
             modalNavigationStore.Close();
         }
 
         private async Task DeleteCorrespondingBreedingEvent()
         {
-            int record = GetBreedingEventId();
-            // foreach (int id in record)
-            await breedingEventStore.Remove(record);
+            inseminationService.GetAllInseminationEventBySynchronizationBatchAsync(_synchronizationId);
+
+            foreach (InseminationEventWithAnimal record in inseminationEventStore.InseminationEventsWithAnimals)
+                await inseminationService.DeleteInseminationEventAsync(record.BreedingEventId);
         }
 
-        private int GetBreedingEventId()
-        {
-            breedingEventStore.LoadForAnimal(_synchronizationId);
-            BreedingEvent? result = breedingEventStore.BreedingEvents.FirstOrDefault(x => x.SynchronizationEventId == _synchronizationId);
-            // List<int> record = [];
-            // record.AddRange(result.Select(bred => bred.BreedingEventId));
-            return result != null ? result.BreedingEventId : 0;
-        }
 
         private void ExecuteCancelCommand()
         {

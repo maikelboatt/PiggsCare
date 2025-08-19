@@ -1,17 +1,20 @@
+// Ignore Spelling: Piggs
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MvvmCross;
 using MvvmCross.Exceptions;
 using MvvmCross.IoC;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.ApplicationState.Stores.Animals;
+using PiggsCare.Business.Services.Animals;
 using PiggsCare.Core.Control;
 using PiggsCare.Core.Factory;
-using PiggsCare.Core.Stores;
 using PiggsCare.Core.ViewModels;
 using PiggsCare.DataAccess.DatabaseAccess;
-using PiggsCare.DataAccess.Repositories;
-using PiggsCare.Domain.Repositories;
-using PiggsCare.Domain.Services;
+using PiggsCare.DataAccess.Repositories.Animals;
+using PiggsCare.Infrastructure.Services;
 using System.Reflection;
 
 namespace PiggsCare.Core
@@ -37,11 +40,11 @@ namespace PiggsCare.Core
 
             Assembly[] assembliesToScan =
             [
-                GetType().Assembly,              // Current assembly (PiggsCare.Core)
-                typeof(IAnimalService).Assembly, // Assembly containing the interfaces
-                // typeof(AnimalService).Assembly,  // Assembly containing the implementations
+                GetType().Assembly, // Current assembly (PiggsCare.Core)
+                typeof(IAnimalService).Assembly,
                 typeof(IAnimalRepository).Assembly,
-                typeof(AnimalRepository).Assembly
+                typeof(IAnimalStore).Assembly,
+                typeof(IDateConverterService).Assembly
             ];
 
             foreach (Assembly assembly in assembliesToScan)
@@ -86,35 +89,20 @@ namespace PiggsCare.Core
 
 
             // Register ViewModelFactory
-            // Mvx.IoCProvider.LazyConstructAndRegisterSingleton<IViewModelFactory, ViewModelFactory>();
             Mvx.IoCProvider?.RegisterSingleton<IViewModelFactory>(new ViewModelFactory());
 
             // Register the viewmodel factory
             Mvx.IoCProvider?.RegisterSingleton<Func<Type, object, MvxViewModel>>(() => ( viewModelType, parameter ) =>
             {
-                object? resolvedViewModel = Mvx.IoCProvider.Resolve(viewModelType);
+                // Resolve the ViewModel instance from the IoC container
+                MvxViewModel viewModel = (MvxViewModel)(Mvx.IoCProvider.Resolve(viewModelType)
+                                                        ?? throw new MvxIoCResolveException($"Failed to resolve ViewModel of type: {viewModelType.FullName}"));
 
-                if (resolvedViewModel == null)
-                {
-                    // Handle the case where the ViewModel is not registered.
-                    // This is crucial for preventing runtime exceptions.
-                    string errorMessage = $"Failed to resolve ViewModel of type: {viewModelType.FullName}";
-                    //Options for handling the error
-                    //1. Throw an exception:
-                    throw new MvxIoCResolveException(errorMessage);
-                    //2. Log the error and return null (less recommended, as it might lead to other null reference exceptions later):
-                    //Mvx.IoCProvider.Log.Error(errorMessage);
-                    //return null;
-                }
+                // Invoke the "Prepare" method on the ViewModel if it exists
+                viewModelType.GetMethod("Prepare", new[] { parameter.GetType() })
+                             ?.Invoke(viewModel, new[] { parameter });
 
-                MvxViewModel viewModel = (MvxViewModel)resolvedViewModel; // Safe cast now
-
-                //Call the correct prepare statement based on the parameter type
-                {
-                    MethodInfo? prepareMethod = viewModelType.GetMethod("Prepare", new[] { parameter.GetType() });
-                    prepareMethod?.Invoke(viewModel, new[] { parameter });
-                }
-
+                // Initialize the ViewModel
                 viewModel.Initialize();
                 return viewModel;
             });

@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores.Pregnancy;
+using PiggsCare.Business.Services.Pregnancy;
 using PiggsCare.Core.Control;
-using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -10,25 +12,32 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 {
     public class PregnancyListingViewModel:MvxViewModel<int>, IPregnancyListingViewModel
     {
+        private readonly ILogger<PregnancyListingViewModel> _logger;
+        private readonly IModalNavigationControl _modalNavigationControl;
+
+        private readonly MvxObservableCollection<PregnancyScan> _pregnancies;
+        private readonly IPregnancyService _pregnancyService;
+        private readonly IPregnancyStore _pregnancyStore;
+
+        private bool _isLoading;
+
+
         #region Constructor
 
-        public PregnancyListingViewModel( IPregnancyStore pregnancyStore, IModalNavigationControl modalNavigationControl )
+        public PregnancyListingViewModel( IPregnancyService pregnancyService, IPregnancyStore pregnancyStore, IModalNavigationControl modalNavigationControl,
+            ILogger<PregnancyListingViewModel> logger )
         {
+            _pregnancyService = pregnancyService;
             _pregnancyStore = pregnancyStore;
             _modalNavigationControl = modalNavigationControl;
+            _logger = logger;
 
-            _pregnancies = new MvxObservableCollection<PregnancyScan>(_pregnancyStore.PregnancyScans);
-
+            _pregnancies = new MvxObservableCollection<PregnancyScan>(_pregnancyStore.Pregnancies);
             _pregnancies.CollectionChanged += PregnanciesOnCollectionChanged;
-        }
 
-        #endregion
-
-        #region Event Handlers
-
-        private void PregnanciesOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
-        {
-            RaisePropertyChanged(nameof(Pregnancies));
+            _pregnancyStore.OnPregnancyAdded += PregnancyStoreOnPregnancyAdded;
+            _pregnancyStore.OnPregnancyUpdated += PregnancyStoreOnPregnancyUpdated;
+            _pregnancyStore.OnPregnancyDeleted += PregnancyStoreOnPregnancyDeleted;
         }
 
         #endregion
@@ -52,15 +61,47 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
             await base.Initialize();
         }
 
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            _pregnancyStore.OnPregnancyAdded -= PregnancyStoreOnPregnancyAdded;
+            _pregnancyStore.OnPregnancyUpdated -= PregnancyStoreOnPregnancyUpdated;
+            _pregnancyStore.OnPregnancyDeleted -= PregnancyStoreOnPregnancyDeleted;
+            base.ViewDestroy(viewFinishing);
+        }
+
         #endregion
 
-        #region Fields
+        #region Event Handlers
 
-        private bool _isLoading;
+        private void PregnanciesOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
+        {
+            RaisePropertyChanged(nameof(Pregnancies));
+        }
 
-        private readonly MvxObservableCollection<PregnancyScan> _pregnancies;
-        private readonly IPregnancyStore _pregnancyStore;
-        private readonly IModalNavigationControl _modalNavigationControl;
+        private void PregnancyStoreOnPregnancyAdded( PregnancyScan scan )
+        {
+            _pregnancies.Add(scan);
+        }
+
+        private void PregnancyStoreOnPregnancyUpdated( PregnancyScan scan )
+        {
+            // Update the scan in the local collection if it exists
+            int index = _pregnancies.IndexOf(scan);
+            if (index >= 0)
+            {
+                _pregnancies.RemoveAt(index);
+                _pregnancies.Insert(index, scan);
+            }
+            else
+            {
+                _logger.LogWarning("Animal with ID {ScanId} not found in local collection for update.", scan.ScanId);
+            }
+        }
+
+        private void PregnancyStoreOnPregnancyDeleted( PregnancyScan scan )
+        {
+            _pregnancies.Remove(scan);
+        }
 
         #endregion
 
@@ -94,20 +135,13 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
             try
             {
                 _pregnancies!.Clear();
-                await _pregnancyStore.Load(BreedingEventId);
-                int loadedCount = _pregnancyStore.PregnancyScans.Count();
-                Console.WriteLine($"Loaded {loadedCount} records");
+                await _pregnancyService.GetAllPregnancyScansAsync(BreedingEventId);
 
-                foreach (PregnancyScan pregnancyScan in _pregnancyStore.PregnancyScans)
+                foreach (PregnancyScan pregnancyScan in _pregnancyStore.Pregnancies)
                 {
                     _pregnancies.Add(pregnancyScan);
                 }
                 UpdateView();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
             finally
             {

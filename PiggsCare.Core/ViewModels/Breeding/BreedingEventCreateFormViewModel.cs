@@ -14,7 +14,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
         private readonly IInseminationService _inseminationService;
         private readonly ModalNavigationStore _modalNavigationStore;
 
-        private DateTime _aiDate;
+        private DateTime _aiDate = DateTime.Now;
         private int _animalId;
         private DateOnly _expectedFarrowDate = DateOnly.FromDateTime(DateTime.Now);
 

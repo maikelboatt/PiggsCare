@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores.Health;
+using PiggsCare.Business.Services.Health;
 using PiggsCare.Core.Control;
-using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 using System.Collections.Specialized;
 
@@ -9,18 +11,83 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 {
     public class HealthListingViewModel:MvxViewModel<int>, IHealthListingViewModel
     {
-        public HealthListingViewModel( IHealthRecordStore healthRecordStore, IModalNavigationControl modalNavigationControl )
+        private readonly IHealthRecordStore _healthRecordStore;
+
+        private readonly IHealthService _healthService;
+        private readonly ILogger<HealthListingViewModel> _logger;
+        private readonly IModalNavigationControl _modalNavigationControl;
+        private bool _isLoading;
+
+
+        public HealthListingViewModel( IHealthService healthService, IHealthRecordStore healthRecordStore, IModalNavigationControl modalNavigationControl,
+            ILogger<HealthListingViewModel> logger )
         {
+            _healthService = healthService;
             _healthRecordStore = healthRecordStore;
             _modalNavigationControl = modalNavigationControl;
+            _logger = logger;
             _healthRecords.CollectionChanged += HealthRecordsOnCollectionChanged;
+
+            _healthRecordStore.OnHealthRecordAdded += HealthRecordStoreOnOnHealthRecordAdded;
+            _healthRecordStore.OnHealthRecordUpdated += HealthRecordStoreOnOnHealthRecordUpdated;
+            _healthRecordStore.OnHealthRecordDeleted += HealthRecordStoreOnOnHealthRecordDeleted;
         }
+
+        private MvxObservableCollection<HealthRecord> _healthRecords => new(_healthRecordStore.HealthRecords);
+
+        #region ViewModel LifeCycle
+
+        public override void Prepare( int parameter )
+        {
+            AnimalId = parameter;
+        }
+
+        public override async Task Initialize()
+        {
+            await LoadHealthRecordDetailsAsync();
+            await base.Initialize();
+        }
+
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            _healthRecordStore.OnHealthRecordAdded -= HealthRecordStoreOnOnHealthRecordAdded;
+            _healthRecordStore.OnHealthRecordUpdated -= HealthRecordStoreOnOnHealthRecordUpdated;
+            _healthRecordStore.OnHealthRecordDeleted -= HealthRecordStoreOnOnHealthRecordDeleted;
+            base.ViewDestroy(viewFinishing);
+        }
+
+        #endregion
 
         #region Event Handlers
 
         private void HealthRecordsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
         {
             RaisePropertyChanged(nameof(HealthRecords));
+        }
+
+        private void HealthRecordStoreOnOnHealthRecordDeleted( HealthRecord health )
+        {
+            _healthRecords.Remove(health);
+        }
+
+        private void HealthRecordStoreOnOnHealthRecordUpdated( HealthRecord health )
+        {
+            // Update the animal in the local collection if it exists
+            int index = _healthRecords.IndexOf(health);
+            if (index >= 0)
+            {
+                _healthRecords.RemoveAt(index);
+                _healthRecords.Insert(index, health);
+            }
+            else
+            {
+                _logger.LogWarning("Animal with ID {HealthRecordId} not found in local collection for update.", health.HealthRecordId);
+            }
+        }
+
+        private void HealthRecordStoreOnOnHealthRecordAdded( HealthRecord health )
+        {
+            _healthRecords.Add(health);
         }
 
         #endregion
@@ -41,13 +108,13 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
             try
             {
                 _healthRecords!.Clear();
-                await _healthRecordStore.Load(AnimalId);
+                await _healthService.GetAllHealthRecordsAsync(AnimalId);
+
+                foreach (HealthRecord record in _healthRecordStore.HealthRecords)
+                {
+                    _healthRecords.Add(record);
+                }
                 UpdateView();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
             finally
             {
@@ -79,21 +146,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #endregion
 
-        #region ViewModel LifeCycle
-
-        public override void Prepare( int parameter )
-        {
-            AnimalId = parameter;
-        }
-
-        public override async Task Initialize()
-        {
-            await LoadHealthRecordDetailsAsync();
-            await base.Initialize();
-        }
-
-        #endregion
-
         #region Properties
 
         public IEnumerable<HealthRecord> HealthRecords => _healthRecords;
@@ -105,16 +157,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
             get => _isLoading;
             set => SetProperty(ref _isLoading, value);
         }
-
-        #endregion
-
-        #region Fields
-
-        private readonly IHealthRecordStore _healthRecordStore;
-        private readonly IModalNavigationControl _modalNavigationControl;
-        private bool _isLoading;
-
-        private MvxObservableCollection<HealthRecord> _healthRecords => new(_healthRecordStore.HealthRecords);
 
         #endregion
     }

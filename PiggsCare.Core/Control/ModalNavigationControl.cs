@@ -1,5 +1,6 @@
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Core.Parameter;
 using PiggsCare.Domain.Models;
 
 namespace PiggsCare.Core.Control
@@ -14,6 +15,21 @@ namespace PiggsCare.Core.Control
         public void PopUp<T>( List<Animal> selectedAnimals ) where T : IMvxViewModel
         {
             modalNavigationStore.CurrentModalViewModel = viewModelFactory(typeof(T), selectedAnimals);
+        }
+
+        public void PopUp<T>( InseminationDetailAnimalList inseminationDetailAnimalList ) where T : IMvxViewModel
+        {
+            modalNavigationStore.CurrentModalViewModel = viewModelFactory(typeof(T), inseminationDetailAnimalList);
+        }
+
+        public void PopUp<T>( IEnumerable<ScheduledNotification> scheduledNotifications ) where T : IMvxViewModel
+        {
+            modalNavigationStore.CurrentModalViewModel = viewModelFactory(typeof(T), scheduledNotifications);
+        }
+
+        public void PopUp<T>( ScheduledNotification scheduledNotifications ) where T : IMvxViewModel
+        {
+            modalNavigationStore.CurrentModalViewModel = viewModelFactory(typeof(T), scheduledNotifications);
         }
     }
 }

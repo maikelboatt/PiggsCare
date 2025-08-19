@@ -1,8 +1,10 @@
+using Microsoft.Extensions.Logging;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores.Synchronization;
+using PiggsCare.Business.Services.Synchronization;
 using PiggsCare.Core.Control;
 using PiggsCare.Core.Factory;
-using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 using System.Collections.Specialized;
 
@@ -13,6 +15,15 @@ namespace PiggsCare.Core.ViewModels.Synchronization
     /// </summary>
     public class SynchronizationListingViewModel:MvxViewModel, ISynchronizationListingViewModel
     {
+        private readonly ILogger<SynchronizationListingViewModel> _logger;
+        private readonly IModalNavigationControl _modalNavigationControl;
+        private readonly ISynchronizationEventStore _synchronizationEventStore;
+        private readonly ISynchronizationService _synchronizationService;
+        private readonly IViewModelFactory _viewModelFactory;
+
+        private bool _isLoading;
+
+
         #region Constructor
 
         /// <summary>
@@ -21,16 +32,44 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         /// <param name="synchronizationEventStore" >The synchronization event store.</param>
         /// <param name="modalNavigationControl" >The modal navigation control.</param>
         /// <param name="viewModelFactory" >The view model factory.</param>
-        /// <param name="currentViewModelStore" >The current view model store.</param>
-        public SynchronizationListingViewModel( ISynchronizationEventStore synchronizationEventStore, IModalNavigationControl modalNavigationControl, IViewModelFactory viewModelFactory,
-            ICurrentViewModelStore currentViewModelStore )
+        public SynchronizationListingViewModel( ISynchronizationService synchronizationService, ISynchronizationEventStore synchronizationEventStore,
+            IModalNavigationControl modalNavigationControl, IViewModelFactory viewModelFactory, ILogger<SynchronizationListingViewModel> logger )
         {
+            _synchronizationService = synchronizationService;
             _synchronizationEventStore = synchronizationEventStore;
             _modalNavigationControl = modalNavigationControl;
             _viewModelFactory = viewModelFactory;
-            _currentViewModelStore = currentViewModelStore;
+            _logger = logger;
 
             _synchronizationEvents.CollectionChanged += SynchronizationEventsOnCollectionChanged;
+            _synchronizationEventStore.OnSynchronizationEventAdded += SynchronizationEventsOnSynchronizationEventAdded;
+            _synchronizationEventStore.OnSynchronizationEventUpdated += SynchronizationEventStoreOnOnSynchronizationEventUpdated;
+            _synchronizationEventStore.OnSynchronizationEventDeleted += SynchronizationEventStoreOnOnSynchronizationEventDeleted;
+        }
+
+        #endregion
+
+        private MvxObservableCollection<SynchronizationEvent> _synchronizationEvents => new(_synchronizationEventStore.SynchronizationEvents);
+
+        #region ViewModel Life-Cycle
+
+        /// <summary>
+        ///     Initializes the ViewModel asynchronously.
+        /// </summary>
+        public override async Task Initialize()
+        {
+            await LoadSynchronizationEventDetailsAsync();
+            await base.Initialize();
+        }
+
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            _synchronizationEvents.CollectionChanged -= SynchronizationEventsOnCollectionChanged;
+            _synchronizationEvents.CollectionChanged -= SynchronizationEventsOnCollectionChanged;
+            _synchronizationEventStore.OnSynchronizationEventAdded -= SynchronizationEventsOnSynchronizationEventAdded;
+            _synchronizationEventStore.OnSynchronizationEventUpdated -= SynchronizationEventStoreOnOnSynchronizationEventUpdated;
+            _synchronizationEventStore.OnSynchronizationEventDeleted -= SynchronizationEventStoreOnOnSynchronizationEventDeleted;
+            base.ViewDestroy(viewFinishing);
         }
 
         #endregion
@@ -47,36 +86,30 @@ namespace PiggsCare.Core.ViewModels.Synchronization
             RaisePropertyChanged(nameof(SynchronizationEvents));
         }
 
-        #endregion
-
-        #region ViewModel Life-Cycle
-
-        /// <summary>
-        ///     Initializes the ViewModel asynchronously.
-        /// </summary>
-        public override async Task Initialize()
+        private void SynchronizationEventStoreOnOnSynchronizationEventDeleted( SynchronizationEvent synchronization )
         {
-            await LoadSynchronizationEventDetailsAsync();
-            await base.Initialize();
+            _synchronizationEvents.Remove(synchronization);
         }
 
-        public override void ViewDestroy( bool viewFinishing = true )
+        private void SynchronizationEventStoreOnOnSynchronizationEventUpdated( SynchronizationEvent synchronization )
         {
-            base.ViewDestroy(viewFinishing);
-            _synchronizationEvents.CollectionChanged -= SynchronizationEventsOnCollectionChanged;
+            // Update the synchronization in the local collection if it exists
+            int index = _synchronizationEvents.IndexOf(synchronization);
+            if (index >= 0)
+            {
+                _synchronizationEvents.RemoveAt(index);
+                _synchronizationEvents.Insert(index, synchronization);
+            }
+            else
+            {
+                _logger.LogWarning("Animal with ID {Synchronization} not found in local collection for update.", synchronization.SynchronizationEventId);
+            }
         }
 
-        #endregion
-
-        #region Fields
-
-        private bool _isLoading;
-
-        private MvxObservableCollection<SynchronizationEvent> _synchronizationEvents => new(_synchronizationEventStore.SynchronizationEvents);
-        private readonly ISynchronizationEventStore _synchronizationEventStore;
-        private readonly IModalNavigationControl _modalNavigationControl;
-        private readonly IViewModelFactory _viewModelFactory;
-        private readonly ICurrentViewModelStore _currentViewModelStore;
+        private void SynchronizationEventsOnSynchronizationEventAdded( SynchronizationEvent synchronization )
+        {
+            _synchronizationEvents.Add(synchronization);
+        }
 
         #endregion
 
@@ -114,18 +147,21 @@ namespace PiggsCare.Core.ViewModels.Synchronization
             try
             {
                 _synchronizationEvents!.Clear();
-                await _synchronizationEventStore.LoadAsync();
+                await _synchronizationService.GetAllSynchronizationEventsAsync();
+                foreach (SynchronizationEvent synchronizationEvent in _synchronizationEventStore.SynchronizationEvents)
+                {
+                    _synchronizationEvents.Add(synchronizationEvent);
+                }
+                {
+
+                }
                 UpdateView();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
             finally
             {
                 IsLoading = false;
             }
+
         }
 
         /// <summary>
@@ -145,7 +181,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         private void ExecuteOpenModifyRecordDialog( int id ) // id is SynchronizationEventId now
         {
             // Open the SynchronizationEventModifyForm dialog
-            _modalNavigationControl.PopUp<SynchronizationEventModifyFormViewModel>(id); // Pass SynchronizationEventId to Modify form
+            _modalNavigationControl.PopUp<SynchronizationEventModifyFormViewModel>(id); // Pass SynchronizationEventId to UpdateAnimal form
         }
 
         private void ExecuteOpenRemoveRecordDialog( int id ) // id is SynchronizationEventId now

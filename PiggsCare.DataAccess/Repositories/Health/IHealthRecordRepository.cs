@@ -1,6 +1,6 @@
 using PiggsCare.Domain.Models;
 
-namespace PiggsCare.Domain.Repositories
+namespace PiggsCare.DataAccess.Repositories.Health
 {
     public interface IHealthRecordRepository
     {
@@ -23,7 +23,7 @@ namespace PiggsCare.Domain.Repositories
         /// </summary>
         /// <param name="health" > Details of the health record</param>
         /// <returns>the created health record</returns>
-        Task CreateHealthRecordAsync( HealthRecord health );
+        Task<int> CreateHealthRecordAsync( HealthRecord health );
 
         /// <summary>
         ///     Updates an existing record

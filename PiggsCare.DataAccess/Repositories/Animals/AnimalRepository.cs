@@ -1,16 +1,12 @@
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Repositories;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Animals
 {
     public class AnimalRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IAnimalRepository
     {
-        // private const string Connectionstring = @"Server=--THEBARON--\BOATT;Database=PiggsCare;User ID=PiggsCare_Admin;Password=1Passcode.;TrustServerCertificate=True;";
-        //private const string Connectionstring = @"Server=--THEBARON--\BOATT;Database=PiggsCare;User ID=PiggsCare_Admin;Password=Merlin;TrustServerCertificate=True;";
-
         public async Task<IEnumerable<Animal>> GetAllAnimalsAsync()
         {
             // Query the database for all animal record in the database

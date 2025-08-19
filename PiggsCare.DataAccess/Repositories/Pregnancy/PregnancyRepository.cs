@@ -1,10 +1,9 @@
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Repositories;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Pregnancy
 {
     public class PregnancyRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IPregnancyRepository
     {
@@ -27,7 +26,7 @@ namespace PiggsCare.DataAccess.Repositories
                 : null;
         }
 
-        public async Task CreatePregnancyScanAsync( PregnancyScan scan )
+        public async Task<int> CreatePregnancyScanAsync( PregnancyScan scan )
         {
             // Convert PregnancyScan to PregnancyScanDto
             PregnancyScanDto record = new()
@@ -39,7 +38,7 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync(
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
                 "sp.PregnancyScan_Insert",
                 new
                 {
@@ -48,6 +47,8 @@ namespace PiggsCare.DataAccess.Repositories
                     record.ScanResults
                 }
             );
+
+            return result.Single();
         }
 
         public async Task UpdatePregnancyScanAsync( PregnancyScan scan )

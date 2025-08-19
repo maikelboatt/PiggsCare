@@ -1,9 +1,9 @@
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Farrowing
 {
     public class FarrowRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IFarrowRepository
     {
@@ -39,33 +39,6 @@ namespace PiggsCare.DataAccess.Repositories
                 : null;
         }
 
-        public async Task CreateFarrowEventAsync( FarrowEvent farrow )
-        {
-            // Convert FarrowingEvent to FarrowingEventDto
-            FarrowingEventDto record = new()
-            {
-                BreedingEventId = farrow.BreedingEventId,
-                FarrowDate = dateConverterService.GetDateTime(farrow.FarrowDate),
-                LitterSize = farrow.LitterSize,
-                BornAlive = farrow.BornAlive,
-                BornDead = farrow.BordDead,
-                Mummified = farrow.Mummified
-            };
-
-            // Insert record into the database
-            await dataAccess.CommandAsync(
-                "sp.Farrowing_Insert",
-                new
-                {
-                    record.BreedingEventId,
-                    record.FarrowDate,
-                    record.LitterSize,
-                    record.BornAlive,
-                    record.BornDead,
-                    record.Mummified
-                });
-        }
-
         public async Task UpdateFarrowEventAsync( FarrowEvent farrow )
         {
             // Convert FarrowingEvent to FarrowingEventDto
@@ -87,6 +60,35 @@ namespace PiggsCare.DataAccess.Repositories
         public async Task DeleteFarrowEventAsync( int id )
         {
             await dataAccess.CommandAsync("sp.Farrowing_Delete", new { FarrowingEventId = id });
+        }
+
+        public async Task<int> CreateFarrowEventAsync( FarrowEvent farrow )
+        {
+            // Convert FarrowingEvent to FarrowingEventDto
+            FarrowingEventDto record = new()
+            {
+                BreedingEventId = farrow.BreedingEventId,
+                FarrowDate = dateConverterService.GetDateTime(farrow.FarrowDate),
+                LitterSize = farrow.LitterSize,
+                BornAlive = farrow.BornAlive,
+                BornDead = farrow.BordDead,
+                Mummified = farrow.Mummified
+            };
+
+            // Insert record into the database
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
+                "sp.Farrowing_Insert",
+                new
+                {
+                    record.BreedingEventId,
+                    record.FarrowDate,
+                    record.LitterSize,
+                    record.BornAlive,
+                    record.BornDead,
+                    record.Mummified
+                });
+
+            return result.Single();
         }
     }
 }

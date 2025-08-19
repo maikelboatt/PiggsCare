@@ -1,10 +1,9 @@
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Repositories;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Removal
 {
     public class RemovalEventRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IRemovalEventRepository
     {
@@ -38,7 +37,7 @@ namespace PiggsCare.DataAccess.Repositories
                 : null;
         }
 
-        public async Task CreateRemovalEventAsync( RemovalEvent removalEvent )
+        public async Task<int> CreateRemovalEventAsync( RemovalEvent removalEvent )
         {
             // Convert RemovalEvent to RemovalEventDto
             RemovalEventDto record = new()
@@ -49,7 +48,7 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync(
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
                 "sp.Removal_Insert", // Stored procedure name for Insert
                 new
                 {
@@ -57,6 +56,8 @@ namespace PiggsCare.DataAccess.Repositories
                     RemovalDate = dateConverterService.GetDateTime(removalEvent.RemovalDate), // Convert DateOnly to DateTime for DB
                     removalEvent.ReasonForRemoval
                 });
+
+            return result.Single();
         }
 
         public async Task UpdateRemovalEventAsync( RemovalEvent removalEvent )

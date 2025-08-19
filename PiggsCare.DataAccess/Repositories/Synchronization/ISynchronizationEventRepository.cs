@@ -1,6 +1,6 @@
 using PiggsCare.Domain.Models;
 
-namespace PiggsCare.Domain.Repositories
+namespace PiggsCare.DataAccess.Repositories.Synchronization
 {
     public interface ISynchronizationEventRepository
     {

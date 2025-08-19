@@ -1,6 +1,6 @@
 using PiggsCare.Domain.Models;
 
-namespace PiggsCare.Domain.Repositories
+namespace PiggsCare.DataAccess.Repositories.Removal
 {
     public interface IRemovalEventRepository
     {
@@ -30,7 +30,7 @@ namespace PiggsCare.Domain.Repositories
         /// </summary>
         /// <param name="removalEvent" >The RemovalEvent object containing the details of the new removal event.</param>
         /// <returns>A task that represents the asynchronous creation operation.</returns>
-        Task CreateRemovalEventAsync( RemovalEvent removalEvent );
+        Task<int> CreateRemovalEventAsync( RemovalEvent removalEvent );
 
         /// <summary>
         ///     Updates an existing removal event in the database.

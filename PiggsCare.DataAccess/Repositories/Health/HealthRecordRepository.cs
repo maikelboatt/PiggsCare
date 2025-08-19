@@ -1,10 +1,9 @@
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Repositories;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Health
 {
     public class HealthRecordRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IHealthRecordRepository
     {
@@ -32,7 +31,7 @@ namespace PiggsCare.DataAccess.Repositories
                 : null;
         }
 
-        public async Task CreateHealthRecordAsync( HealthRecord health )
+        public async Task<int> CreateHealthRecordAsync( HealthRecord health )
         {
             // Convert HealthRecord to HealthRecordDto
             HealthRecordDto record = new()
@@ -45,7 +44,7 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync(
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
                 "sp.HealthRecords_Insert",
                 new
                 {
@@ -56,6 +55,8 @@ namespace PiggsCare.DataAccess.Repositories
                     record.Outcome
                 }
             );
+
+            return result.Single();
         }
 
         public async Task UpdateHealthRecordAsync( HealthRecord health )

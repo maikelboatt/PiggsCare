@@ -1,6 +1,6 @@
 using PiggsCare.Domain.Models;
 
-namespace PiggsCare.Domain.Repositories
+namespace PiggsCare.DataAccess.Repositories.Pregnancy
 {
     public interface IPregnancyRepository
     {
@@ -23,7 +23,7 @@ namespace PiggsCare.Domain.Repositories
         /// </summary>
         /// <param name="scan" > Details of the pregnancy scan</param>
         /// <returns>the created pregnancy scan </returns>
-        Task CreatePregnancyScanAsync( PregnancyScan scan );
+        Task<int> CreatePregnancyScanAsync( PregnancyScan scan );
 
         /// <summary>
         ///     Updates an existing pregnancy scan

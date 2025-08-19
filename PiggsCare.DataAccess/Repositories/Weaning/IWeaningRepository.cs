@@ -1,6 +1,6 @@
 using PiggsCare.Domain.Models;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Weaning
 {
     public interface IWeaningRepository
     {
@@ -23,7 +23,7 @@ namespace PiggsCare.DataAccess.Repositories
         /// </summary>
         /// <param name="weaning" > Details of the weaning event</param>
         /// <returns>the created weaning event</returns>
-        Task CreateWeaningEventAsync( WeaningEvent weaning );
+        Task<int> CreateWeaningEventAsync( WeaningEvent weaning );
 
         /// <summary>
         ///     Updates an existing weaning event

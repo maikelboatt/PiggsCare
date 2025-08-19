@@ -1,6 +1,6 @@
 using PiggsCare.Domain.Models;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Farrowing
 {
     public interface IFarrowRepository
     {
@@ -23,7 +23,7 @@ namespace PiggsCare.DataAccess.Repositories
         /// </summary>
         /// <param name="farrow" > Details of the farrow event</param>
         /// <returns>the created farrow event</returns>
-        Task CreateFarrowEventAsync( FarrowEvent farrow );
+        Task<int> CreateFarrowEventAsync( FarrowEvent farrow );
 
         /// <summary>
         ///     Updates an existing farrow event

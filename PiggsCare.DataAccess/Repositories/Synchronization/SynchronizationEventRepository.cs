@@ -1,10 +1,9 @@
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Repositories;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Synchronization
 {
     public class SynchronizationEventRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):ISynchronizationEventRepository
     {
@@ -42,6 +41,34 @@ namespace PiggsCare.DataAccess.Repositories
                 : null;
         }
 
+        public async Task<int> CreateSynchronizationEventAsync( SynchronizationEvent synchronizationEvent )
+        {
+            // Convert SynchronizationEvent to SynchronizationEventDto
+            EstrusSynchronizationEventDto record = new()
+            {
+                SynchronizationEventId = synchronizationEvent.SynchronizationEventId,
+                StartDate = dateConverterService.GetDateTime(synchronizationEvent.StartDate),
+                EndDate = dateConverterService.GetDateTime(synchronizationEvent.EndDate),
+                BatchNumber = synchronizationEvent.BatchNumber,
+                SynchronizationProtocol = synchronizationEvent.SynchronizationProtocol,
+                Comments = synchronizationEvent.Comments
+            };
+
+            // Insert record into the database
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
+                "sp.Synchronization_Insert",
+                new
+                {
+                    StartDate = dateConverterService.GetDateTime(synchronizationEvent.StartDate), // Convert DateOnly to DateTime
+                    EndDate = dateConverterService.GetDateTime(synchronizationEvent.EndDate),     // Convert DateOnly to DateTime
+                    synchronizationEvent.BatchNumber,
+                    synchronizationEvent.SynchronizationProtocol,
+                    synchronizationEvent.Comments
+                });
+
+            return result.Single();
+        }
+
         public async Task UpdateSynchronizationEventAsync( SynchronizationEvent synchronizationEvent )
         {
             // Convert SynchronizationEvent to SynchronizationEventDto
@@ -74,34 +101,6 @@ namespace PiggsCare.DataAccess.Repositories
             await dataAccess.CommandAsync(
                 "sp.Synchronization_Delete",
                 new { SynchronizationEventId = synchronizationEventId });
-        }
-
-        public async Task<int> CreateSynchronizationEventAsync( SynchronizationEvent synchronizationEvent )
-        {
-            // Convert SynchronizationEvent to SynchronizationEventDto
-            EstrusSynchronizationEventDto record = new()
-            {
-                SynchronizationEventId = synchronizationEvent.SynchronizationEventId,
-                StartDate = dateConverterService.GetDateTime(synchronizationEvent.StartDate),
-                EndDate = dateConverterService.GetDateTime(synchronizationEvent.EndDate),
-                BatchNumber = synchronizationEvent.BatchNumber,
-                SynchronizationProtocol = synchronizationEvent.SynchronizationProtocol,
-                Comments = synchronizationEvent.Comments
-            };
-
-            // Insert record into the database
-            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
-                "sp.Synchronization_Insert",
-                new
-                {
-                    StartDate = dateConverterService.GetDateTime(synchronizationEvent.StartDate), // Convert DateOnly to DateTime
-                    EndDate = dateConverterService.GetDateTime(synchronizationEvent.EndDate),     // Convert DateOnly to DateTime
-                    synchronizationEvent.BatchNumber,
-                    synchronizationEvent.SynchronizationProtocol,
-                    synchronizationEvent.Comments
-                });
-
-            return result.Single();
         }
     }
 }

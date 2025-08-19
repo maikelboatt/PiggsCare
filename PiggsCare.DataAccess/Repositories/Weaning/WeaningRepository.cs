@@ -1,9 +1,9 @@
 using PiggsCare.DataAccess.DatabaseAccess;
 using PiggsCare.DataAccess.DTO;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 
-namespace PiggsCare.DataAccess.Repositories
+namespace PiggsCare.DataAccess.Repositories.Weaning
 {
     public class WeaningRepository( ISqlDataAccess dataAccess, IDateConverterService dateConverterService ):IWeaningRepository
     {
@@ -39,7 +39,7 @@ namespace PiggsCare.DataAccess.Repositories
                 : null;
         }
 
-        public async Task CreateWeaningEventAsync( WeaningEvent weaning )
+        public async Task<int> CreateWeaningEventAsync( WeaningEvent weaning )
         {
             // Convert WeaningEvent to WeaningEventDto
             WeaningEventDto record = new()
@@ -53,7 +53,7 @@ namespace PiggsCare.DataAccess.Repositories
             };
 
             // Insert record into the database
-            await dataAccess.CommandAsync(
+            IEnumerable<int> result = await dataAccess.QueryAsync<int, dynamic>(
                 "sp.Weaning_Insert",
                 new
                 {
@@ -65,6 +65,8 @@ namespace PiggsCare.DataAccess.Repositories
                     record.AverageWeaningWeight
                 }
             );
+
+            return result.Single();
         }
 
         public async Task UpdateWeaningEventAsync( WeaningEvent weaning )

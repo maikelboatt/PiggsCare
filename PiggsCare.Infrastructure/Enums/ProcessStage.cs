@@ -1,4 +1,4 @@
-namespace PiggsCare.Core.ViewModels
+namespace PiggsCare.Infrastructure.Enums
 {
     public enum ProcessStage
     {

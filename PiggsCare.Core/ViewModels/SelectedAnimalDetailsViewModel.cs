@@ -1,11 +1,12 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Message;
 using PiggsCare.Core.Factory;
-using PiggsCare.Core.Stores;
 using PiggsCare.Core.ViewModels.Breeding;
 using PiggsCare.Core.ViewModels.HealthRecords;
 using PiggsCare.Core.ViewModels.Removal;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Enums;
 using System.Windows;
 
 namespace PiggsCare.Core.ViewModels

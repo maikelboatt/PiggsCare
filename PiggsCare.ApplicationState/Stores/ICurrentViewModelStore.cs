@@ -1,7 +1,7 @@
 using MvvmCross.ViewModels;
-using PiggsCare.Core.ViewModels;
+using PiggsCare.Infrastructure.Enums;
 
-namespace PiggsCare.Core.Stores
+namespace PiggsCare.ApplicationState.Stores
 {
     public interface ICurrentViewModelStore
     {

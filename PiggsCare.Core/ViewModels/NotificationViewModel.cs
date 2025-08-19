@@ -1,6 +1,6 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 

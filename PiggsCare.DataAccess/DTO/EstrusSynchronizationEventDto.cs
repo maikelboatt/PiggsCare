@@ -10,8 +10,8 @@ namespace PiggsCare.DataAccess.DTO
         public required string Comments { get; set; }
 
 
-        // Hybrid approach: link to associated breeding events
-        // public List<BreedingEventDto>? BreedingEvents { get; init; }
+        // Hybrid approach: link to associated insemination events
+        // public List<InseminationEventDto>? BreedingEvents { get; init; }
     }
     // public List<int> AnimalIds { get; init; } = [];
 }

@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores.Removal;
+using PiggsCare.Business.Services.Removal;
 using PiggsCare.Core.Control;
-using PiggsCare.Core.Stores;
 using PiggsCare.Domain.Models;
 using System.Collections.Specialized;
 
@@ -9,26 +11,33 @@ namespace PiggsCare.Core.ViewModels.Removal
 {
     public class RemovalListingViewModel:MvxViewModel<int>, IRemovalListingViewModel
     {
+        private readonly ILogger<RemovalListingViewModel> _logger;
+        private readonly IModalNavigationControl _modalNavigationControl;
+        private readonly IRemovalEventStore _removalEventStore;
+        private readonly IRemovalService _removalService;
+
+        private bool _isLoading;
+
         #region Constructor
 
-        public RemovalListingViewModel( IRemovalEventStore removalEventStore, IModalNavigationControl modalNavigationControl )
+        public RemovalListingViewModel( IRemovalService removalService, IRemovalEventStore removalEventStore, IModalNavigationControl modalNavigationControl,
+            ILogger<RemovalListingViewModel> logger )
         {
+            _removalService = removalService;
             _removalEventStore = removalEventStore;
             _modalNavigationControl = modalNavigationControl;
+            _logger = logger;
 
             _removalEvents.CollectionChanged += RemovalEventsOnCollectionChanged;
+
+            _removalEventStore.OnRemovalEventAdded += RemovalEventStoreOnOnRemovalEventAdded;
+            _removalEventStore.OnRemovalEventUpdated += RemovalEventStoreOnOnRemovalEventUpdated;
+            _removalEventStore.OnRemovalEventDeleted += RemovalEventStoreOnOnRemovalEventDeleted;
         }
 
         #endregion
 
-        #region Event Handlers
-
-        private void RemovalEventsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
-        {
-            RaisePropertyChanged(nameof(RemovalEvents));
-        }
-
-        #endregion
+        private MvxObservableCollection<RemovalEvent> _removalEvents => new(_removalEventStore.RemovalEvents);
 
         #region ViewModel Life-Cycle
 
@@ -43,17 +52,51 @@ namespace PiggsCare.Core.ViewModels.Removal
             await base.Initialize();
         }
 
-        #endregion
-
-        #region Fields
-
-        private bool _isLoading;
-
-        private MvxObservableCollection<RemovalEvent> _removalEvents => new(_removalEventStore.RemovalEvents);
-        private readonly IRemovalEventStore _removalEventStore;
-        private readonly IModalNavigationControl _modalNavigationControl;
+        public override void ViewDestroy( bool viewFinishing = true )
+        {
+            _removalEventStore.OnRemovalEventAdded -= RemovalEventStoreOnOnRemovalEventAdded;
+            _removalEventStore.OnRemovalEventUpdated -= RemovalEventStoreOnOnRemovalEventUpdated;
+            _removalEventStore.OnRemovalEventDeleted -= RemovalEventStoreOnOnRemovalEventDeleted;
+            base.ViewDestroy(viewFinishing);
+        }
 
         #endregion
+
+        #region Event Handlers
+
+        private void RemovalEventsOnCollectionChanged( object? sender, NotifyCollectionChangedEventArgs e )
+        {
+            RaisePropertyChanged(nameof(RemovalEvents));
+        }
+
+        private void RemovalEventStoreOnOnRemovalEventDeleted( RemovalEvent removal )
+        {
+            _removalEvents.Remove(removal);
+        }
+
+        private void RemovalEventStoreOnOnRemovalEventUpdated( RemovalEvent removal )
+        {
+            // Update the animal in the local collection if it exists
+            int index = _removalEvents.IndexOf(removal);
+            if (index >= 0)
+            {
+                _removalEvents.RemoveAt(index);
+                _removalEvents.Insert(index, removal);
+            }
+            else
+            {
+                _logger.LogWarning("Animal with ID {RemovalEventId} not found in local collection for update.", removal.RemovalEventId);
+            }
+        }
+
+
+        private void RemovalEventStoreOnOnRemovalEventAdded( RemovalEvent removal )
+        {
+            _removalEvents.Add(removal);
+        }
+
+        #endregion
+
 
         #region Properties
 
@@ -85,13 +128,13 @@ namespace PiggsCare.Core.ViewModels.Removal
             try
             {
                 _removalEvents!.Clear();
-                await _removalEventStore.LoadAsync(AnimalId); // Load with AnimalId now
+                await _removalService.GetAllRemovalEventsAsync(AnimalId);
+
+                foreach (RemovalEvent removalEvent in _removalEventStore.RemovalEvents)
+                {
+                    _removalEvents.Add(removalEvent);
+                }
                 UpdateView();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
             finally
             {
@@ -107,13 +150,13 @@ namespace PiggsCare.Core.ViewModels.Removal
         private void ExecuteOpenInsertRecordDialog()
         {
             // Open the RemovalEventCreateForm dialog
-            _modalNavigationControl.PopUp<RemovalEventCreateFormViewModel>(AnimalId); // Pass AnimalId to Create form
+            _modalNavigationControl.PopUp<RemovalEventCreateFormViewModel>(AnimalId); // Pass AnimalId to AddAnimal form
         }
 
         private void ExecuteOpenModifyRecordDialog( int id ) // id is RemovalEventId now
         {
             // Open the RemovalEventModifyForm dialog
-            _modalNavigationControl.PopUp<RemovalEventModifyFormViewModel>(id); // Pass RemovalEventId to Modify form
+            _modalNavigationControl.PopUp<RemovalEventModifyFormViewModel>(id); // Pass RemovalEventId to UpdateAnimal form
         }
 
         private void ExecuteOpenRemoveRecordDialog( int id ) // id is RemovalEventId now

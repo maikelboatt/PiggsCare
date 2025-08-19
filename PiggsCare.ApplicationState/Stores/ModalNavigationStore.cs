@@ -1,6 +1,6 @@
 using MvvmCross.ViewModels;
 
-namespace PiggsCare.Core.Stores
+namespace PiggsCare.ApplicationState.Stores
 {
     public class ModalNavigationStore
     {

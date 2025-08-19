@@ -1,28 +1,40 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.ApplicationState.Stores.Insemination;
 using PiggsCare.Core.Control;
 using PiggsCare.Core.Factory;
-using PiggsCare.Core.Stores;
 using PiggsCare.Core.ViewModels.Farrowing;
 using PiggsCare.Core.ViewModels.Pregnancy;
 using PiggsCare.Domain.Models;
+using PiggsCare.Infrastructure.Enums;
 using System.Collections.Specialized;
 
 namespace PiggsCare.Core.ViewModels.Breeding
 {
     public class BreedingBatchListingViewModel:MvxViewModel<int>, IBreedingBatchListingViewModel
     {
+        private readonly MvxObservableCollection<InseminationEventWithAnimal> _breedingEvents;
+        private readonly ICurrentViewModelStore _currentViewModelStore;
+        private readonly IInseminationEventStore _inseminationEventStore;
+        private readonly IModalNavigationControl _modalNavigationControl;
+        private readonly IViewModelFactory _viewModelFactory;
+        private bool _isLoading;
+
+        private int _synchronizationId;
+
+
         #region Constructor
 
-        public BreedingBatchListingViewModel( IBreedingEventStore breedingEventStore, IModalNavigationControl modalNavigationControl, IViewModelFactory viewModelFactory,
+        public BreedingBatchListingViewModel( IInseminationEventStore inseminationEventStore, IModalNavigationControl modalNavigationControl, IViewModelFactory viewModelFactory,
             ICurrentViewModelStore currentViewModelStore )
         {
-            _breedingEventStore = breedingEventStore;
+            _inseminationEventStore = inseminationEventStore;
             _modalNavigationControl = modalNavigationControl;
             _viewModelFactory = viewModelFactory;
             _currentViewModelStore = currentViewModelStore;
 
-            _breedingEvents = new MvxObservableCollection<BreedingEventWithAnimal>(_breedingEventStore.BreedingEventsBatch);
+            _breedingEvents = new MvxObservableCollection<InseminationEventWithAnimal>(_inseminationEventStore.InseminationEventsWithAnimals);
 
             _breedingEvents.CollectionChanged += BreedingEventsOnCollectionChanged;
         }
@@ -47,28 +59,15 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         public override async Task Initialize()
         {
-            await LoadBreedingEventsDetailsAsync();
+            LoadBreedingEventsDetailsAsync();
             await base.Initialize();
         }
 
         #endregion
 
-        #region Fields
-
-        private int _synchronizationId;
-        private bool _isLoading;
-
-        private readonly MvxObservableCollection<BreedingEventWithAnimal> _breedingEvents;
-        private readonly IBreedingEventStore _breedingEventStore;
-        private readonly IModalNavigationControl _modalNavigationControl;
-        private readonly IViewModelFactory _viewModelFactory;
-        private readonly ICurrentViewModelStore _currentViewModelStore;
-
-        #endregion
-
         #region Properties
 
-        public IEnumerable<BreedingEventWithAnimal> BreedingEvents => _breedingEvents;
+        public IEnumerable<InseminationEventWithAnimal> BreedingEvents => _breedingEvents;
 
         public bool IsLoading
         {
@@ -89,25 +88,20 @@ namespace PiggsCare.Core.ViewModels.Breeding
 
         #region Methods
 
-        private async Task LoadBreedingEventsDetailsAsync()
+        private void LoadBreedingEventsDetailsAsync()
         {
             IsLoading = true;
             try
             {
                 _breedingEvents!.Clear();
-                await _breedingEventStore.LoadForBatch(_synchronizationId);
+                _inseminationEventStore.GetAllInseminationEventsBySynchronizationBatch(_synchronizationId);
 
-                foreach (BreedingEventWithAnimal breedingEvent in _breedingEventStore.BreedingEventsBatch)
+                foreach (InseminationEventWithAnimal breedingEvent in _inseminationEventStore.InseminationEventsWithAnimals)
                 {
                     _breedingEvents.Add(breedingEvent);
                 }
 
                 UpdateView();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
             }
             finally
             {
@@ -133,12 +127,12 @@ namespace PiggsCare.Core.ViewModels.Breeding
             _modalNavigationControl.PopUp<BreedingEventDeleteFormViewModel>(id);
         }
 
-        // Opens the PregnancyListingViewModel and passes in the breeding event id
+        // Opens the PregnancyListingViewModel and passes in the insemination event id
         private void ExecuteOpenPregnancyEventDialog( int id )
         {
             // if (id <= 0)
             // {
-            //     Console.WriteLine("Attempted to navigate with an invalid breeding event id: " + id);
+            //     Console.WriteLine("Attempted to navigate with an invalid insemination event id: " + id);
             //     return; // or handle the error appropriately
             // }
             PregnancyListingViewModel? viewmodel = _viewModelFactory.CreateViewModel<PregnancyListingViewModel, int>(id);
@@ -147,7 +141,7 @@ namespace PiggsCare.Core.ViewModels.Breeding
             viewmodel?.Initialize();
         }
 
-        // Opens the FarrowingListingViewModel and passes in the breeding event id
+        // Opens the FarrowingListingViewModel and passes in the insemination event id
         private void ExecuteOpenFarrowingEventDialog( int id )
         {
             FarrowListingViewModel? viewmodel = _viewModelFactory.CreateViewModel<FarrowListingViewModel, int>(id);

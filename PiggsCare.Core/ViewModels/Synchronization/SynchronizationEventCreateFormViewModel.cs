@@ -1,9 +1,13 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Insemination;
+using PiggsCare.Business.Services.Message;
+using PiggsCare.Business.Services.ScheduledNotifications;
+using PiggsCare.Business.Services.Synchronization;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows;
@@ -11,36 +15,108 @@ using System.Windows;
 namespace PiggsCare.Core.ViewModels.Synchronization
 {
     /// <summary>
-    ///     ViewModel for creating synchronization events for a list of animals.
+    ///     ViewModel for creating a synchronization event, handling form state, validation, and commands.
     /// </summary>
     public class SynchronizationEventCreateFormViewModel:MvxViewModel<List<Animal>>, ISynchronizationEventCreateFormViewModel
     {
+        /// <summary>
+        ///     The number of days in the synchronization period.
+        /// </summary>
+        private const int SynchronizationPeriodInDays = 18;
+
+        /// <summary>
+        ///     The number of days to add to the end date to calculate the AI (Artificial Insemination) date.
+        /// </summary>
+        private const int DaysToAddForAi = 4;
+
+        /// <summary>
+        ///     The number of days to add for the gestation period (typically 114 days for pigs).
+        /// </summary>
+        private const int DaysToAddForGestation = 114;
+
+        /// <summary>
+        ///     Service for converting dates.
+        /// </summary>
+        private readonly IDateConverterService _dateConverterService;
+
+        /// <summary>
+        ///     Service for handling insemination events.
+        /// </summary>
+        private readonly IInseminationService _inseminationService;
+
+        /// <summary>
+        ///     Service for displaying messages to the user.
+        /// </summary>
+        private readonly IMessageService _messageService;
+
+        /// <summary>
+        ///     Store for modal navigation.
+        /// </summary>
+        private readonly ModalNavigationStore _modalNavigationStore;
+
+        /// <summary>
+        ///     Store for notifications.
+        /// </summary>
+        private readonly INotificationStore _notificationStore;
+
+        /// <summary>
+        ///     Validation logic for synchronization records.
+        /// </summary>
+        private readonly ISynchronizationRecordValidation _recordValidation = new SynchronizationRecordValidation();
+
+        private readonly IScheduledNotificationService _scheduledNotificationService;
+
+        /// <summary>
+        ///     Service for handling synchronization events.
+        /// </summary>
+        private readonly ISynchronizationService _synchronizationService;
+
+        // The batch number for the synchronization event.
+        private string _batchNumber = string.Empty;
+
+        // Comments for the synchronization event.
+        private string _comments = string.Empty;
+
+        // The end date of the synchronization event.
+        private DateOnly _endDate;
+
+        /// The list of selected animals for the event.
+        private List<Animal> _selectedAnimals = [];
+
+        /// The start date of the synchronization event.
+        private DateTime _startDate = DateTime.Now;
+
+        /// The ID of the created synchronization event.
+        private int _synchronizationId;
+
+        /// The synchronization protocol.
+        private string _synchronizationProtocol = string.Empty;
+
         #region Constructor
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="SynchronizationEventCreateFormViewModel" /> class.
         /// </summary>
-        /// <param name="synchronizationEventStore" >The store for synchronization events.</param>
-        /// <param name="modalNavigationStore" >The store for modal navigation.</param>
-        /// <param name="recordValidation" >The validation service for synchronization records.</param>
-        /// <param name="dateConverterService" >The service for date conversion.</param>
-        /// <param name="breedingEventStore" >The store for breeding events.</param>
-        /// <param name="messageService" >The service for displaying messages.</param>
-        /// <param name="notificationStore" >The store for notifications.</param>
-        public SynchronizationEventCreateFormViewModel( ISynchronizationEventStore synchronizationEventStore, ModalNavigationStore modalNavigationStore,
-            ISynchronizationRecordValidation recordValidation, IDateConverterService dateConverterService, IBreedingEventStore breedingEventStore, IMessageService messageService,
+        /// <param name="synchronizationService" >Service for synchronization events.</param>
+        /// <param name="scheduledNotificationService" >Service for scheduled notifications</param>
+        /// <param name="dateConverterService" >Service for date conversion.</param>
+        /// <param name="inseminationService" >Service for insemination events.</param>
+        /// <param name="messageService" >Service for user messages.</param>
+        /// <param name="modalNavigationStore" >Store for modal navigation.</param>
+        /// <param name="notificationStore" >Store for notifications.</param>
+        public SynchronizationEventCreateFormViewModel( ISynchronizationService synchronizationService, IScheduledNotificationService scheduledNotificationService,
+            IDateConverterService dateConverterService, IInseminationService inseminationService, IMessageService messageService, ModalNavigationStore modalNavigationStore,
             INotificationStore notificationStore )
         {
-            _synchronizationEventStore = synchronizationEventStore;
+            _synchronizationService = synchronizationService;
+            _scheduledNotificationService = scheduledNotificationService;
             _modalNavigationStore = modalNavigationStore;
-            _recordValidation = recordValidation;
             _dateConverterService = dateConverterService;
-            _breedingEventStore = breedingEventStore;
+            _inseminationService = inseminationService;
             _messageService = messageService;
             _notificationStore = notificationStore;
-            _recordValidation.Errors.Clear();
 
-            recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
 
             // Initialize commands once so that RaiseCanExecuteChanged works as expected
             SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
@@ -79,10 +155,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         /// </summary>
         /// <param name="propertyName" >The name of the property.</param>
         /// <returns>An enumerable of validation errors.</returns>
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         /// <summary>
         ///     Gets a value indicating whether there are validation errors.
@@ -108,29 +181,12 @@ namespace PiggsCare.Core.ViewModels.Synchronization
 
         #endregion
 
-        #region Fields
-
-        private DateTime _startDate;
-        private DateOnly _endDate;
-        private string _batchNumber = string.Empty;
-        private string _synchronizationProtocol = string.Empty;
-        private string _comments = string.Empty;
-        private List<Animal> _selectedAnimals = [];
-        private DateOnly AiDate => EndDate.AddDays(4);
-        private int _synchronizationId;
-        private readonly ISynchronizationEventStore _synchronizationEventStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly ISynchronizationRecordValidation _recordValidation;
-        private readonly IDateConverterService _dateConverterService;
-        private readonly IBreedingEventStore _breedingEventStore;
-        private readonly IMessageService _messageService;
-        private readonly INotificationStore _notificationStore;
-
-        private const int SynchronizationPeriodInDays = 18;
-
-        #endregion
-
         #region Properties
+
+        /// <summary>
+        ///     Gets the AI date, calculated as EndDate plus 4 days.
+        /// </summary>
+        private DateOnly AiDate => EndDate.AddDays(DaysToAddForAi);
 
         /// <summary>
         ///     Gets or sets the start date of the synchronization event.
@@ -207,6 +263,7 @@ namespace PiggsCare.Core.ViewModels.Synchronization
             {
                 if (value.Equals(_comments)) return;
                 _comments = value;
+                RaisePropertyChanged();
                 _recordValidation.ValidateProp(_comments);
                 SubmitRecordCommand.RaiseCanExecuteChanged();
             }
@@ -247,38 +304,43 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         private async Task ExecuteSubmitRecord()
         {
             SynchronizationEvent record = GetSynchronizationEventFromFields();
-            _synchronizationId = await _synchronizationEventStore.CreateAsync(record);
-            ConfirmInsemination();
+            _synchronizationId = await _synchronizationService.CreateSynchronizationEventAsync(record);
+            await ConfirmInseminationReminder();
             _modalNavigationStore.Close();
         }
 
         /// <summary>
-        ///     Confirms if the user wants to create insemination events for the synchronized animals.
+        ///     Confirms if the user wants to create reminders for this synchronization event.
         /// </summary>
-        private void ConfirmInsemination()
+        private async Task ConfirmInseminationReminder()
         {
-            MessageBoxResult result = _messageService.Show("Do you want to create an Insemination Event for these records?",
-                                                           "Confirmation",
-                                                           MessageBoxButton.YesNo,
-                                                           MessageBoxImage.Question);
+            MessageBoxResult result = _messageService.Show(
+                "Do you want to create a reminder for these Insemination records?",
+                "Confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
-                CreateInseminationRecordForSynchronizedAnimals();
+                await CreateReminderForInsemination();
         }
 
-        /// <summary>
-        ///     Creates insemination records for all selected animals.
-        /// </summary>
-        private void CreateInseminationRecordForSynchronizedAnimals()
-        {
-            // Create insemination events for all selected animals
-            foreach (BreedingEvent record in _selectedAnimals.Select(animal => GetBreedingEventFromFields(animal.AnimalId)))
-            {
-                _breedingEventStore.Create(record);
-            }
 
-            int length = _selectedAnimals.Count;
-            _notificationStore.AddNotification($"{length} breeding events were successfully created for the synchronized animals.");
+        private async Task CreateReminderForInsemination()
+        {
+            List<int> ids = GetIdsOfSelectedAnimals();
+
+            const string message = "Reminder: Artificial Insemination for animal(s) has to be done.";
+
+            ScheduledNotification notification = new(1, message, AiDate, ids, _synchronizationId);
+
+            await _scheduledNotificationService.CreateScheduledNotificationAsync(notification);
+        }
+
+        private List<int> GetIdsOfSelectedAnimals()
+        {
+            List<int> ids = [];
+            ids.AddRange(_selectedAnimals.Select(animal => animal.AnimalId));
+            return ids;
         }
 
         /// <summary>
@@ -293,25 +355,20 @@ namespace PiggsCare.Core.ViewModels.Synchronization
         ///     Gets a synchronization event from the form fields.
         /// </summary>
         /// <returns>A new synchronization event.</returns>
-        private SynchronizationEvent GetSynchronizationEventFromFields()
-        {
-            return new SynchronizationEvent(1,
-                                            _dateConverterService.GetDateOnly(_startDate),
-                                            _endDate,
-                                            _batchNumber,
-                                            _synchronizationProtocol,
-                                            _comments);
-        }
+        private SynchronizationEvent GetSynchronizationEventFromFields() => new(
+            1,
+            _dateConverterService.GetDateOnly(_startDate),
+            _endDate,
+            _batchNumber,
+            _synchronizationProtocol,
+            _comments);
 
         /// <summary>
-        ///     Gets a breeding event from the form fields for a specific animal.
+        ///     Gets an insemination event from the form fields for a specific animal.
         /// </summary>
         /// <param name="animalId" >The ID of the animal.</param>
-        /// <returns>A new breeding event.</returns>
-        private BreedingEvent GetBreedingEventFromFields( int animalId )
-        {
-            return new BreedingEvent(1, animalId, AiDate, AiDate.AddDays(114), _synchronizationId);
-        }
+        /// <returns>A new insemination event.</returns>
+        private InseminationEvent GetBreedingEventFromFields( int animalId ) => new(1, animalId, AiDate, AiDate.AddDays(DaysToAddForGestation), _synchronizationId);
 
         /// <summary>
         ///     Calculates the end date of the synchronization period based on the start date.

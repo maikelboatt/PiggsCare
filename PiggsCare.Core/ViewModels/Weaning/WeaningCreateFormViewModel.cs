@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Weaning;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -11,12 +12,22 @@ namespace PiggsCare.Core.ViewModels.Weaning
 {
     public class WeaningCreateFormViewModel:MvxViewModel<int>, IWeaningCreateFormViewModel, INotifyDataErrorInfo
     {
+        private readonly IDateConverterService _dateConverterService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IWeaningRecordValidation _recordValidation = new WeaningRecordValidation();
+        private readonly IWeaningService _weaningService;
+        private float _averageWeaningWeight;
+
+
+        private int _farrowingEventId;
+        private int _femalesWeaned;
+        private int _malesWeaned;
+        private int _numberWeaned;
+        private DateTime _weaningDate = DateTime.Now;
+
         #region INotifyDataErrorInfo Implementation
 
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
@@ -25,16 +36,13 @@ namespace PiggsCare.Core.ViewModels.Weaning
 
         #region Constructor
 
-        public WeaningCreateFormViewModel( IWeaningStore weaningStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
-            IWeaningRecordValidation recordValidation )
+        public WeaningCreateFormViewModel( IWeaningService weaningService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
         {
-            _weaningStore = weaningStore;
+            _weaningService = weaningService;
             _modalNavigationStore = modalNavigationStore;
             _dateConverterService = dateConverterService;
-            _recordValidation = recordValidation;
-            _recordValidation.Errors.Clear();
 
-            recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
 
             // Initialize commands once so that RaiseCanExecuteChanged works as expected
             SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
@@ -131,22 +139,6 @@ namespace PiggsCare.Core.ViewModels.Weaning
 
         #endregion
 
-        #region Fields
-
-        private int _farrowingEventId;
-        private DateTime _weaningDate;
-        private int _numberWeaned;
-        private int _malesWeaned;
-        private int _femalesWeaned;
-        private float _averageWeaningWeight;
-
-        private readonly IDateConverterService _dateConverterService;
-        private readonly IWeaningRecordValidation _recordValidation;
-        private readonly IWeaningStore _weaningStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-
-        #endregion
-
         #region Commands
 
         public IMvxAsyncCommand SubmitRecordCommand { get; }
@@ -166,7 +158,7 @@ namespace PiggsCare.Core.ViewModels.Weaning
         private async Task ExecuteSubmitRecord()
         {
             WeaningEvent record = GetWeaningEventsFromFields();
-            await _weaningStore.Create(record);
+            await _weaningService.CreateWeaningEventAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -175,10 +167,14 @@ namespace PiggsCare.Core.ViewModels.Weaning
             _modalNavigationStore.Close();
         }
 
-        private WeaningEvent GetWeaningEventsFromFields()
-        {
-            return new WeaningEvent(1, _farrowingEventId, _dateConverterService.GetDateOnly(WeaningDate), NumberWeaned, MalesWeaned, FemalesWeaned, AverageWeaningWeight);
-        }
+        private WeaningEvent GetWeaningEventsFromFields() => new(
+            1,
+            _farrowingEventId,
+            _dateConverterService.GetDateOnly(WeaningDate),
+            NumberWeaned,
+            MalesWeaned,
+            FemalesWeaned,
+            AverageWeaningWeight);
 
         #endregion
     }

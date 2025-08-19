@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Removal;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -11,18 +12,23 @@ namespace PiggsCare.Core.ViewModels.Removal
 {
     public class RemovalEventCreateFormViewModel:MvxViewModel<int>, IRemovalEventCreateFormViewModel, INotifyDataErrorInfo
     {
+        private readonly IDateConverterService _dateConverterService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IRemovalEventValidation _recordValidation = new RemovalEventValidation();
+        private readonly IRemovalService _removalService;
+        private int _animalId;
+        private string _reasonForRemoval = string.Empty;
+        private DateTime _removalDate = DateTime.Now;
+
         #region Constructor
 
-        public RemovalEventCreateFormViewModel( IRemovalEventStore eventStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
-            IRemovalEventValidation recordValidation )
+        public RemovalEventCreateFormViewModel( IRemovalService removalService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
         {
-            _eventStore = eventStore;
+            _removalService = removalService;
             _modalNavigationStore = modalNavigationStore;
             _dateConverterService = dateConverterService;
-            _recordValidation = recordValidation;
-            _recordValidation.Errors.Clear();
 
-            recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
 
             // Initialize commands once so that RaiseCanExecuteChanged works as expected
             SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
@@ -77,10 +83,7 @@ namespace PiggsCare.Core.ViewModels.Removal
 
         #region INotifyDataErrorInfo Implementation
 
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
         public bool HasErrors => _recordValidation.HasErrors;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
@@ -91,18 +94,6 @@ namespace PiggsCare.Core.ViewModels.Removal
             RaisePropertyChanged(nameof(HasErrors));
             SubmitRecordCommand.RaiseCanExecuteChanged();
         }
-
-        #endregion
-
-        #region Fields
-
-        private readonly IDateConverterService _dateConverterService;
-        private readonly IRemovalEventValidation _recordValidation;
-        private readonly IRemovalEventStore _eventStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private int _animalId;
-        private DateTime _removalDate;
-        private string _reasonForRemoval = string.Empty;
 
         #endregion
 
@@ -125,7 +116,7 @@ namespace PiggsCare.Core.ViewModels.Removal
         private async Task ExecuteSubmitRecord()
         {
             RemovalEvent record = GetRemovalEventFromFields();
-            await _eventStore.CreateAsync(record);
+            await _removalService.CreateRemovalEventAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -134,10 +125,7 @@ namespace PiggsCare.Core.ViewModels.Removal
             _modalNavigationStore.Close();
         }
 
-        private RemovalEvent GetRemovalEventFromFields()
-        {
-            return new RemovalEvent(1, _animalId, _dateConverterService.GetDateOnly(_removalDate), _reasonForRemoval);
-        }
+        private RemovalEvent GetRemovalEventFromFields() => new(1, _animalId, _dateConverterService.GetDateOnly(_removalDate), _reasonForRemoval);
 
         #endregion
     }

@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Health;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -11,18 +12,27 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 {
     public class HealthRecordCreateFormViewModel:MvxViewModel<int>, IHealthRecordCreateFormViewModel, INotifyDataErrorInfo
     {
+        private readonly IDateConverterService _dateConverterService;
+        private readonly IHealthService _healthService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IHealthRecordValidation _recordValidation = new HealthRecordValidation();
+        private int _animalId;
+        private string _diagnosis = string.Empty;
+        private string _outcome = string.Empty;
+
+
+        private DateTime _recordDate = DateTime.Now;
+        private string _treatment = string.Empty;
+
         #region Constructor
 
-        public HealthRecordCreateFormViewModel( IHealthRecordStore healthRecordStore, ModalNavigationStore modalNavigationStore, IHealthRecordValidation recordValidation,
-            IDateConverterService dateConverterService )
+        public HealthRecordCreateFormViewModel( IHealthService healthService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
         {
-            _healthRecordStore = healthRecordStore;
+            _healthService = healthService;
             _modalNavigationStore = modalNavigationStore;
-            _recordValidation = recordValidation;
             _dateConverterService = dateConverterService;
-            _recordValidation.Errors.Clear();
 
-            recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
 
             // Initialize commands once so that RaiseCanExecuteChanged works as expected
             SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
@@ -31,24 +41,6 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #endregion
 
-        #region INotifyDataErrorInfo Implementation
-
-        public IEnumerable GetErrors( string? propertyName )
-        {
-            return _recordValidation.GetErrors(propertyName);
-        }
-
-        public bool HasErrors => _recordValidation.HasErrors;
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-
-        private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
-        {
-            ErrorsChanged?.Invoke(this, e);
-            RaisePropertyChanged(nameof(HasErrors));
-            SubmitRecordCommand.RaiseCanExecuteChanged();
-        }
-
-        #endregion
 
         #region ViewModel Life-Cycle
 
@@ -65,17 +57,19 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
 
         #endregion
 
-        #region Fields
+        #region INotifyDataErrorInfo Implementation
 
-        private DateTime _recordDate;
-        private string _diagnosis = string.Empty;
-        private string _treatment = string.Empty;
-        private string _outcome = string.Empty;
-        private int _animalId;
-        private readonly IHealthRecordStore _healthRecordStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IHealthRecordValidation _recordValidation;
-        private readonly IDateConverterService _dateConverterService;
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
+
+        public bool HasErrors => _recordValidation.HasErrors;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
+        private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
+        {
+            ErrorsChanged?.Invoke(this, e);
+            RaisePropertyChanged(nameof(HasErrors));
+            SubmitRecordCommand.RaiseCanExecuteChanged();
+        }
 
         #endregion
 
@@ -151,7 +145,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
         private async Task ExecuteSubmitRecord()
         {
             HealthRecord record = GetHealthRecordFromFields();
-            await _healthRecordStore.Create(record);
+            await _healthService.CreateHealthRecordAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -160,10 +154,7 @@ namespace PiggsCare.Core.ViewModels.HealthRecords
             _modalNavigationStore.Close();
         }
 
-        private HealthRecord GetHealthRecordFromFields()
-        {
-            return new HealthRecord(1, _animalId, _dateConverterService.GetDateOnly(RecordDate), _diagnosis, _treatment, _outcome);
-        }
+        private HealthRecord GetHealthRecordFromFields() => new(1, _animalId, _dateConverterService.GetDateOnly(RecordDate), _diagnosis, _treatment, _outcome);
 
         #endregion
     }

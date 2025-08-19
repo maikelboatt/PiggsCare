@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Farrowing;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -11,15 +12,42 @@ namespace PiggsCare.Core.ViewModels.Farrowing
 {
     public class FarrowingCreateFormViewModel:MvxViewModel<int>, IFarrowingCreateFormViewModel, INotifyDataErrorInfo
     {
-        #region INotifyDataErrorInfo Implementation
+        private readonly IDateConverterService _dateConverterService;
 
-        public IEnumerable GetErrors( string? propertyName )
+        private readonly IFarrowingService _farrowingService;
+        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly IFarrowRecordValidation _recordValidation = new FarrowRecordValidation();
+        private string _birthStatus = string.Empty;
+        private int _bornAlive;
+        private int _bornDead;
+
+        private int _breedingEventId;
+        private DateTime _farrowDate = DateTime.Now;
+        private int _litterSize;
+        private int _mummified;
+
+
+        #region Constructor
+
+        public FarrowingCreateFormViewModel( IFarrowingService farrowingService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
         {
-            return _recordValidation.GetErrors(propertyName);
+            _farrowingService = farrowingService;
+            _modalNavigationStore = modalNavigationStore;
+            _dateConverterService = dateConverterService;
+
+            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+
+            // Initialize commands once so that RaiseCanExecuteChanged works as expected
+            SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+            CancelRecordCommand = new MvxCommand(ExecuteCancelCommand);
         }
 
-        public bool HasErrors => _recordValidation.HasErrors;
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+        private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
+        {
+            ErrorsChanged?.Invoke(this, e);
+            RaisePropertyChanged(nameof(HasErrors));
+            SubmitRecordCommand.RaiseCanExecuteChanged();
+        }
 
         #endregion
 
@@ -38,32 +66,15 @@ namespace PiggsCare.Core.ViewModels.Farrowing
 
         #endregion
 
-        #region Constructor
+        #region INotifyDataErrorInfo Implementation
 
-        public FarrowingCreateFormViewModel( IFarrowingStore farrowingStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
-            IFarrowRecordValidation recordValidation )
-        {
-            _farrowingStore = farrowingStore;
-            _modalNavigationStore = modalNavigationStore;
-            _dateConverterService = dateConverterService;
-            _recordValidation = recordValidation;
-            _recordValidation.Errors.Clear();
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
-            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
-
-            // Initialize commands once so that RaiseCanExecuteChanged works as expected
-            SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
-            CancelRecordCommand = new MvxCommand(ExecuteCancelCommand);
-        }
-
-        private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
-        {
-            ErrorsChanged?.Invoke(this, e);
-            RaisePropertyChanged(nameof(HasErrors));
-            SubmitRecordCommand.RaiseCanExecuteChanged();
-        }
+        public bool HasErrors => _recordValidation.HasErrors;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         #endregion
+
 
         #region Properties
 
@@ -142,26 +153,10 @@ namespace PiggsCare.Core.ViewModels.Farrowing
             }
         }
 
-        public BirthStatus[] BirthStatusCollection => Enum.GetValues<BirthStatus>().ToArray();
+        public BirthStatus[] BirthStatusCollection => Enum.GetValues<BirthStatus>();
 
         #endregion
 
-        #region Fields
-
-        private readonly IFarrowingStore _farrowingStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IDateConverterService _dateConverterService;
-        private readonly IFarrowRecordValidation _recordValidation;
-
-        private int _breedingEventId;
-        private string _birthStatus = string.Empty;
-        private DateTime _farrowDate;
-        private int _litterSize;
-        private int _bornAlive;
-        private int _bornDead;
-        private int _mummified;
-
-        #endregion
 
         #region Commands
 
@@ -183,7 +178,7 @@ namespace PiggsCare.Core.ViewModels.Farrowing
         private async Task ExecuteSubmitRecord()
         {
             FarrowEvent record = GetFarrowFromFields();
-            await _farrowingStore.Create(record);
+            await _farrowingService.CreateFarrowingAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -193,10 +188,7 @@ namespace PiggsCare.Core.ViewModels.Farrowing
             _modalNavigationStore.Close();
         }
 
-        private FarrowEvent GetFarrowFromFields()
-        {
-            return new FarrowEvent(1, _breedingEventId, _dateConverterService.GetDateOnly(FarrowDate), LitterSize, BornAlive, BornDead, Mummified);
-        }
+        private FarrowEvent GetFarrowFromFields() => new(1, _breedingEventId, _dateConverterService.GetDateOnly(FarrowDate), LitterSize, BornAlive, BornDead, Mummified);
 
         #endregion
     }

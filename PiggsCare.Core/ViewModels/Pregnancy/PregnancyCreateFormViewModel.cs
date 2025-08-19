@@ -1,9 +1,10 @@
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores;
+using PiggsCare.Business.Services.Pregnancy;
 using PiggsCare.Core.Validation;
 using PiggsCare.Domain.Models;
-using PiggsCare.Domain.Services;
+using PiggsCare.Infrastructure.Services;
 using System.Collections;
 using System.ComponentModel;
 
@@ -11,15 +12,37 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 {
     public class PregnancyCreateFormViewModel:MvxViewModel<int>, IPregnancyCreateFormViewModel, INotifyDataErrorInfo
     {
-        #region INotifyDataErrorInfo Implementation
+        private readonly IDateConverterService _dateConverterService;
+        private readonly ModalNavigationStore _modalNavigationStore;
 
-        public IEnumerable GetErrors( string? propertyName )
+
+        private readonly IPregnancyService _pregnancyService;
+        private readonly IPregnancyRecordValidation _recordValidation = new PregnancyRecordValidation();
+        private int _breedingEventId;
+        private DateTime _scanDate = DateTime.Now;
+        private string _scanResults = string.Empty;
+
+        #region Constructor
+
+        public PregnancyCreateFormViewModel( IPregnancyService pregnancyService, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService )
         {
-            return _recordValidation.GetErrors(propertyName);
+            _pregnancyService = pregnancyService;
+            _modalNavigationStore = modalNavigationStore;
+            _dateConverterService = dateConverterService;
+
+            _recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
+
+            // Initialize commands once so that RaiseCanExecuteChanged works as expected
+            SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
+            CancelRecordCommand = new MvxCommand(ExecuteCancelCommand);
         }
 
-        public bool HasErrors => _recordValidation.HasErrors;
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+        private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
+        {
+            ErrorsChanged?.Invoke(this, e);
+            RaisePropertyChanged(nameof(HasErrors));
+            SubmitRecordCommand.RaiseCanExecuteChanged();
+        }
 
         #endregion
 
@@ -38,43 +61,15 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
 
         #endregion
 
-        #region Constructor
+        #region INotifyDataErrorInfo Implementation
 
-        public PregnancyCreateFormViewModel( IPregnancyStore pregnancyStore, ModalNavigationStore modalNavigationStore, IDateConverterService dateConverterService,
-            IPregnancyRecordValidation recordValidation )
-        {
-            _pregnancyStore = pregnancyStore;
-            _modalNavigationStore = modalNavigationStore;
-            _dateConverterService = dateConverterService;
-            _recordValidation = recordValidation;
+        public IEnumerable GetErrors( string? propertyName ) => _recordValidation.GetErrors(propertyName);
 
-            recordValidation.ErrorsChanged += RecordValidationOnErrorsChanged;
-
-            // Initialize commands once so that RaiseCanExecuteChanged works as expected
-            SubmitRecordCommand = new MvxAsyncCommand(ExecuteSubmitRecord, CanSubmitRecord);
-            CancelRecordCommand = new MvxCommand(ExecuteCancelCommand);
-        }
-
-        private void RecordValidationOnErrorsChanged( object? sender, DataErrorsChangedEventArgs e )
-        {
-            ErrorsChanged?.Invoke(this, e);
-            RaisePropertyChanged(nameof(HasErrors));
-            SubmitRecordCommand.RaiseCanExecuteChanged();
-        }
+        public bool HasErrors => _recordValidation.HasErrors;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         #endregion
 
-        #region Fields
-
-        private readonly IPregnancyStore _pregnancyStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly IDateConverterService _dateConverterService;
-        private readonly IPregnancyRecordValidation _recordValidation;
-        private int _breedingEventId;
-        private DateTime _scanDate;
-        private string _scanResults = string.Empty;
-
-        #endregion
 
         #region Properties
 
@@ -125,7 +120,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
         private async Task ExecuteSubmitRecord()
         {
             PregnancyScan record = GetPregnancyScanFromFields();
-            await _pregnancyStore.Create(record);
+            await _pregnancyService.CreatePregnancyScanAsync(record);
             _modalNavigationStore.Close();
         }
 
@@ -134,10 +129,7 @@ namespace PiggsCare.Core.ViewModels.Pregnancy
             _modalNavigationStore.Close();
         }
 
-        private PregnancyScan GetPregnancyScanFromFields()
-        {
-            return new PregnancyScan(1, _breedingEventId, _dateConverterService.GetDateOnly(ScanDate), ScanResults);
-        }
+        private PregnancyScan GetPregnancyScanFromFields() => new(1, _breedingEventId, _dateConverterService.GetDateOnly(ScanDate), ScanResults);
 
         #endregion
     }

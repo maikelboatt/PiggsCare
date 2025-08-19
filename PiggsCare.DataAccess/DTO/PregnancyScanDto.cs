@@ -7,7 +7,5 @@ namespace PiggsCare.DataAccess.DTO
         public required DateTime ScanDate { get; set; }
         public required string ScanResults { get; set; }
 
-        // // Navigation property
-        // public BreedingEventDto BreedingEventDto { get; set; }
     }
 }

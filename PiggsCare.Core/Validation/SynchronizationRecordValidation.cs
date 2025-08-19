@@ -95,7 +95,7 @@ namespace PiggsCare.Core.Validation
                 case nameof(SynchronizationEvent.BatchNumber):
                 case nameof(SynchronizationEvent.SynchronizationProtocol):
                 case nameof(SynchronizationEvent.Comments):
-                    ValidateStringProperty((string)value, propertyName, "Field cannot be empty", 3, 30);
+                    ValidateStringProperty((string)value, propertyName, "Field cannot be empty", 3);
                     break;
             }
         }
@@ -109,7 +109,7 @@ namespace PiggsCare.Core.Validation
             //     AddError(propertyName, "Record date cannot be greater than the current date.");
         }
 
-        private void ValidateStringProperty( string value, string propertyName, string errorMessage, int minLength, int maxLength )
+        private void ValidateStringProperty( string value, string propertyName, string errorMessage, int minLength )
         {
             ClearError(propertyName);
             if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
@@ -117,9 +117,9 @@ namespace PiggsCare.Core.Validation
                 AddError(propertyName, errorMessage);
             }
 
-            else if (value.Length < minLength || value.Length > maxLength)
+            else if (value.Length < minLength)
             {
-                AddError(propertyName, $"{propertyName} has to be between {minLength} and {maxLength}.");
+                AddError(propertyName, $"{propertyName} has to be less than {minLength}.");
             }
         }
 

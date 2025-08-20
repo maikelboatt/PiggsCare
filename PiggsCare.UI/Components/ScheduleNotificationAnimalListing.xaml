@@ -38,15 +38,27 @@
                 </Grid.RowDefinitions>
 
 
-                <Button Grid.Row="0"
-                        Width="100"
-                        Margin="10,0"
-                        HorizontalAlignment="Right"
-                        Command="{Binding ApproveInseminationCommand}"
-                        IsDefault="True"
-                        Style="{DynamicResource CreateBtn}">
-                    <iconPacks:PackIconMaterial Kind="CloudCheckVariantOutline" Style="{StaticResource IconButtonIcon}" />
-                </Button>
+                <Grid Grid.Row="0">
+
+                    <Button Width="100"
+                            HorizontalAlignment="Left"
+                            Command="{Binding PowerOffCommand}"
+                            Style="{DynamicResource DelBtn}">
+                        <iconPacks:PackIconMaterial Kind="Power" Style="{StaticResource IconButtonIcon}" />
+                    </Button>
+
+                    <Button Width="100"
+                            Margin="10,0"
+                            HorizontalAlignment="Right"
+                            Command="{Binding ApproveInseminationCommand}"
+                            IsDefault="True"
+                            Style="{DynamicResource CreateBtn}"
+                            ToolTip="Approve Insemination">
+                        <iconPacks:PackIconMaterial Kind="CloudCheckVariantOutline" Style="{StaticResource IconButtonIcon}" />
+                    </Button>
+
+
+                </Grid>
 
                 <DataGrid Grid.Row="1"
                           Background="{DynamicResource SecondaryBackgroundColor}"

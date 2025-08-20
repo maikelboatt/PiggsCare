@@ -45,7 +45,7 @@ namespace PiggsCare.Core.ViewModels.Notifications
 
             // Initialize Commands
             ApproveInseminationCommand = new MvxAsyncCommand(ExecuteApproveInsemination);
-
+            PowerOffCommand = new MvxCommand(ExecutePowerOff);
         }
 
         private MvxObservableCollection<Animal> _animals => new(_scheduleNotificationAnimalStore.Animals);
@@ -59,7 +59,10 @@ namespace PiggsCare.Core.ViewModels.Notifications
             set => SetProperty(ref _isLoading, value);
         }
 
+
         public IMvxAsyncCommand ApproveInseminationCommand { get; }
+
+        public IMvxCommand PowerOffCommand { get; }
 
         public override async Task Initialize()
         {
@@ -81,6 +84,12 @@ namespace PiggsCare.Core.ViewModels.Notifications
             }
             InformUserOfStatus();
             _modalNavigationStore.Close();
+        }
+
+        private void ExecutePowerOff()
+        {
+            _modalNavigationStore.Close();
+
         }
 
         private void InformUserOfStatus()

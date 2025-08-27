@@ -1,105 +1,73 @@
-using LiveCharts;
-using LiveCharts.Defaults;
-using LiveCharts.Wpf;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 using MvvmCross.ViewModels;
-using PiggsCare.Core.Stores;
+using PiggsCare.ApplicationState.Stores.ScheduledNotifications;
+using PiggsCare.Business.Services.Reports;
+using PiggsCare.Core.Control;
 using PiggsCare.Domain.Models;
-using System.Collections.ObjectModel;
 
 namespace PiggsCare.Core.ViewModels
 {
-    public class DashboardViewModel( IAnimalStore animalStore ):MvxViewModel
+    public class DashboardViewModel:MvxViewModel
     {
-        private double _female;
-        private IChartValues _femaleValues;
-
+        private readonly IModalNavigationControl _modalNavigationControl;
+        private readonly IReportService _reportService;
+        private readonly IScheduledNotificationStore _scheduledNotificationStore;
+        private IEnumerable<Animal> _animals;
         private bool _isLoading;
-        private double _male;
-        private IChartValues _maleValues;
+
+        /// <summary>
+        ///     Stores the chart series data.
+        /// </summary>
+        private ISeries[] _series;
+
+        public DashboardViewModel( IReportService reportService, IScheduledNotificationStore scheduledNotificationStore, IModalNavigationControl modalNavigationControl )
+        {
+            _reportService = reportService;
+            _scheduledNotificationStore = scheduledNotificationStore;
+            _modalNavigationControl = modalNavigationControl;
+
+        }
+
         public bool IsLoading
         {
             get => _isLoading;
             set => SetProperty(ref _isLoading, value);
         }
 
-        public Func<ChartPoint, string> PointLabel { get; set; }
-        public SeriesCollection SeriesCollection { get; set; }
-        public ObservableCollection<string> Labels { get; set; }
-
-        public IChartValues FemaleValues
+        /// <summary>
+        ///     Gets or sets the chart series data.
+        /// </summary>
+        public ISeries[] Series
         {
-            get
-            {
-                ObservableValue count = new(_female);
-                return new ChartValues<ObservableValue>([count]);
-            }
-            set => SetProperty(ref _femaleValues, value);
-        }
-        public IChartValues MaleValues
-        {
-            get
-            {
-                ObservableValue count = new(_male);
-                return new ChartValues<ObservableValue>([count]);
-            }
-            set => SetProperty(ref _maleValues, value);
-        }
-
-        public override void Prepare()
-        {
-            SetupPieChart();
-            SetupBarChart();
-            base.Prepare();
-        }
-
-        private void SetupPieChart()
-        {
-
-            PointLabel = point => $"{point.Y} ({point.Participation:P})";
-        }
-
-        private void SetupBarChart()
-        {
-
-            SeriesCollection =
-            [
-                new ColumnSeries
-                {
-                    Title = "2015",
-                    Values = new ChartValues<double> { _female, 50, 39, 50 }
-                },
-
-                new ColumnSeries
-                {
-                    Title = "2016",
-                    Values = new ChartValues<double> { _male, 56, 42, 48 }
-                }
-            ];
-
-            Labels = ["Jan", "Feb", "March", "April", "May"];
+            get => _series;
+            set => SetProperty(ref _series, value);
         }
 
         public override async Task Initialize()
         {
-            await LoadAnimalDetails();
+            _animals = await _reportService.LoadAnimalsFromDatabase() ?? [];
+            UpdateSeries();
             await base.Initialize();
         }
 
-        private async Task LoadAnimalDetails()
+        private void UpdateSeries()
         {
             IsLoading = true;
+
             try
             {
-                await animalStore.Load();
-                IEnumerable<Animal> animal = animalStore.Animals;
-                Animal[] enumerable = animal as Animal[] ?? animal.ToArray();
-                _male = enumerable.Count(pig => pig.Gender == "Male");
-                _female = enumerable.Count(pig => pig.Gender == "Female");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                Series = _animals.GroupBy(a => a.Gender)
+                                 .Select(g => new ColumnSeries<int>
+                                 {
+                                     Values =
+                                     [
+                                         g.Count()
+                                     ],
+                                     Name = g.Key
+                                 })
+                                 .Cast<ISeries>()
+                                 .ToArray();
             }
             finally
             {

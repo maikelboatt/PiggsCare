@@ -21,6 +21,7 @@
             <resources:NullToBoolConverter x:Key="NullToBoolConverter" />
             <resources:EnumToBooleanConverter x:Key="EnumToBoolConverter" />
             <resources:RadioButtonConverter x:Key="RadioButtonConverter" />
+            <resources:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
             <resources:ErrorConverter x:Key="ErrorConverter" />
         </ResourceDictionary>
     </views:MvxApplication.Resources>

@@ -10,6 +10,9 @@ namespace PiggsCare.Core.ViewModels
         private readonly ModalNavigationStore _modalNavigationStore;
         private readonly IViewModelFactory _viewModelFactory;
         private MvxViewModel? _currentViewModel;
+        private int _unreadNotifications = 1;
+
+        private int _unreadReminders = 7;
 
         public ShellViewModel( ModalNavigationStore modalNavigationStore, IViewModelFactory viewModelFactory )
         {
@@ -23,6 +26,18 @@ namespace PiggsCare.Core.ViewModels
 
             modalNavigationStore.CurrentModalViewModelChanged += ModalNavigationStoreOnCurrentModalViewModelChanged;
 
+        }
+
+        public int UnreadNotifications
+        {
+            get => _unreadNotifications;
+            set => SetProperty(ref _unreadNotifications, value);
+        }
+
+        public int UnreadReminders
+        {
+            get => _unreadReminders;
+            set => SetProperty(ref _unreadReminders, value);
         }
 
         public override Task Initialize()
@@ -58,6 +73,7 @@ namespace PiggsCare.Core.ViewModels
             ReminderViewModel? viewModel = _viewModelFactory.CreateViewModel<ReminderViewModel>();
             CurrentViewModel = viewModel;
             viewModel?.Initialize();
+            UnreadReminders = 1;
         }
 
         private void ShowNotificationView()
@@ -66,6 +82,7 @@ namespace PiggsCare.Core.ViewModels
             CurrentViewModel = viewmodel;
             viewmodel?.Prepare();
             viewmodel?.Initialize();
+            UnreadNotifications = 0;
         }
 
 
@@ -82,6 +99,7 @@ namespace PiggsCare.Core.ViewModels
             get => _currentViewModel;
             set => SetProperty(ref _currentViewModel, value);
         }
+
 
         public bool IsModalOpen => _modalNavigationStore.CurrentModalViewModel != null;
         public MvxViewModel? CurrentModalViewModel => _modalNavigationStore?.CurrentModalViewModel;

@@ -11,6 +11,7 @@
                   xmlns:farrowEventViewModel="clr-namespace:PiggsCare.Core.ViewModels.Farrowing;assembly=PiggsCare.Core"
                   xmlns:healthRecordViewModel="clr-namespace:PiggsCare.Core.ViewModels.HealthRecords;assembly=PiggsCare.Core"
                   xmlns:healthRecordsForm="clr-namespace:PiggsCare.UI.Forms.HealthRecords"
+                  xmlns:helpers="clr-namespace:PiggsCare.UI.Helpers"
                   xmlns:local="clr-namespace:PiggsCare.UI.Views"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:modalDialogControl="clr-namespace:ModalDialogControl;assembly=ModalDialogControl"
@@ -33,6 +34,7 @@
                   mc:Ignorable="d">
 
     <views:MvxWpfView.Resources>
+
         <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
             <local:HomeView />
         </DataTemplate>
@@ -289,6 +291,8 @@
                                              Tag="{DynamicResource Collections}" />
 
                                 <RadioButton Margin="0,1,0,1"
+                                             helpers:BadgeHelper.BadgeCount="{Binding UnreadReminders}"
+                                             helpers:BadgeHelper.ShowBadge="True"
                                              Command="{Binding NavigateToReminders}"
                                              Content="Reminders"
                                              Style="{DynamicResource MenuRadioButtonStyle}"
@@ -298,13 +302,14 @@
                                 <Separator Margin="20,20" Background="{DynamicResource TertiaryBackgroundColor}" />
 
                                 <RadioButton Margin="0,1,0,1"
+                                             helpers:BadgeHelper.BadgeCount="{Binding UnreadNotifications}"
+                                             helpers:BadgeHelper.ShowBadge="True"
                                              Command="{Binding NavigateToNotifications}"
                                              Content="Notifications"
                                              Style="{DynamicResource MenuRadioButtonStyle}"
                                              Tag="{DynamicResource Notifications}" />
-
                             </StackPanel>
-                            <!--  End Navigation Buttons  -->
+                            <!--  E Navigation Buttons  -->
 
                             <!--  Start Theme Switcher  -->
                             <Path Grid.Row="2"

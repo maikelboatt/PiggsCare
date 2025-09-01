@@ -46,33 +46,32 @@ namespace PiggsCare.Core.ViewModels
 
         public override async Task Initialize()
         {
-            _animals = await _reportService.LoadAnimalsFromDatabase() ?? [];
-            UpdateSeries();
-            await base.Initialize();
-        }
-
-        private void UpdateSeries()
-        {
             IsLoading = true;
-
             try
             {
-                Series = _animals.GroupBy(a => a.Gender)
-                                 .Select(g => new ColumnSeries<int>
-                                 {
-                                     Values =
-                                     [
-                                         g.Count()
-                                     ],
-                                     Name = g.Key
-                                 })
-                                 .Cast<ISeries>()
-                                 .ToArray();
+                _animals = await _reportService.LoadAnimalsFromDatabase() ?? [];
+                UpdateSeries();
             }
             finally
             {
                 IsLoading = false;
             }
+            await base.Initialize();
+        }
+
+        private void UpdateSeries()
+        {
+            Series = _animals.GroupBy(a => a.Gender)
+                             .Select(g => new PieSeries<int>
+                             {
+                                 Values =
+                                 [
+                                     g.Count()
+                                 ],
+                                 Name = g.Key
+                             })
+                             .Cast<ISeries>()
+                             .ToArray();
         }
     }
 }

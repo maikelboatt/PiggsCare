@@ -129,7 +129,6 @@
                                     <iconPacks:PackIconMaterial Kind="Power" Style="{StaticResource IconButtonIcon}" />
                                 </Button>
 
-
                             </StackPanel>
                             <!--  End Navigation Buttons  -->
 
@@ -144,7 +143,6 @@
                             <RowDefinition Height="60" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-
 
                         <ContentControl Grid.Row="1"
                                         Margin="10"

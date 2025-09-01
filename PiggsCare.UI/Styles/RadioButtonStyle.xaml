@@ -1,4 +1,6 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:helpers="clr-namespace:PiggsCare.UI.Helpers">
     <!--  Start: VerticalMenuStyle  -->
     <Style x:Key="MenuRadioButtonStyle" TargetType="{x:Type RadioButton}">
         <Setter Property="Background" Value="Transparent" />
@@ -6,6 +8,7 @@
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="Height" Value="48" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RadioButton}">
@@ -18,7 +21,7 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
-                            <!--  Selected  -->
+                            <!--  Selected Highlight  -->
                             <Border x:Name="btnSelected"
                                     Grid.ColumnSpan="2"
                                     Width="225"
@@ -26,7 +29,7 @@
                                     CornerRadius="10" />
 
                             <!--  Indicator  -->
-                            <Rectangle Name="Indicator"
+                            <Rectangle x:Name="Indicator"
                                        Width="6"
                                        Height="25"
                                        HorizontalAlignment="Left"
@@ -40,47 +43,83 @@
                                 </Rectangle.Effect>
                             </Rectangle>
 
-                            <!--  Icon  -->
-                            <Path x:Name="Icon"
-                                  Width="24"
-                                  Height="24"
-                                  Margin="0,0,5,0"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Center"
-                                  Data="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}}"
-                                  Fill="{DynamicResource PrimaryTextColor}"
-                                  Stretch="None" />
+                            <!--  Icon + Badge  -->
+                            <Canvas Width="24"
+                                    Height="24"
+                                    Margin="0,0,5,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center">
+
+                                <!--  Icon  -->
+                                <Path x:Name="Icon"
+                                      Width="24"
+                                      Height="24"
+                                      Data="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}}"
+                                      Fill="{DynamicResource PrimaryTextColor}"
+                                      Stretch="None" />
+
+                                <!--  Badge  -->
+                                <Border x:Name="Badge"
+                                        Canvas.Left="12"
+                                        Canvas.Top="-6"
+                                        Width="16"
+                                        Height="16"
+                                        Background="Red"
+                                        CornerRadius="10"
+                                        Visibility="Collapsed">
+                                    <TextBlock HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontSize="10"
+                                               Foreground="White"
+                                               Text="{Binding Path=(helpers:BadgeHelper.BadgeCount), RelativeSource={RelativeSource AncestorType=RadioButton}}" />
+                                </Border>
+                            </Canvas>
 
                             <!--  Text  -->
-                            <TextBlock x:Name="txtName"
-                                       Grid.Column="1"
-                                       Margin="12,0,0,0"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center"
-                                       FontSize="{TemplateBinding FontSize}"
-                                       FontWeight="{TemplateBinding FontWeight}"
-                                       Foreground="{TemplateBinding Foreground}"
-                                       Text="{TemplateBinding Content}" />
+                            <ContentPresenter Grid.Column="1"
+                                              Margin="12,0,0,0"
+                                              VerticalAlignment="Center"
+                                              ContentSource="Content"
+                                              RecognizesAccessKey="True"
+                                              TextBlock.FontSize="{TemplateBinding FontSize}"
+                                              TextBlock.FontWeight="{TemplateBinding FontWeight}"
+                                              TextBlock.Foreground="{TemplateBinding Foreground}" />
                         </Grid>
                     </Border>
+
+                    <!--  Triggers  -->
                     <ControlTemplate.Triggers>
+                        <!--  Hover  -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="txtName" Property="Foreground" Value="{DynamicResource SecondaryTextColor}" />
                             <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource SecondaryTextColor}" />
                             <Setter TargetName="btnSelected" Property="Background" Value="{DynamicResource TertiaryBackgroundColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextColor}" />
                         </Trigger>
+
+                        <!--  Checked  -->
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource TertiaryTextColor}" />
                             <Setter TargetName="Indicator" Property="Fill" Value="{DynamicResource SecondaryBlueColor}" />
                             <Setter TargetName="btnSelected" Property="Background" Value="{DynamicResource TertiaryBackgroundColor}" />
-                            <Setter TargetName="txtName" Property="Foreground" Value="{DynamicResource TertiaryTextColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TertiaryTextColor}" />
+                        </Trigger>
+
+                        <!--  Show badge if flagged  -->
+                        <Trigger Property="helpers:BadgeHelper.ShowBadge" Value="True">
+                            <Setter TargetName="Badge" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
+                        <!--  Hide badge if count = 0  -->
+                        <Trigger Property="helpers:BadgeHelper.BadgeCount" Value="0">
+                            <Setter TargetName="Badge" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    <!--  End: VerticalMenuStyle  -->
+
+    <!--  VerticalMenuStyle  -->
 
     <!--  Start: SecondaryRadioButton  -->
     <Style x:Key="SecondaryMenuButton" TargetType="{x:Type TextBlock}">
@@ -205,3 +244,127 @@
     </Style>
     <!--  End: ToggleButtonStyle  -->
 </ResourceDictionary>
+
+<!-- <Style x:Key="MenuRadioButtonStyle" TargetType="{x:Type RadioButton}"> -->
+<!--        <Setter Property="Background" Value="Transparent" /> -->
+<!--        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}" /> -->
+<!--        <Setter Property="FontWeight" Value="Medium" /> -->
+<!--        <Setter Property="FontSize" Value="15" /> -->
+<!--        <Setter Property="Height" Value="48" /> -->
+<!--        <Setter Property="OverridesDefaultStyle" Value="True" /> -->
+<!--        <Setter Property="Template"> -->
+<!--            <Setter.Value> -->
+<!--                <ControlTemplate TargetType="{x:Type RadioButton}"> -->
+<!--  <Border x:Name="menuButton"  -->
+<!--  Background="{TemplateBinding Background}"  -->
+<!--  BorderThickness="{TemplateBinding BorderThickness}">  -->
+<!--                        <Grid> -->
+<!--                            <Grid.ColumnDefinitions> -->
+<!--                                <ColumnDefinition Width="45" /> -->
+<!--                                <ColumnDefinition /> -->
+<!--                            </Grid.ColumnDefinitions> -->
+<!--    -->
+<!--  ~1~  Selected Highlight  @1@  -->
+<!--  <Border x:Name="btnSelected"  -->
+<!--  Grid.ColumnSpan="2"  -->
+<!--  Width="225"  -->
+<!--  HorizontalAlignment="Right"  -->
+<!--  CornerRadius="10" />  -->
+<!--    -->
+<!--  ~1~  Indicator  @1@  -->
+<!--  <Rectangle Name="Indicator"  -->
+<!--  Width="6"  -->
+<!--  Height="25"  -->
+<!--  HorizontalAlignment="Left"  -->
+<!--  VerticalAlignment="Center"  -->
+<!--  RadiusX="3"  -->
+<!--  RadiusY="3">  -->
+<!--                                <Rectangle.Effect> -->
+<!--  <DropShadowEffect Direction="0"  -->
+<!--  ShadowDepth="3"  -->
+<!--  Color="#5B8DEF" />  -->
+<!--                                </Rectangle.Effect> -->
+<!--                            </Rectangle> -->
+<!--    -->
+<!--  ~1~  Icon + Badge in Canvas  @1@  -->
+<!--  <Canvas Width="24"  -->
+<!--  Height="24"  -->
+<!--  Margin="0,0,5,0"  -->
+<!--  HorizontalAlignment="Right"  -->
+<!--  VerticalAlignment="Center">  -->
+<!--    -->
+<!--  ~1~  Icon  @1@  -->
+<!--  <Path x:Name="Icon"  -->
+<!--  Width="24"  -->
+<!--  Height="24"  -->
+<!--  Data="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}}"  -->
+<!--  Fill="{DynamicResource PrimaryTextColor}"  -->
+<!--  Stretch="None" />  -->
+<!--    -->
+<!--  ~1~  Badge  @1@  -->
+<!--  <Border x:Name="Badge"  -->
+<!--  Canvas.Left="12"  -->
+<!--  Canvas.Top="-6"  -->
+<!--  Width="16"  -->
+<!--  Height="16"  -->
+<!--  Background="Red"  -->
+<!--  CornerRadius="10"  -->
+<!--  Visibility="Collapsed">  -->
+<!--  <TextBlock HorizontalAlignment="Center"  -->
+<!--  VerticalAlignment="Center"  -->
+<!--  FontSize="10"  -->
+<!--  Foreground="White"  -->
+<!--  Text="{Binding RelativeSource={RelativeSource AncestorType=RadioButton}, Path=(helpers:BadgeHelper.BadgeCount)}" />  -->
+<!--                                </Border> -->
+<!--                            </Canvas> -->
+<!--    -->
+<!--  ~1~  Text (use ContentPresenter instead of TextBlock)  @1@  -->
+<!--  <ContentPresenter Grid.Column="1"  -->
+<!--  Margin="12,0,0,0"  -->
+<!--  VerticalAlignment="Center"  -->
+<!--  ContentSource="Content"  -->
+<!--  RecognizesAccessKey="True"  -->
+<!--  TextBlock.FontSize="{TemplateBinding FontSize}"  -->
+<!--  TextBlock.FontWeight="{TemplateBinding FontWeight}"  -->
+<!--  TextBlock.Foreground="{TemplateBinding Foreground}" />  -->
+<!--                        </Grid> -->
+<!--                    </Border> -->
+<!--    -->
+<!--  ~1~  Triggers  @1@  -->
+<!--                    <ControlTemplate.Triggers> -->
+<!--  ~1~  Hover  @1@  -->
+<!--                        <Trigger Property="IsMouseOver" Value="True"> -->
+<!--                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource SecondaryTextColor}" /> -->
+<!--                            <Setter TargetName="btnSelected" Property="Background" Value="{DynamicResource TertiaryBackgroundColor}" /> -->
+<!--                            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextColor}" /> -->
+<!--                        </Trigger> -->
+<!--    -->
+<!--  ~1~  Checked  @1@  -->
+<!--                        <Trigger Property="IsChecked" Value="True"> -->
+<!--                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource TertiaryTextColor}" /> -->
+<!--                            <Setter TargetName="Indicator" Property="Fill" Value="{DynamicResource SecondaryBlueColor}" /> -->
+<!--                            <Setter TargetName="btnSelected" Property="Background" Value="{DynamicResource TertiaryBackgroundColor}" /> -->
+<!--                            <Setter Property="Foreground" Value="{DynamicResource TertiaryTextColor}" /> -->
+<!--                        </Trigger> -->
+<!--    -->
+<!--  ~1~  Show badge only when flagged  @1@  -->
+<!--                        <MultiTrigger> -->
+<!--                            <MultiTrigger.Conditions> -->
+<!--                                <Condition Property="helpers:BadgeHelper.ShowBadge" Value="True" /> -->
+<!--                                <Condition Property="helpers:BadgeHelper.BadgeCount" Value="0" /> -->
+<!--                            </MultiTrigger.Conditions> -->
+<!--                            <Setter TargetName="Badge" Property="Visibility" Value="Collapsed" /> -->
+<!--                        </MultiTrigger> -->
+<!--    -->
+<!--                        <MultiTrigger> -->
+<!--                            <MultiTrigger.Conditions> -->
+<!--                                <Condition Property="helpers:BadgeHelper.ShowBadge" Value="True" /> -->
+<!--                            </MultiTrigger.Conditions> -->
+<!--                            <Setter TargetName="Badge" Property="Visibility" Value="Visible" /> -->
+<!--                        </MultiTrigger> -->
+<!--    -->
+<!--                    </ControlTemplate.Triggers> -->
+<!--                </ControlTemplate> -->
+<!--            </Setter.Value> -->
+<!--        </Setter> -->
+<!--    </Style> -->
